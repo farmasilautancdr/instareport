@@ -20,26 +20,42 @@
         .page { display: none; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* OVERLAY TO BLOCK INTERACTION DURING UPLOAD */
+        #uploadSpinner {
+            display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.4);
+            z-index: 20000; cursor: wait;
+        }
+
         .photo-slot { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 16px; background: #fff; margin-top: 8px; }
         .preview-box { width: 100%; height: 140px; border-radius: 12px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0; position: relative; }
         .preview-box img { width: 100%; height: 100%; object-fit: cover; }
         .audit-section { background: white; padding: 16px; border-radius: 24px; border: 1px solid #e2e8f0; margin-bottom: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         .score-box { position: sticky; bottom: 100px; background: #2563eb; color: white; padding: 16px; border-radius: 20px; text-align: center; font-weight: 900; z-index: 100; box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4); }
+        
         #supervisorBtn { position: fixed; bottom: 25px; right: 25px; width: 56px; height: 56px; background: white; color: var(--primary); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 9999; cursor: pointer; border: 2px solid #e2e8f0; }
         .menu-card { background: white; padding: 24px; border-radius: 28px; border: 1px solid #e2e8f0; text-align: center; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
         .menu-card:active { transform: scale(0.96); background: #f1f5f9; }
+        
         input[type="checkbox"] { width: 26px; height: 26px; border-radius: 8px; border: 2px solid #cbd5e1; appearance: none; cursor: pointer; transition: all 0.2s; position: relative; }
         input[type="checkbox"]:checked { background-color: #2563eb; border-color: #2563eb; }
         input[type="checkbox"]:checked::after { content: '\f00c'; font-family: "Font Awesome 6 Free"; font-weight: 900; color: white; font-size: 14px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
         .gallery-container { display: flex; overflow-x: auto; gap: 10px; padding: 5px 0; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
         .gallery-item { flex: 0 0 85%; scroll-snap-align: center; border-radius: 15px; overflow: hidden; border: 1px solid #eee; height: 200px; }
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         select, input, textarea { font-size: 16px !important; }
         .tab-btn.active { border-bottom: 3px solid #2563eb; color: #2563eb; }
+
+        /* BUTTON SPINNER */
+        .btn-loader { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; width: 20px; height: 20px; animation: spin 0.8s linear infinite; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="antialiased text-slate-900">
+
+    <div id="uploadSpinner"></div>
 
     <div id="successOverlay" class="hidden fixed inset-0 bg-white/95 z-[10000] flex flex-col items-center justify-center text-center">
         <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center text-white text-4xl shadow-xl animate-bounce"><i class="fas fa-check"></i></div>
@@ -127,7 +143,7 @@
         <div class="fixed bottom-0 left-0 right-0 p-5 bg-white/90 backdrop-blur-xl border-t z-50">
             <button onclick="submitReport()" id="submitBtn" class="w-full bg-blue-600 text-white font-black py-5 rounded-[2rem] shadow-xl flex items-center justify-center gap-3">
                 <span id="btnText">FINISH & UPLOAD</span>
-                <div id="mainLoader" class="loader"></div>
+                <div id="btnLoader" class="btn-loader"></div>
             </button>
         </div>
     </div>
@@ -165,6 +181,8 @@
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzgsyV3uymPOyKXx8KdwAe_TvNuMozuW5jIqzUX1YwHYf1Qn3I3_vu-FtvJUYPtm-c/exec";
         const AM_PASS = "AM2026", SUPER_PASS = "8899";
+        
+        let isAmAuthenticated = false;
 
         const regions = {
             "R1 - AMIRUL": ["DG", "DGD", "KMD", "KMN", "KMSK", "MR"],
@@ -178,7 +196,7 @@
             "R9 - IFFAH / RAIHAN": ["GM", "CK"]
         };
 
-        const allOutlets = ["AJ", "B6", "BB", "BJR", "BP", "CDR", "CK", "DG", "DGD", "GB", "GBD", "GM", "HL", "HQ", "HQCT", "JL", "JLD", "JTH", "KB", "KBKK", "KBKS", "KBTJ", "KKR", "KL", "KMD", "KMN", "KMSK", "KS", "MC", "MLR", "MR", "PC", "PK", "PM", "PP", "PPK", "PSPD", "PT", "RJ", "SLS", "SMR", "ST", "TM", "TMD", "TMT", "TPOH", "TPT", "WM"];
+        const allOutlets = ["AJ", "B6", "BB", "BJR", "BP", "CDR", "CK", "DG", "DGD", "GB", "GBD", "GM", "HL", "HQ", "HQCT", "JL", "JLD", "JTH", "KB", "KBKK", "KBKS", "KBTJ", "KKR", "KL", "KMD", "KMN", "KMSK", "KS", "MC", "MLR", "MR", "PC", "PK", "PM", "PP", "PPK", "PSPD", "PT", "RJ", "RP", "SLS", "SMR", "ST", "TM", "TMD", "TMT", "TPOH", "TPT", "WM"];
         const productsList = ["Mom & Baby", "Health Supplement", "Food Supplement", "OTC", "Personal Care", "Rehab", "Dressing", "Back Counter"];
         const planogramTasks = ["House Brand Products", "Focused Products 1", "Focused Products 2 & 3", "End Cap", "Store Layout", "Housekeeping", "Clear Price Tag", "Shelf Tags", "Pharmacist Tags", "Store Display", "Welcoming Board", "Updated Promo"];
         
@@ -210,6 +228,10 @@
         }
 
         function navTo(num) {
+            const superBtn = document.getElementById('supervisorBtn');
+            if (num === 1) superBtn.style.display = "flex";
+            else superBtn.style.display = "none";
+
             if(num === 2) {
                 if(!document.getElementById('staffName').value) return alert("Enter Name");
                 const role = document.getElementById('userRole').value;
@@ -225,7 +247,13 @@
         }
 
         function openCategory(cat) {
-            if(cat === 'AM' && prompt("Security: Enter AM PIN") !== AM_PASS) return;
+            if(cat === 'AM' && !isAmAuthenticated) {
+                if(prompt("Security: Enter AM PIN") === AM_PASS) {
+                    isAmAuthenticated = true;
+                } else {
+                    return;
+                }
+            }
             currentCat = cat;
             document.getElementById('catTitle').innerText = cat;
             navTo(3);
@@ -306,7 +334,7 @@
                 let h = `<div class="audit-section"><h4 class="text-blue-600 font-black text-[10px] mb-4 border-b pb-2 uppercase tracking-widest">${sec.title}</h4>`;
                 sec.items.forEach(item => {
                     if(item.header) {
-                        h += `<div class="mt-4 mb-2"><span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">${item.n}</span></div>`;
+                        h += `<div class="mt-4 mb-2"><span class="text-[10px] font-black text-slate-400 uppercase">${item.n}</span></div>`;
                     } else {
                         h += `<div class="py-3 border-b border-slate-50 last:border-0">
                                 <div class="flex justify-between items-center">
@@ -371,13 +399,19 @@
                     ctx.fillStyle = "rgba(0,0,0,0.6)"; ctx.fillRect(0, canvas.height-barH, canvas.width, barH);
                     ctx.fillStyle = "white"; ctx.font = "bold 32px sans-serif";
                     
+                    const role = document.getElementById('userRole').value;
                     const outlet = document.getElementById('outletName').value;
                     const name = document.getElementById('staffName').value;
                     const date = document.getElementById('reportDate').value;
                     const time = new Date().toLocaleTimeString();
                     
-                    // Unified timestamp for staff and AM portals
-                    const stamp = `${outlet} | ${name.toUpperCase()} | ${date} | ${time}`;
+                    // Logic: Enhanced Timestamps
+                    let stamp = "";
+                    if (role === "Area Manager") {
+                        stamp = `${outlet} - ${name.toUpperCase()} - ${date} - ${time}`;
+                    } else {
+                        stamp = `${outlet} | ${name.toUpperCase()} | ${date} | ${time}`;
+                    }
                     ctx.fillText(stamp, 30, canvas.height-(barH/2)+12);
                     
                     const prev = document.getElementById(`prev_${idx}`);
@@ -390,7 +424,11 @@
         }
 
         async function submitReport() {
-            const btn = document.getElementById('submitBtn'), loader = document.getElementById('mainLoader');
+            const btn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnLoader = document.getElementById('btnLoader');
+            const interactionBlocker = document.getElementById('uploadSpinner');
+
             const images = [], photoNames = [];
             document.querySelectorAll('img[id^="prev_"]:not(.hidden)').forEach((img, i) => {
                 images.push(img.src.split(',')[1]);
@@ -409,7 +447,12 @@
                 return alert("Photo evidence required.");
             }
 
-            btn.disabled = true; loader.style.display = "block";
+            // ACTIVATE LOADING STATE
+            interactionBlocker.style.display = "block";
+            btn.disabled = true;
+            btnText.style.display = "none";
+            btnLoader.style.display = "block";
+            
             let rem = "";
             if(currentTask === 'AUDIT FORM') {
                 const disc = Array.from({length:4}, (_,i) => document.getElementById('disc_'+i).value).join(" | ");
@@ -422,11 +465,30 @@
 
             try {
                 const r = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ staff: document.getElementById('staffName').value, outlet: document.getElementById('outletName').value, category: currentCat, task: currentTask, remarks: rem, staffTime: document.getElementById('reportDate').value, images, photoNames })});
-                if((await r.text()).includes("Success")) {
+                const result = await r.text();
+                
+                if(result.includes("Success")) {
                     document.getElementById('successOverlay').classList.remove('hidden');
-                    setTimeout(() => window.location.reload(), 2000);
+                    setTimeout(() => {
+                        document.getElementById('successOverlay').classList.add('hidden');
+                        interactionBlocker.style.display = "none";
+                        btnText.style.display = "block";
+                        btnLoader.style.display = "none";
+                        if (currentCat === 'AM') {
+                           openCategory('AM'); 
+                        } else {
+                           navTo(2); 
+                        }
+                        btn.disabled = false;
+                    }, 2000);
                 }
-            } catch(e) { alert("Network Error"); btn.disabled = false; loader.style.display="none"; }
+            } catch(e) { 
+                interactionBlocker.style.display = "none";
+                btnText.style.display = "block";
+                btnLoader.style.display = "none";
+                alert("Network Error"); 
+                btn.disabled = false; 
+            }
         }
 
         document.getElementById('supervisorBtn').onclick = () => {
@@ -467,7 +529,7 @@
             const q = document.getElementById('dashSearch').value.toLowerCase();
             const now = new Date();
             const filtered = allSubmissions.filter(s => {
-                const isCorrectTab = (currentTab === 'AM') ? s.category === 'AM' : s.category === currentTab;
+                const isCorrectTab = (currentTab === 'AM') ? (s.category === 'AM' || s.category === 'AREA MANAGER') : s.category === currentTab;
                 const matchSearch = s.staff.toLowerCase().includes(q) || s.outlet.toLowerCase().includes(q);
                 const sDate = new Date(s.staffTime);
                 let matchTime = true;
@@ -506,10 +568,8 @@
             window.open(SCRIPT_URL + queryParams);
         }
 
-        // PWA SERVICE WORKER REGISTRATION
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js')
-                .then(() => console.log("Service Worker Registered Successfully"));
+            navigator.serviceWorker.register('./sw.js').then(() => console.log("Service Worker Registered"));
         }
     </script>
 </body>
