@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>InstaReport Pro v11.5</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { --primary: #2563eb; --success: #16a34a; --bg: #f8fafc; }
+        body { 
+            background-color: var(--bg); 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+        .page { display: none; animation: fadeIn 0.3s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .photo-slot { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 16px; background: #fff; margin-top: 8px; }
+        .preview-box { width: 100%; height: 140px; border-radius: 12px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0; position: relative; }
+        .preview-box img { width: 100%; height: 100%; object-fit: cover; }
+        .audit-section { background: white; padding: 16px; border-radius: 24px; border: 1px solid #e2e8f0; margin-bottom: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .score-box { position: sticky; bottom: 100px; background: #2563eb; color: white; padding: 16px; border-radius: 20px; text-align: center; font-weight: 900; z-index: 100; box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4); }
+        #supervisorBtn { position: fixed; bottom: 25px; right: 25px; width: 56px; height: 56px; background: white; color: var(--primary); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 9999; cursor: pointer; border: 2px solid #e2e8f0; }
+        .menu-card { background: white; padding: 24px; border-radius: 28px; border: 1px solid #e2e8f0; text-align: center; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
+        .menu-card:active { transform: scale(0.96); background: #f1f5f9; }
+        input[type="checkbox"] { width: 26px; height: 26px; border-radius: 8px; border: 2px solid #cbd5e1; appearance: none; cursor: pointer; transition: all 0.2s; position: relative; }
+        input[type="checkbox"]:checked { background-color: #2563eb; border-color: #2563eb; }
+        input[type="checkbox"]:checked::after { content: '\f00c'; font-family: "Font Awesome 6 Free"; font-weight: 900; color: white; font-size: 14px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .gallery-container { display: flex; overflow-x: auto; gap: 10px; padding: 5px 0; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+        .gallery-item { flex: 0 0 85%; scroll-snap-align: center; border-radius: 15px; overflow: hidden; border: 1px solid #eee; height: 200px; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        select, input, textarea { font-size: 16px !important; }
+        .tab-btn.active { border-bottom: 3px solid #2563eb; color: #2563eb; }
+    </style>
+</head>
+<body class="antialiased text-slate-900">
+
+    <div id="successOverlay" class="hidden fixed inset-0 bg-white/95 z-[10000] flex flex-col items-center justify-center text-center">
+        <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center text-white text-4xl shadow-xl animate-bounce"><i class="fas fa-check"></i></div>
+        <h2 class="text-2xl font-black mt-6 tracking-tight uppercase px-6">Upload Successful</h2>
+    </div>
+
+    <div id="page1" class="page active min-h-screen p-6">
+        <header class="text-center mt-4 mb-10">
+            <h1 class="text-4xl font-black text-blue-600 tracking-tighter">InstaReport</h1>
+            <p class="text-slate-400 text-[10px] font-black tracking-[0.2em] uppercase mt-1">Enterprise Portal v11.5</p>
+        </header>
+
+        <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 space-y-6">
+            <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Access Role</label>
+                <select id="userRole" onchange="handleRoleChange()" class="w-full mt-1.5 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-slate-700">
+                    <option value="Staff">Staff Member</option>
+                    <option value="Area Manager">Area Manager (AM)</option>
+                </select>
+            </div>
+            <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
+                <input type="text" id="staffName" class="w-full mt-1.5 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold" placeholder="Required">
+            </div>
+            <div id="amRegionContainer" class="hidden">
+                <label class="text-[10px] font-black text-blue-400 uppercase tracking-widest ml-1">AM Region</label>
+                <select id="amRegion" onchange="updateOutletList()" class="w-full mt-1.5 p-4 bg-blue-50 border border-blue-100 rounded-2xl outline-none font-black text-blue-700">
+                    <option value="">Select Region...</option>
+                    <option value="R1">R1 - AMIRUL</option><option value="R2">R2 - HAZWANI</option>
+                    <option value="R3">R3 - HARIS</option><option value="R4">R4 - RAIHAN</option>
+                    <option value="R5">R5 - ADNIN</option><option value="R6">R6 - NADHIRAH</option>
+                    <option value="R7">R7 - HASANUL</option><option value="R8">R8 - HAFSHAM</option>
+                    <option value="R9">R9 - IFFAH / RAIHAN</option>
+                </select>
+            </div>
+            <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Select Outlet</label>
+                <select id="outletName" class="w-full mt-1.5 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold"></select>
+            </div>
+            <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Reporting Date</label>
+                <input type="date" id="reportDate" class="w-full mt-1.5 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-blue-600">
+            </div>
+            <button onclick="navTo(2)" class="w-full bg-blue-600 text-white font-black py-5 rounded-3xl shadow-xl active:scale-95 transition-all">DASHBOARD <i class="fas fa-arrow-right ml-2"></i></button>
+        </div>
+    </div>
+
+    <div id="page2" class="page min-h-screen p-6">
+        <div class="flex items-center justify-between mb-8 mt-2">
+            <button onclick="navTo(1)" class="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400"><i class="fas fa-arrow-left"></i></button>
+            <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest" id="displayRole">Portal</p>
+        </div>
+        <div class="grid grid-cols-1 gap-5">
+            <div id="menu_outlet" onclick="openCategory('OUTLET')" class="menu-card border-l-8 border-l-blue-500 flex items-center gap-5">
+                <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 text-2xl"><i class="fas fa-store"></i></div>
+                <div class="text-left"><h3 class="font-black text-lg uppercase">Outlet</h3><p class="text-[10px] text-slate-400 font-bold uppercase">Training & Planogram</p></div>
+            </div>
+            <div id="menu_marketing" onclick="openCategory('MARKETING')" class="menu-card border-l-8 border-l-orange-500 flex items-center gap-5">
+                <div class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500 text-2xl"><i class="fas fa-bullhorn"></i></div>
+                <div class="text-left"><h3 class="font-black text-lg uppercase">Marketing</h3><p class="text-[10px] text-slate-400 font-bold uppercase">Promotions</p></div>
+            </div>
+            <div id="menu_am" onclick="openCategory('AM')" class="hidden menu-card border-l-8 border-l-blue-900 bg-blue-50 flex items-center gap-5">
+                <div class="w-14 h-14 bg-blue-900 rounded-2xl flex items-center justify-center text-white text-2xl"><i class="fas fa-user-shield"></i></div>
+                <div class="text-left"><h3 class="font-black text-lg text-blue-900 uppercase">AM Portal</h3><p class="text-[10px] text-blue-400 font-bold uppercase">Audit & Visit</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="page3" class="page min-h-screen p-6">
+        <div class="flex items-center gap-4 mb-8">
+            <button onclick="navTo(2)" class="w-12 h-12 rounded-2xl bg-white border flex items-center justify-center text-slate-400"><i class="fas fa-chevron-left"></i></button>
+            <div><h2 class="text-2xl font-black uppercase" id="catTitle">Category</h2><p class="text-[10px] font-black text-slate-400 tracking-widest uppercase">Select Task</p></div>
+        </div>
+        <div id="taskList" class="space-y-4"></div>
+    </div>
+
+    <div id="page4" class="page min-h-screen p-4 pb-48">
+        <div class="flex items-center gap-4 mb-6 mt-2">
+            <button onclick="navTo(3)" class="w-10 h-10 rounded-xl bg-white border flex items-center justify-center text-slate-400 shadow-sm"><i class="fas fa-chevron-left"></i></button>
+            <h2 class="font-black text-lg uppercase truncate" id="taskTitle">Task Name</h2>
+        </div>
+        <div id="dynamicForm" class="space-y-4"></div>
+        <div id="photoSection" class="mt-6"><div id="photoGrid" class="space-y-3"></div></div>
+        <div id="auditScoreBox" class="score-box hidden uppercase">Audit Marks: <span id="currentScore">0</span> / 46</div>
+        <div class="fixed bottom-0 left-0 right-0 p-5 bg-white/90 backdrop-blur-xl border-t z-50">
+            <button onclick="submitReport()" id="submitBtn" class="w-full bg-blue-600 text-white font-black py-5 rounded-[2rem] shadow-xl flex items-center justify-center gap-3">
+                <span id="btnText">FINISH & UPLOAD</span>
+                <div id="mainLoader" class="loader"></div>
+            </button>
+        </div>
+    </div>
+
+    <div id="supervisorDashboard" class="hidden min-h-screen bg-slate-50 p-4 pb-20">
+        <nav class="bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-100 mb-6 sticky top-4 z-[100]">
+            <div class="flex justify-between items-center mb-5">
+                <button onclick="window.location.reload()" class="font-black text-[10px] text-slate-400 uppercase">Exit Portal</button>
+                <div class="flex gap-2">
+                    <button onclick="downloadAllPDF()" class="bg-red-50 text-red-600 text-[9px] font-black px-3 py-1.5 rounded-full border border-red-100"><i class="fas fa-file-pdf mr-1"></i> DOWNLOAD ALL</button>
+                    <span class="bg-blue-600 text-white text-[9px] font-black px-3 py-1.5 rounded-full shadow-lg" id="totalCount">0</span>
+                </div>
+            </div>
+            <div class="flex border-b mb-4 text-[10px] font-black overflow-x-auto whitespace-nowrap gap-4 px-2 no-scrollbar">
+                <button onclick="setTab('STAFF')" class="tab-btn active px-2 py-2">STAFF</button>
+                <button onclick="setTab('MARKETING')" class="tab-btn px-2 py-2">MARKETING</button>
+                <button onclick="setTab('AM')" class="tab-btn px-2 py-2">AM PORTAL</button>
+            </div>
+            <div class="space-y-3">
+                <input type="text" id="dashSearch" onkeyup="filterFeed()" placeholder="Search Name/Outlet..." class="w-full p-4 bg-slate-50 rounded-2xl text-sm font-bold outline-none border border-slate-100">
+                <div class="grid grid-cols-4 gap-2">
+                    <button onclick="setTimeFilter('all')" class="time-btn bg-blue-600 text-white p-2 rounded-lg text-[8px] font-black">ALL</button>
+                    <button onclick="setTimeFilter('week')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black">WEEK</button>
+                    <button onclick="setTimeFilter('month')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black">MONTH</button>
+                    <button onclick="setTimeFilter('year')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black">YEAR</button>
+                </div>
+            </div>
+        </nav>
+        <div id="feedList" class="space-y-4"></div>
+    </div>
+
+    <canvas id="compressCanvas" class="hidden"></canvas>
+    <div id="supervisorBtn"><i class="fas fa-lock"></i></div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzgsyV3uymPOyKXx8KdwAe_TvNuMozuW5jIqzUX1YwHYf1Qn3I3_vu-FtvJUYPtm-c/exec";
+        const AM_PASS = "AM2026", SUPER_PASS = "8899";
+
+        const regions = {
+            "R1 - AMIRUL": ["DG", "DGD", "KMD", "KMN", "KMSK", "MR"],
+            "R2 - HAZWANI": ["AJ", "BJR", "BP", "HQCT", "KB", "PK", "WM"],
+            "R3 - HARIS": ["B6", "BB", "CDR", "HL", "BG", "KL"],
+            "R4 - RAIHAN": ["GB", "GBD", "JTH", "RJ", "ST", "TPOH"],
+            "R5 - ADNIN": ["JL", "JLD", "PP", "PSPD", "SMR"],
+            "R6 - NADHIRAH": ["KS", "MC", "MLR", "TM", "TMD", "TMT"],
+            "R7 - HASANUL": ["KBKK", "KBKS", "KBTJ", "PC", "PT"],
+            "R8 - HAFSHAM": ["PM", "SLS", "TPT", "KKR", "PPK"],
+            "R9 - IFFAH / RAIHAN": ["GM", "CK"]
+        };
+
+        const allOutlets = ["AJ", "B6", "BB", "BJR", "BP", "CDR", "CK", "DG", "DGD", "GB", "GBD", "GM", "HL", "HQ", "HQCT", "JL", "JLD", "JTH", "KB", "KBKK", "KBKS", "KBTJ", "KKR", "KL", "KMD", "KMN", "KMSK", "KS", "MC", "MLR", "MR", "PC", "PK", "PM", "PP", "PPK", "PSPD", "PT", "RJ", "SLS", "SMR", "ST", "TM", "TMD", "TMT", "TPOH", "TPT", "WM"];
+        const productsList = ["Mom & Baby", "Health Supplement", "Food Supplement", "OTC", "Personal Care", "Rehab", "Dressing", "Back Counter"];
+        const planogramTasks = ["House Brand Products", "Focused Products 1", "Focused Products 2 & 3", "End Cap", "Store Layout", "Housekeeping", "Clear Price Tag", "Shelf Tags", "Pharmacist Tags", "Store Display", "Welcoming Board", "Updated Promo"];
+        
+        let currentCat = "", currentTask = "", timeFilter = "all", currentTab = "STAFF", allSubmissions = [];
+
+        window.onload = () => {
+            document.getElementById('reportDate').valueAsDate = new Date();
+            updateOutletList();
+        };
+
+        function handleRoleChange() {
+            const role = document.getElementById('userRole').value;
+            const isAM = role === "Area Manager";
+            document.getElementById('amRegionContainer').classList.toggle('hidden', !isAM);
+            updateOutletList();
+        }
+
+        function updateOutletList() {
+            const role = document.getElementById('userRole').value;
+            const reg = document.getElementById('amRegion').value;
+            const select = document.getElementById('outletName');
+            select.innerHTML = "";
+            let list = allOutlets;
+            if(role === "Area Manager" && reg) {
+                const key = Object.keys(regions).find(k => k.startsWith(reg));
+                list = regions[key];
+            }
+            list.forEach(o => select.innerHTML += `<option value="${o}">${o}</option>`);
+        }
+
+        function navTo(num) {
+            if(num === 2) {
+                if(!document.getElementById('staffName').value) return alert("Enter Name");
+                const role = document.getElementById('userRole').value;
+                const isAM = role === "Area Manager";
+                document.getElementById('menu_outlet').classList.toggle('hidden', isAM);
+                document.getElementById('menu_marketing').classList.toggle('hidden', isAM);
+                document.getElementById('menu_am').classList.toggle('hidden', !isAM);
+                document.getElementById('displayRole').innerText = isAM ? "AM Portal" : "Staff Portal";
+            }
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page'+num).classList.add('active');
+            window.scrollTo(0,0);
+        }
+
+        function openCategory(cat) {
+            if(cat === 'AM' && prompt("Security: Enter AM PIN") !== AM_PASS) return;
+            currentCat = cat;
+            document.getElementById('catTitle').innerText = cat;
+            navTo(3);
+            const list = document.getElementById('taskList');
+            list.innerHTML = "";
+            const tasks = {
+                'OUTLET': ['TRAINING', 'ALL PRODUCTS', 'PLANOGRAM'],
+                'MARKETING': ['CLEARANCE', 'PWP', 'DISPLAY (INFORMED BY MARKETING)'],
+                'AM': ['VISIT EVIDENCE', 'AM TRAINING', 'AUDIT FORM', 'KPI DISCUSSION']
+            };
+            tasks[cat].forEach(t => {
+                list.innerHTML += `<button onclick="setupTask('${t}')" class="w-full bg-white p-6 rounded-[2rem] border text-left font-black flex justify-between items-center shadow-sm uppercase">${t} <i class="fas fa-chevron-right text-slate-200"></i></button>`;
+            });
+        }
+
+        function setupTask(task) {
+            currentTask = task;
+            document.getElementById('taskTitle').innerText = task;
+            const form = document.getElementById('dynamicForm');
+            const auditScore = document.getElementById('auditScoreBox');
+            form.innerHTML = ""; auditScore.classList.add('hidden');
+            navTo(4);
+
+            if(task === 'TRAINING' || task === 'VISIT EVIDENCE' || task === 'AM TRAINING') {
+                form.innerHTML = `<input type="text" id="taskSub" class="w-full p-4 rounded-2xl border font-bold" placeholder="Topic / Title">
+                                 <textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="Notes..."></textarea>`;
+                initPhotos(4);
+            } else if(task === 'PLANOGRAM' || task === 'ALL PRODUCTS') {
+                const opts = task === 'PLANOGRAM' ? planogramTasks : productsList;
+                let s = `<select id="subTask" class="w-full p-4 rounded-2xl border font-bold bg-slate-50 appearance-none">`;
+                opts.forEach(o => s += `<option value="${o}">${o}</option>`);
+                form.innerHTML = s + `</select><textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="Remarks..."></textarea>`;
+                initPhotos(8);
+            } else if(task === 'AUDIT FORM') {
+                auditScore.classList.remove('hidden');
+                buildAuditForm(form);
+            } else if(task === 'KPI DISCUSSION') {
+                form.innerHTML = `<div class="space-y-4">
+                    <div class="bg-white p-5 rounded-3xl border"><label class="text-[9px] font-black text-slate-400">PROGRESSION</label><textarea id="kpi1" class="w-full mt-2 h-24 outline-none font-bold text-sm"></textarea></div>
+                    <div class="bg-white p-5 rounded-3xl border"><label class="text-[9px] font-black text-slate-400">LIMITATIONS</label><textarea id="kpi2" class="w-full mt-2 h-24 outline-none font-bold text-sm"></textarea></div>
+                    <div class="bg-white p-5 rounded-3xl border"><label class="text-[9px] font-black text-slate-400">ACTION PLAN</label><textarea id="kpi3" class="w-full mt-2 h-24 outline-none font-bold text-sm"></textarea></div>
+                </div>`;
+                initPhotos(0);
+            } else {
+                form.innerHTML = `<input type="text" id="taskSub" class="w-full p-4 rounded-2xl border font-bold bg-slate-50" placeholder="Topic Title">
+                                 <textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="Notes..."></textarea>`;
+                initPhotos(8);
+            }
+        }
+
+        function buildAuditForm(container) {
+            const auditData = [
+                {title: "Visual Merchandising", items: [
+                    {n: "Planogram based on Category", snap: true}, {n: "House Brand Products", snap: false}, {n: "FP1", snap: false}, {n: "FP2 & FP3", snap: false}, {n: "End cap", snap: false},
+                    {n: "Store layout - LTR Logic", snap: true}, {n: "Clean Shelves", snap: true}, {n: "Price tag & colours", snap: true}, {n: "Clear & Accurate Price Tag", snap: false}, {n: "Utilise Shelf Tags", snap: false}, {n: "Pharmacist Recommendation tags", snap: false},
+                    {n: "Display Item", snap: true}, {n: "Marketing Compliance", header: true}, {n: "Item clearance & PWP", snap: false}, {n: "Welcoming Board Display & Promo", snap: false}, {n: "Repost From HQ", snap: false}, {n: "POSM", snap: false}
+                ]},
+                {title: "Staff Knowledge & Competency", items: [
+                    {n: "Sales Target", snap: false}, {n: "Focused Items", header: true}, {n: "House Brand", snap: false}, {n: "Focused Items 1", snap: false}, {n: "Focused Items 2 & 3", snap: false},
+                    {n: "SOP", snap: false}, {n: "Product Knowledge", header: true}, {n: "Brief Unique selling points", snap: false}, {n: "Spontaneous test by AM", snap: false}
+                ]},
+                {title: "Ambience & cleanliness", items: [
+                    {n: "Music", snap: false}, {n: "Scent", snap: false}, {n: "Consultation area", snap: false}, {n: "Lighting & Air Cond", snap: false}, {n: "Storefront & Signage", snap: false}, {n: "Floor, wall and ceiling", snap: false}
+                ]},
+                {title: "Customer Experience", items: [
+                    {n: "Warm greeting", snap: false}, {n: "Proactive assistance", snap: false}, {n: "Available Pharmacist", snap: false}, {n: "Add-on recommendation", snap: false}, {n: "Thanks & return invitation", snap: false}, {n: "Efficient customer flow & queue", snap: false}, {n: "Good Customer Impression", snap: false}
+                ]},
+                {title: "Operational Compliance", items: [
+                    {n: "Poison logbook", snap: true}, {n: "License valid & displayed", snap: true}, {n: "No expired products", snap: true}, {n: "Temperature logs", snap: true}, {n: "Storage FEFO", snap: true}, {n: "No personal item in area", snap: true}
+                ]}
+            ];
+
+            let photoIdx = 0;
+            const grid = document.getElementById('photoGrid');
+            grid.innerHTML = "";
+
+            auditData.forEach(sec => {
+                let h = `<div class="audit-section"><h4 class="text-blue-600 font-black text-[10px] mb-4 border-b pb-2 uppercase tracking-widest">${sec.title}</h4>`;
+                sec.items.forEach(item => {
+                    if(item.header) {
+                        h += `<div class="mt-4 mb-2"><span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">${item.n}</span></div>`;
+                    } else {
+                        h += `<div class="py-3 border-b border-slate-50 last:border-0">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-black text-slate-600 leading-tight pr-4">${item.n}</span>
+                                    <input type="checkbox" class="audit-check" onchange="calcAudit()">
+                                </div>`;
+                        if(item.snap) {
+                            h += `<div class="photo-slot">
+                                    <div class="preview-box"><img id="prev_${photoIdx}" class="hidden"><i class="fas fa-camera text-slate-300 absolute inset-0 flex items-center justify-center"></i></div>
+                                    <button onclick="document.getElementById('cam_${photoIdx}').click()" class="bg-blue-50 text-blue-600 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest">Snap Evidence</button>
+                                    <input type="file" id="cam_${photoIdx}" class="hidden" accept="image/*" capture="environment" onchange="handleImg(${photoIdx})">
+                                    <input type="hidden" id="label_${photoIdx}" value="${item.n}">
+                                  </div>`;
+                            photoIdx++;
+                        }
+                        h += `</div>`;
+                    }
+                });
+                container.innerHTML += h + `</div>`;
+            });
+            
+            const discItems = ["Discussion with BM", "Staff Challenges", "Ground feedback", "Event Plan & Update"];
+            let dHtml = `<div class="audit-section"><h4 class="text-blue-800 font-black text-[10px] mb-4 border-b pb-2 uppercase tracking-widest">Discussion & Brainstorming</h4>`;
+            discItems.forEach((di, idx) => {
+                dHtml += `<div class="mb-4">
+                    <div class="flex justify-between items-center mb-2"><label class="text-[10px] font-black text-slate-500 uppercase">${di}</label><input type="checkbox" class="audit-check" onchange="calcAudit()"></div>
+                    <textarea id="disc_${idx}" class="w-full p-4 rounded-2xl bg-slate-50 border-none font-bold text-sm h-24" placeholder="Input details here..."></textarea>
+                </div>`;
+            });
+            container.innerHTML += dHtml + `</div>`;
+        }
+
+        function initPhotos(count) {
+            const grid = document.getElementById('photoGrid');
+            grid.innerHTML = "";
+            for(let i=0; i<count; i++) {
+                grid.innerHTML += `<div class="photo-slot">
+                    <div class="preview-box"><img id="prev_${i}" class="hidden"><i class="fas fa-camera text-slate-300 absolute inset-0 flex items-center justify-center"></i></div>
+                    <input type="text" id="label_${i}" class="p-3 text-xs font-black border-b border-dashed outline-none" placeholder="Photo Description">
+                    <button onclick="document.getElementById('cam_${i}').click()" class="bg-slate-100 py-3 rounded-xl text-[9px] font-black uppercase">Open Camera</button>
+                    <input type="file" id="cam_${i}" class="hidden" accept="image/*" capture="environment" onchange="handleImg(${i})">
+                </div>`;
+            }
+        }
+
+        function calcAudit() {
+            document.getElementById('currentScore').innerText = document.querySelectorAll('.audit-check:checked').length;
+        }
+
+        function handleImg(idx) {
+            const file = document.getElementById(`cam_${idx}`).files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.getElementById('compressCanvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = 1000; canvas.height = (img.height/img.width)*1000;
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    const barH = canvas.height * 0.08;
+                    ctx.fillStyle = "rgba(0,0,0,0.6)"; ctx.fillRect(0, canvas.height-barH, canvas.width, barH);
+                    ctx.fillStyle = "white"; ctx.font = "bold 32px sans-serif";
+                    
+                    const outlet = document.getElementById('outletName').value;
+                    const name = document.getElementById('staffName').value;
+                    const date = document.getElementById('reportDate').value;
+                    const time = new Date().toLocaleTimeString();
+                    
+                    // Unified timestamp for staff and AM portals
+                    const stamp = `${outlet} | ${name.toUpperCase()} | ${date} | ${time}`;
+                    ctx.fillText(stamp, 30, canvas.height-(barH/2)+12);
+                    
+                    const prev = document.getElementById(`prev_${idx}`);
+                    prev.src = canvas.toDataURL('image/jpeg', 0.7);
+                    prev.classList.remove('hidden');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function submitReport() {
+            const btn = document.getElementById('submitBtn'), loader = document.getElementById('mainLoader');
+            const images = [], photoNames = [];
+            document.querySelectorAll('img[id^="prev_"]:not(.hidden)').forEach((img, i) => {
+                images.push(img.src.split(',')[1]);
+                const lblInput = document.getElementById('label_'+i);
+                const lbl = lblInput ? (lblInput.value || 'Evidence') : 'Evidence';
+                photoNames.push(`${currentTask}_${lbl}.jpg`);
+            });
+
+            if(currentTask === 'AUDIT FORM') {
+                if(document.querySelectorAll('.audit-check:checked').length === 0) return alert("Must tick at least one achievement.");
+                if(images.length < 12) return alert("All 12 mandatory audit photos required.");
+                for(let i=0; i<4; i++) {
+                    if(!document.getElementById('disc_'+i).value.trim()) return alert("Fill all Discussion fields.");
+                }
+            } else if(currentTask !== 'KPI DISCUSSION' && images.length === 0) {
+                return alert("Photo evidence required.");
+            }
+
+            btn.disabled = true; loader.style.display = "block";
+            let rem = "";
+            if(currentTask === 'AUDIT FORM') {
+                const disc = Array.from({length:4}, (_,i) => document.getElementById('disc_'+i).value).join(" | ");
+                rem = `SCORE: ${document.getElementById('currentScore').innerText}/46 | DISC: ${disc}`;
+            } else if(currentTask === 'KPI DISCUSSION') {
+                rem = `P: ${document.getElementById('kpi1').value} | L: ${document.getElementById('kpi2').value} | A: ${document.getElementById('kpi3').value}`;
+            } else {
+                rem = `TASK: ${document.getElementById('taskSub')?.value || document.getElementById('subTask')?.value} | ${document.getElementById('remarks')?.value || ''}`;
+            }
+
+            try {
+                const r = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ staff: document.getElementById('staffName').value, outlet: document.getElementById('outletName').value, category: currentCat, task: currentTask, remarks: rem, staffTime: document.getElementById('reportDate').value, images, photoNames })});
+                if((await r.text()).includes("Success")) {
+                    document.getElementById('successOverlay').classList.remove('hidden');
+                    setTimeout(() => window.location.reload(), 2000);
+                }
+            } catch(e) { alert("Network Error"); btn.disabled = false; loader.style.display="none"; }
+        }
+
+        document.getElementById('supervisorBtn').onclick = () => {
+            if(prompt("Supervisor PIN") === SUPER_PASS) {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById('supervisorDashboard').classList.remove('hidden');
+                document.getElementById('supervisorBtn').style.display = "none";
+                loadFeed();
+            }
+        };
+
+        async function loadFeed() {
+            const r = await fetch(SCRIPT_URL + "?action=read");
+            const d = await r.json();
+            allSubmissions = d.submissions;
+            filterFeed();
+        }
+
+        function setTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            filterFeed();
+        }
+
+        function setTimeFilter(f) {
+            timeFilter = f;
+            document.querySelectorAll('.time-btn').forEach(b => {
+                b.classList.replace('bg-blue-600', 'bg-white');
+                b.classList.replace('text-white', 'text-slate-400');
+            });
+            event.target.classList.replace('bg-white', 'bg-blue-600');
+            event.target.classList.replace('text-slate-400', 'text-white');
+            filterFeed();
+        }
+
+        function filterFeed() {
+            const q = document.getElementById('dashSearch').value.toLowerCase();
+            const now = new Date();
+            const filtered = allSubmissions.filter(s => {
+                const isCorrectTab = (currentTab === 'AM') ? s.category === 'AM' : s.category === currentTab;
+                const matchSearch = s.staff.toLowerCase().includes(q) || s.outlet.toLowerCase().includes(q);
+                const sDate = new Date(s.staffTime);
+                let matchTime = true;
+                if(timeFilter === 'week') matchTime = (now - sDate) < (7 * 86400000);
+                if(timeFilter === 'month') matchTime = sDate.getMonth() === now.getMonth();
+                if(timeFilter === 'year') matchTime = sDate.getFullYear() === now.getFullYear();
+                return isCorrectTab && matchSearch && matchTime;
+            });
+            
+            document.getElementById('feedList').innerHTML = filtered.map(s => {
+                let photoHtml = '';
+                if(s.urls && s.urls.length > 0) {
+                    photoHtml = `<div class="gallery-container no-scrollbar">` + 
+                        s.urls.map(u => `<div class="gallery-item"><img src="${u}" onclick="window.open('${u}')"></div>`).join('') + 
+                        `</div>`;
+                } else if(s.url) {
+                    photoHtml = `<img src="${s.url}" onclick="window.open('${s.url}')" class="w-full h-44 object-cover rounded-2xl border">`;
+                }
+
+                return `
+                <div class="bg-white p-5 rounded-3xl border shadow-sm">
+                    <div class="flex justify-between items-start mb-2">
+                        <div><h4 class="font-black text-sm uppercase">${s.staff}</h4><p class="text-[9px] font-black text-blue-600 uppercase">${s.outlet}</p></div>
+                        <span class="text-[9px] font-black text-slate-300 uppercase">${s.staffTime}</span>
+                    </div>
+                    <div class="bg-slate-50 p-2 rounded-lg text-[10px] font-bold text-slate-500 mb-2">${s.task}</div>
+                    ${photoHtml}
+                    <button onclick="window.open('${SCRIPT_URL}?action=generatePDF&rowId=${s.rowId}')" class="w-full mt-3 py-2 border rounded-xl text-[9px] font-black uppercase text-slate-400"><i class="fas fa-file-pdf mr-1"></i> VIEW INDIVIDUAL PDF</button>
+                </div>
+            `}).join('');
+            document.getElementById('totalCount').innerText = filtered.length;
+        }
+
+        function downloadAllPDF() {
+            const queryParams = `?action=combinedPDF&tab=${currentTab}&time=${timeFilter}`;
+            window.open(SCRIPT_URL + queryParams);
+        }
+
+        // PWA SERVICE WORKER REGISTRATION
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+                .then(() => console.log("Service Worker Registered Successfully"));
+        }
+    </script>
+</body>
+</html>
