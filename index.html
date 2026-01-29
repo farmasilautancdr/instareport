@@ -421,11 +421,24 @@
                 const result = await response.json();
                 const link = document.createElement('a');
                 link.href = `data:application/pdf;base64,${result.data}`;
-                link.download = result.filename || "report.pdf";
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } catch (e) { alert("PDF Error. Deploy GAS v2.4."); } finally { blocker.style.display = "none"; }
+                link.download = result.filename;
+                document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            } catch (e) { alert("Download Failed"); } finally { blocker.style.display = "none"; }
+        }
+
+        async function downloadBulk(btn) {
+            const selected = Array.from(document.querySelectorAll('.report-checkbox:checked')).map(cb => cb.value);
+            if (selected.length === 0) return alert("Select reports.");
+            const blocker = document.getElementById('uploadSpinner');
+            blocker.style.display = "block";
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=combinedPDF&ids=${selected.join(',')}`);
+                const result = await response.json();
+                const link = document.createElement('a');
+                link.href = `data:application/pdf;base64,${result.data}`;
+                link.download = "Combined_Report.pdf";
+                document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            } catch (e) { alert("Bulk PDF Failed."); } finally { blocker.style.display = "none"; }
         }
 
         function setTab(tab) {
