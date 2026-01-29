@@ -98,7 +98,7 @@
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Reporting Date</label>
                 <input type="date" id="reportDate" class="w-full mt-1.5 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-blue-600">
             </div>
-            <button onclick="navTo(2)" class="w-full bg-blue-600 text-white font-black py-5 rounded-3xl shadow-xl active:scale-95 transition-all uppercase tracking-widest">Dashboard <i class="fas fa-arrow-right ml-2"></i></button>
+            <button onclick="navTo(2)" class="w-full bg-blue-600 text-white font-black py-5 rounded-3xl shadow-xl active:scale-95 transition-all">DASHBOARD <i class="fas fa-arrow-right ml-2"></i></button>
         </div>
     </div>
 
@@ -336,7 +336,7 @@
             let photoIdx = 0;
             const photoGrid = document.getElementById('photoGrid');
             container.innerHTML = "";
-            photoGrid.innerHTML = ""; // Ensure global photo grid is cleared
+            photoGrid.innerHTML = ""; 
 
             auditData.forEach(sec => {
                 let h = `<div class="audit-section"><h4 class="text-blue-600 font-black text-[10px] mb-4 border-b pb-2 uppercase tracking-widest">${sec.title}</h4>`;
@@ -460,11 +460,15 @@
         };
 
         async function loadFeed() {
-            const r = await fetch(SCRIPT_URL + "?action=read");
-            const d = await r.json();
-            allSubmissions = d.submissions || [];
-            generateSubFilterOptions();
-            filterFeed();
+            const syncIcon = document.getElementById('syncIcon');
+            syncIcon.classList.add('fa-spin');
+            try {
+                const r = await fetch(SCRIPT_URL + "?action=read");
+                const d = await r.json();
+                allSubmissions = d.submissions || [];
+                generateSubFilterOptions();
+                filterFeed();
+            } catch (e) { alert("Load Error"); } finally { syncIcon.classList.remove('fa-spin'); }
         }
 
         async function downloadIndividualPDF(rowId, tabName) {
@@ -569,7 +573,6 @@
             
             document.getElementById('feedList').innerHTML = filtered.map(s => {
                 let photoHtml = s.urls?.length ? `<div class="gallery-container no-scrollbar">${s.urls.map(u => `<div class="gallery-item"><img src="${u}" onclick="window.open('${u}')"></div>`).join('')}</div>` : (s.url ? `<img src="${s.url}" onclick="window.open('${s.url}')" class="w-full h-44 object-cover rounded-2xl border">` : '');
-                // Correctly fallback to staff tab if tabName is missing
                 const targetTab = s.tabName || ((currentTab === 'AM') ? 'Submissions_AM' : (currentTab === 'MARKETING' ? 'Submissions_Marketing' : 'Submissions_Staff'));
                 return `<div class="bg-white p-5 rounded-3xl border shadow-sm">
                     <div class="flex justify-between items-start mb-2">
@@ -581,11 +584,7 @@
                     <button onclick="downloadIndividualPDF(${s.rowId}, '${targetTab}')" class="w-full mt-3 py-2 border rounded-xl text-[9px] font-black uppercase text-slate-400"><i class="fas fa-file-pdf mr-1"></i> VIEW INDIVIDUAL PDF</button>
                 </div>`;
             }).join('');
-            document.getElementById('totalCount').innerText = filtered.length;
-        }
-
-        function downloadAllPDF() {
-            window.open(`${SCRIPT_URL}?action=combinedPDF&tab=${currentTab}&time=${timeFilter}`);
+            document.getElementById('totalCount').innerText = filtered.length + " Reports";
         }
 
         if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
