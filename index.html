@@ -11,51 +11,32 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root { --primary: #2563eb; --success: #16a34a; --bg: #f8fafc; }
-        body { 
-            background-color: var(--bg); 
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-        }
+        body { background-color: var(--bg); font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
         .page { display: none; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        #uploadSpinner {
-            display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.4);
-            z-index: 20000; cursor: wait;
-        }
-
+        #uploadSpinner { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.4); z-index: 20000; cursor: wait; }
         .photo-slot { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 16px; background: #fff; margin-top: 8px; }
         .preview-box { width: 100%; height: 140px; border-radius: 12px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0; position: relative; }
         .preview-box img { width: 100%; height: 100%; object-fit: cover; }
         .audit-section { background: white; padding: 16px; border-radius: 24px; border: 1px solid #e2e8f0; margin-bottom: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         .score-box { position: sticky; bottom: 100px; background: #2563eb; color: white; padding: 16px; border-radius: 20px; text-align: center; font-weight: 900; z-index: 100; box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4); }
-        
         #supervisorBtn { position: fixed; bottom: 25px; right: 25px; width: 56px; height: 56px; background: white; color: var(--primary); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 9999; cursor: pointer; border: 2px solid #e2e8f0; }
         .menu-card { background: white; padding: 24px; border-radius: 28px; border: 1px solid #e2e8f0; text-align: center; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
-        .menu-card:active { transform: scale(0.96); background: #f1f5f9; }
-        
-        input[type="checkbox"] { width: 26px; height: 26px; border-radius: 8px; border: 2px solid #cbd5e1; appearance: none; cursor: pointer; transition: all 0.2s; position: relative; }
-        input[type="checkbox"]:checked { background-color: #2563eb; border-color: #2563eb; }
-        input[type="checkbox"]:checked::after { content: '\f00c'; font-family: "Font Awesome 6 Free"; font-weight: 900; color: white; font-size: 14px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-
-        .gallery-container { display: flex; overflow-x: auto; gap: 10px; padding: 5px 0; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+        .gallery-container { display: flex; overflow-x: auto; gap: 10px; padding: 5px 0; scroll-snap-type: x mandatory; }
         .gallery-item { flex: 0 0 85%; scroll-snap-align: center; border-radius: 15px; overflow: hidden; border: 1px solid #eee; height: 200px; }
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        
         .v-badge { font-size: 10px; font-weight: 900; color: #2563eb; letter-spacing: 2px; }
         .btn-loader { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; width: 20px; height: 20px; animation: spin 0.8s linear infinite; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
         .tab-btn.active { border-bottom: 3px solid #2563eb; color: #2563eb; }
+        #bulkBar { position: fixed; bottom: 0; left: 0; right: 0; background: #2563eb; color: white; padding: 15px; z-index: 1000; border-radius: 20px 20px 0 0; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -10px 25px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body class="antialiased text-slate-900">
 
     <div id="uploadSpinner"></div>
-
     <div id="successOverlay" class="hidden fixed inset-0 bg-white/95 z-[10000] flex flex-col items-center justify-center text-center">
         <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center text-white text-4xl shadow-xl animate-bounce"><i class="fas fa-check"></i></div>
         <h2 class="text-2xl font-black mt-6 tracking-tight uppercase px-6">Upload Successful</h2>
@@ -66,7 +47,6 @@
             <h1 class="text-4xl font-black text-blue-600 tracking-tighter">InstaReport</h1>
             <p class="v-badge uppercase mt-1">Enterprise Portal v2.1</p>
         </header>
-
         <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 space-y-6">
             <div>
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Access Role</label>
@@ -147,22 +127,20 @@
         </div>
     </div>
 
-    <div id="supervisorDashboard" class="hidden min-h-screen bg-slate-50 p-4 pb-20">
+    <div id="supervisorDashboard" class="hidden min-h-screen bg-slate-50 p-4 pb-32">
         <nav class="bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-100 mb-6 sticky top-4 z-[100]">
             <div class="flex justify-between items-center mb-5">
                 <button onclick="window.location.reload()" class="font-black text-[10px] text-slate-400 uppercase">Exit Portal</button>
                 <div class="flex gap-2">
-                    <button onclick="downloadAllPDF()" class="bg-red-50 text-red-600 text-[9px] font-black px-3 py-1.5 rounded-full border border-red-100"><i class="fas fa-file-pdf mr-1"></i> DOWNLOAD ALL</button>
-                    <span class="bg-blue-600 text-white text-[9px] font-black px-3 py-1.5 rounded-full shadow-lg" id="totalCount">0</span>
+                    <i id="syncIcon" class="fas fa-sync-alt text-blue-600 mt-1"></i>
+                    <span id="totalCount" class="bg-blue-600 text-white text-[9px] font-black px-3 py-1.5 rounded-full shadow-lg">0 Reports</span>
                 </div>
             </div>
-            
             <div class="flex border-b mb-4 text-[10px] font-black overflow-x-auto whitespace-nowrap gap-4 px-2 no-scrollbar">
                 <button onclick="setTab('STAFF')" class="tab-btn active px-2 py-2">STAFF</button>
                 <button onclick="setTab('MARKETING')" class="tab-btn px-2 py-2">MARKETING</button>
                 <button onclick="setTab('AM')" class="tab-btn px-2 py-2">AM PORTAL</button>
             </div>
-
             <div class="space-y-3">
                 <input type="text" id="dashSearch" onkeyup="filterFeed()" placeholder="Search Name/Outlet..." class="w-full p-4 bg-slate-50 rounded-2xl text-sm font-bold outline-none border border-slate-100">
                 <div class="grid grid-cols-4 gap-2">
@@ -171,7 +149,6 @@
                     <button id="btn-month" onclick="setTimeFilter('month')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black uppercase">Month</button>
                     <button id="btn-year" onclick="setTimeFilter('year')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black uppercase">Year</button>
                 </div>
-                
                 <div id="subFilterContainer" class="hidden space-y-2 bg-slate-50 p-3 rounded-2xl border border-slate-100">
                     <div class="relative">
                         <i class="fas fa-search absolute left-3 top-3.5 text-slate-300 text-xs"></i>
@@ -182,6 +159,13 @@
             </div>
         </nav>
         <div id="feedList" class="space-y-4"></div>
+        <div id="bulkBar" class="hidden">
+            <div class="flex items-center gap-3">
+                <input type="checkbox" id="selectAll" onchange="toggleSelectAll()" class="w-5 h-5 rounded border-white">
+                <span id="selectedText" class="text-xs font-black">0 Selected</span>
+            </div>
+            <button onclick="downloadBulk(this)" class="bg-white text-blue-600 px-4 py-2 rounded-xl font-black text-[10px]">COMBINED PDF</button>
+        </div>
     </div>
 
     <canvas id="compressCanvas" class="hidden"></canvas>
@@ -189,11 +173,9 @@
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzgsyV3uymPOyKXx8KdwAe_TvNuMozuW5jIqzUX1YwHYf1Qn3I3_vu-FtvJUYPtm-c/exec";
-        const AM_PASS = "AM2026", SUPER_PASS = "8899";
+        const AM_PASS = "AM2026", SUPER_PASS = "8899", MASTER_PIN = SUPER_PASS;
         
-        let isAmAuthenticated = false;
-        let currentCat = "", currentTask = "", timeFilter = "all", currentTab = "STAFF", allSubmissions = [];
-        let allPeriodOptions = [];
+        let isAmAuthenticated = false, currentCat = "", currentTask = "", timeFilter = "all", currentTab = "STAFF", allSubmissions = [], allPeriodOptions = [];
 
         const regions = {
             "R1 - AMIRUL": ["DG", "DGD", "KMD", "KMN", "KMSK", "MR"],
@@ -207,7 +189,7 @@
             "R9 - IFFAH / RAIHAN": ["GM", "CK"]
         };
 
-        const allOutlets = ["AJ", "B6", "BB", "BJR", "BP", "CDR", "CK", "DG", "DGD", "GB", "GBD", "GM", "HL", "HQ", "HQCT", "JL", "JLD", "JTH", "KB", "KBKK", "KBKS", "KBTJ", "KKR", "KL", "KMD", "KMN", "KMSK", "KS", "MC", "MLR", "MR", "PC", "PK", "PM", "PP", "PPK", "PSPD", "PT", "RJ", "RP", "SLS", "SMR", "ST", "TM", "TMD", "TMT", "TPOH", "TPT", "WM"];
+        const allOutlets = ["AJ", "B6", "BB", "BJR", "BP", "CDR", "CK", "DG", "DGD", "GB", "GBD", "GM", "HL", "HQ", "HQCT", "JL", "JLD", "JTH", "KB", "KBKK", "KBKS", "KBTJ", "KKR", "KL", "KMD", "KMN", "KMSK", "KS", "MC", "MLR", "MR", "PC", "PK", "PM", "PP", "PPK", "PSPD", "PT", "RJ", "ST", "TM", "TMD", "TMT", "TPOH", "TPT", "WM"];
         const productsList = ["Mom & Baby", "Health Supplement", "Food Supplement", "OTC", "Personal Care", "Rehab", "Dressing", "Back Counter"];
         const planogramTasks = ["House Brand Products", "Focused Products 1", "Focused Products 2 & 3", "End Cap", "Store Layout", "Housekeeping", "Clear Price Tag", "Shelf Tags", "Pharmacist Tags", "Store Display", "Welcoming Board", "Updated Promo"];
 
@@ -218,8 +200,7 @@
 
         function handleRoleChange() {
             const role = document.getElementById('userRole').value;
-            const isAM = role === "Area Manager";
-            document.getElementById('amRegionContainer').classList.toggle('hidden', !isAM);
+            document.getElementById('amRegionContainer').classList.toggle('hidden', role !== "Area Manager");
             updateOutletList();
         }
 
@@ -237,16 +218,13 @@
         }
 
         function navTo(num) {
-            const superBtn = document.getElementById('supervisorBtn');
-            superBtn.style.display = (num === 1) ? "flex" : "none";
-
+            document.getElementById('supervisorBtn').style.display = (num === 1) ? "flex" : "none";
             if(num === 2) {
                 const role = document.getElementById('userRole').value;
                 const name = document.getElementById('staffName').value;
                 const region = document.getElementById('amRegion').value;
                 if(!name) return alert("Enter Name");
                 if(role === "Area Manager" && !region) return alert("Select Region to proceed.");
-
                 const isAM = role === "Area Manager";
                 document.getElementById('menu_outlet').classList.toggle('hidden', isAM);
                 document.getElementById('menu_marketing').classList.toggle('hidden', isAM);
@@ -285,7 +263,6 @@
             const auditScore = document.getElementById('auditScoreBox');
             form.innerHTML = ""; auditScore.classList.add('hidden');
             navTo(4);
-
             if(task === 'TRAINING' || task === 'VISIT EVIDENCE' || task === 'AM TRAINING') {
                 form.innerHTML = `<input type="text" id="taskSub" class="w-full p-4 rounded-2xl border font-bold" placeholder="Topic / Title"><textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="Notes..."></textarea>`;
                 initPhotos(4);
@@ -313,45 +290,23 @@
 
         function buildAuditForm(container) {
             const auditData = [
-                {title: "Visual Merchandising", items: [
-                    {n: "Planogram based on Category", snap: true}, {n: "House Brand Products", snap: false}, {n: "FP1", snap: false}, {n: "FP2 & FP3", snap: false}, {n: "End cap", snap: false},
-                    {n: "Store layout - LTR Logic", snap: true}, {n: "Clean Shelves", snap: true}, {n: "Price tag & colours", snap: true}, {n: "Clear & Accurate Price Tag", snap: false}, {n: "Utilise Shelf Tags", snap: false}, {n: "Pharmacist Recommendation tags", snap: false},
-                    {n: "Display Item", snap: true}, {n: "Marketing Compliance", header: true}, {n: "Item clearance & PWP", snap: false}, {n: "Welcoming Board Display & Promo", snap: false}, {n: "Repost From HQ", snap: false}, {n: "POSM", snap: false}
-                ]},
-                {title: "Staff Knowledge & Competency", items: [
-                    {n: "Sales Target", snap: false}, {n: "Focused Items", header: true}, {n: "House Brand", snap: false}, {n: "Focused Items 1", snap: false}, {n: "Focused Items 2 & 3", snap: false},
-                    {n: "SOP", snap: false}, {n: "Product Knowledge", header: true}, {n: "Brief Unique selling points", snap: false}, {n: "Spontaneous test by AM", snap: false}
-                ]},
-                {title: "Ambience & cleanliness", items: [
-                    {n: "Music", snap: false}, {n: "Scent", snap: false}, {n: "Consultation area", snap: false}, {n: "Lighting & Air Cond", snap: false}, {n: "Storefront & Signage", snap: false}, {n: "Floor, wall and ceiling", snap: false}
-                ]},
-                {title: "Customer Experience", items: [
-                    {n: "Warm greeting", snap: false}, {n: "Proactive assistance", snap: false}, {n: "Available Pharmacist", snap: false}, {n: "Add-on recommendation", snap: false}, {n: "Thanks & return invitation", snap: false}, {n: "Efficient customer flow & queue", snap: false}, {n: "Good Customer Impression", snap: false}
-                ]},
-                {title: "Operational Compliance", items: [
-                    {n: "Poison logbook", snap: true}, {n: "License valid & displayed", snap: true}, {n: "No expired products", snap: true}, {n: "Temperature logs", snap: true}, {n: "Storage FEFO", snap: true}, {n: "No personal item in area", snap: true}
-                ]}
+                {title: "Visual Merchandising", items: [{n: "Planogram based on Category", snap: true}, {n: "House Brand Products", snap: false}, {n: "FP1", snap: false}, {n: "FP2 & FP3", snap: false}, {n: "End cap", snap: false}, {n: "Store layout - LTR Logic", snap: true}, {n: "Clean Shelves", snap: true}, {n: "Price tag & colours", snap: true}, {n: "Clear & Accurate Price Tag", snap: false}, {n: "Utilise Shelf Tags", snap: false}, {n: "Pharmacist Recommendation tags", snap: false}, {n: "Display Item", snap: true}, {n: "Marketing Compliance", header: true}, {n: "Item clearance & PWP", snap: false}, {n: "Welcoming Board Display & Promo", snap: false}, {n: "Repost From HQ", snap: false}, {n: "POSM", snap: false}]},
+                {title: "Staff Knowledge & Competency", items: [{n: "Sales Target", snap: false}, {n: "Focused Items", header: true}, {n: "House Brand", snap: false}, {n: "Focused Items 1", snap: false}, {n: "Focused Items 2 & 3", snap: false}, {n: "SOP", snap: false}, {n: "Product Knowledge", header: true}, {n: "Brief Unique selling points", snap: false}, {n: "Spontaneous test by AM", snap: false}]},
+                {title: "Ambience & cleanliness", items: [{n: "Music", snap: false}, {n: "Scent", snap: false}, {n: "Consultation area", snap: false}, {n: "Lighting & Air Cond", snap: false}, {n: "Storefront & Signage", snap: false}, {n: "Floor, wall and ceiling", snap: false}]},
+                {title: "Customer Experience", items: [{n: "Warm greeting", snap: false}, {n: "Proactive assistance", snap: false}, {n: "Available Pharmacist", snap: false}, {n: "Add-on recommendation", snap: false}, {n: "Thanks & return invitation", snap: false}, {n: "Efficient customer flow & queue", snap: false}, {n: "Good Customer Impression", snap: false}]},
+                {title: "Operational Compliance", items: [{n: "Poison logbook", snap: true}, {n: "License valid & displayed", snap: true}, {n: "No expired products", snap: true}, {n: "Temperature logs", snap: true}, {n: "Storage FEFO", snap: true}, {n: "No personal item in area", snap: true}]}
             ];
-
             let photoIdx = 0;
             const photoGrid = document.getElementById('photoGrid');
-            container.innerHTML = "";
-            photoGrid.innerHTML = ""; 
-
+            container.innerHTML = ""; photoGrid.innerHTML = ""; 
             auditData.forEach(sec => {
                 let h = `<div class="audit-section"><h4 class="text-blue-600 font-black text-[10px] mb-4 border-b pb-2 uppercase tracking-widest">${sec.title}</h4>`;
                 sec.items.forEach(item => {
-                    if(item.header) {
-                        h += `<div class="mt-4 mb-2"><span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">${item.n}</span></div>`;
-                    } else {
+                    if(item.header) h += `<div class="mt-4 mb-2"><span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">${item.n}</span></div>`;
+                    else {
                         h += `<div class="py-3 border-b border-slate-50 last:border-0"><div class="flex justify-between items-center"><span class="text-xs font-black text-slate-600 pr-4">${item.n}</span><input type="checkbox" class="audit-check" onchange="calcAudit()"></div>`;
                         if(item.snap) {
-                            h += `<div class="photo-slot">
-                                    <div class="preview-box"><img id="prev_${photoIdx}" class="hidden"><i class="fas fa-camera text-slate-300 absolute inset-0 flex items-center justify-center"></i></div>
-                                    <button onclick="document.getElementById('cam_${photoIdx}').click()" class="bg-blue-50 text-blue-600 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest">Snap Evidence</button>
-                                    <input type="file" id="cam_${photoIdx}" class="hidden" accept="image/*" capture="environment" onchange="handleImg(${photoIdx})">
-                                    <input type="hidden" id="label_${photoIdx}" value="${item.n}">
-                                  </div>`;
+                            h += `<div class="photo-slot"><div class="preview-box"><img id="prev_${photoIdx}" class="hidden"><i class="fas fa-camera text-slate-300 absolute inset-0 flex items-center justify-center"></i></div><button onclick="document.getElementById('cam_${photoIdx}').click()" class="bg-blue-50 text-blue-600 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest">Snap Evidence</button><input type="file" id="cam_${photoIdx}" class="hidden" accept="image/*" capture="environment" onchange="handleImg(${photoIdx})"><input type="hidden" id="label_${photoIdx}" value="${item.n}"></div>`;
                             photoIdx++;
                         }
                         h += `</div>`;
@@ -359,7 +314,6 @@
                 });
                 container.innerHTML += h + `</div>`;
             });
-            
             const discItems = ["DISCUSSION WITH PIC", "Staff Challenges", "Ground feedback", "Event Plan & Update"];
             let dHtml = `<div class="audit-section"><h4 class="text-blue-800 font-black text-[10px] mb-4 border-b pb-2 uppercase tracking-widest">Discussion & Brainstorming</h4>`;
             discItems.forEach((di, idx) => {
@@ -372,18 +326,11 @@
             const grid = document.getElementById('photoGrid');
             grid.innerHTML = "";
             for(let i=0; i<count; i++) {
-                grid.innerHTML += `<div class="photo-slot">
-                    <div class="preview-box"><img id="prev_${i}" class="hidden"><i class="fas fa-camera text-slate-300 absolute inset-0 flex items-center justify-center"></i></div>
-                    <input type="text" id="label_${i}" class="p-3 text-xs font-black border-b border-dashed outline-none" placeholder="Description">
-                    <button onclick="document.getElementById('cam_${i}').click()" class="bg-slate-100 py-3 rounded-xl text-[9px] font-black uppercase">Open Camera</button>
-                    <input type="file" id="cam_${i}" class="hidden" accept="image/*" capture="environment" onchange="handleImg(${i})">
-                </div>`;
+                grid.innerHTML += `<div class="photo-slot"><div class="preview-box"><img id="prev_${i}" class="hidden"><i class="fas fa-camera text-slate-300 absolute inset-0 flex items-center justify-center"></i></div><input type="text" id="label_${i}" class="p-3 text-xs font-black border-b border-dashed outline-none" placeholder="Description"><button onclick="document.getElementById('cam_${i}').click()" class="bg-slate-100 py-3 rounded-xl text-[9px] font-black uppercase">Open Camera</button><input type="file" id="cam_${i}" class="hidden" accept="image/*" capture="environment" onchange="handleImg(${i})"></div>`;
             }
         }
 
-        function calcAudit() {
-            document.getElementById('currentScore').innerText = document.querySelectorAll('.audit-check:checked').length;
-        }
+        function calcAudit() { document.getElementById('currentScore').innerText = document.querySelectorAll('.audit-check:checked').length; }
 
         function handleImg(idx) {
             const file = document.getElementById(`cam_${idx}`).files[0];
@@ -391,17 +338,12 @@
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
-                    const canvas = document.getElementById('compressCanvas');
-                    const ctx = canvas.getContext('2d');
+                    const canvas = document.getElementById('compressCanvas'), ctx = canvas.getContext('2d');
                     canvas.width = 1000; canvas.height = (img.height/img.width)*1000;
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     ctx.fillStyle = "rgba(0,0,0,0.6)"; ctx.fillRect(0, canvas.height-(canvas.height*0.08), canvas.width, canvas.height*0.08);
                     ctx.fillStyle = "white"; ctx.font = "bold 32px sans-serif";
-                    const role = document.getElementById('userRole').value;
-                    const outlet = document.getElementById('outletName').value;
-                    const name = document.getElementById('staffName').value.toUpperCase();
-                    const date = document.getElementById('reportDate').value;
-                    const time = new Date().toLocaleTimeString();
+                    const role = document.getElementById('userRole').value, outlet = document.getElementById('outletName').value, name = document.getElementById('staffName').value.toUpperCase(), date = document.getElementById('reportDate').value, time = new Date().toLocaleTimeString();
                     const stamp = (role === "Area Manager") ? `${outlet} - ${name} - ${date} - ${time}` : `${outlet} | ${name} | ${date} | ${time}`;
                     ctx.fillText(stamp, 30, canvas.height-(canvas.height*0.08/2)+12);
                     const prev = document.getElementById(`prev_${idx}`);
@@ -421,20 +363,13 @@
                 const lblInput = document.getElementById('label_'+i);
                 photoNames.push(`${currentTask}_${lblInput ? (lblInput.value || 'Evidence') : 'Evidence'}.jpg`);
             });
-
             if(currentTask === 'AUDIT FORM') {
-                if(document.querySelectorAll('.audit-check:checked').length === 0) return alert("Must tick at least one achievement.");
-                if(images.length < 11) return alert("All 11 mandatory audit photos required.");
+                if(document.querySelectorAll('.audit-check:checked').length === 0) return alert("Tick at least one achievement.");
+                if(images.length < 11) return alert("11 mandatory photos required.");
                 for(let i=0; i<4; i++) if(!document.getElementById('disc_'+i).value.trim()) return alert("Fill all Discussion fields.");
             } else if(currentTask !== 'KPI DISCUSSION' && images.length === 0) return alert("Photo evidence required.");
-
             blocker.style.display = "block"; btn.disabled = true; btnText.style.display = "none"; btnLoader.style.display = "block";
-            
-            let rem = "";
-            if(currentTask === 'AUDIT FORM') rem = `SCORE: ${document.getElementById('currentScore').innerText}/46 | DISC: ${Array.from({length:4}, (_,i) => document.getElementById('disc_'+i).value).join(" | ")}`;
-            else if(currentTask === 'KPI DISCUSSION') rem = `P: ${document.getElementById('kpi1').value} | L: ${document.getElementById('kpi2').value} | A: ${document.getElementById('kpi3').value}`;
-            else rem = `TASK: ${document.getElementById('taskSub')?.value || document.getElementById('subTask')?.value} | ${document.getElementById('remarks')?.value || ''}`;
-
+            let rem = (currentTask === 'AUDIT FORM') ? `SCORE: ${document.getElementById('currentScore').innerText}/46 | DISC: ${Array.from({length:4}, (_,i) => document.getElementById('disc_'+i).value).join(" | ")}` : (currentTask === 'KPI DISCUSSION' ? `P: ${document.getElementById('kpi1').value} | L: ${document.getElementById('kpi2').value} | A: ${document.getElementById('kpi3').value}` : `TASK: ${document.getElementById('taskSub')?.value || document.getElementById('subTask')?.value} | ${document.getElementById('remarks')?.value || ''}`);
             try {
                 const r = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ staff: document.getElementById('staffName').value, outlet: document.getElementById('outletName').value, category: currentCat, task: currentTask, remarks: rem, staffTime: document.getElementById('reportDate').value, images, photoNames })});
                 const result = await r.text();
@@ -451,9 +386,9 @@
         }
 
         document.getElementById('supervisorBtn').onclick = () => {
-            if(prompt("Supervisor PIN") === SUPER_PASS) {
+            if (prompt("Enter Supervisor PIN:") === MASTER_PIN) {
                 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                document.getElementById('supervisorDashboard').classList.remove('hidden');
+                document.getElementById('supervisorDashboard').classList.add('active');
                 document.getElementById('supervisorBtn').style.display = "none";
                 loadFeed();
             }
@@ -477,18 +412,41 @@
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=generatePDF&rowId=${rowId}&tab=${tabName}`);
                 const result = await response.json();
-                if(!result.data) throw new Error("No PDF data");
+                if(!result.data) throw new Error();
                 const link = document.createElement('a');
                 link.href = `data:application/pdf;base64,${result.data}`;
                 link.download = result.filename || "report.pdf";
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-            } catch (e) {
-                alert("PDF Generation Failed. Ensure latest GAS (v2.3) is deployed as a New Version.");
-            } finally {
-                blocker.style.display = "none";
-            }
+            } catch (e) { alert("PDF Failed. Deploy GAS v2.4."); } finally { blocker.style.display = "none"; }
+        }
+
+        async function downloadBulk(btn) {
+            const selected = Array.from(document.querySelectorAll('.report-checkbox:checked')).map(cb => cb.value);
+            if (selected.length === 0) return alert("Select at least one report.");
+            const blocker = document.getElementById('uploadSpinner');
+            blocker.style.display = "block";
+            try {
+                // Bulk action requires specific GAS logic for ids
+                const response = await fetch(`${SCRIPT_URL}?action=combinedPDF&ids=${selected.join(',')}`);
+                const data = await response.json();
+                const link = document.createElement('a');
+                link.href = `data:application/pdf;base64,${data.data}`;
+                link.download = data.filename || "Combined_Reports.pdf";
+                link.click();
+            } catch (e) { alert("Bulk PDF Failed."); } finally { blocker.style.display = "none"; }
+        }
+
+        function toggleSelectAll() {
+            const master = document.getElementById('selectAll').checked;
+            document.querySelectorAll('.report-checkbox').forEach(cb => cb.checked = master);
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const checked = document.querySelectorAll('.report-checkbox:checked').length;
+            document.getElementById('selectedText').innerText = `${checked} Selected`;
         }
 
         function setTab(tab) {
@@ -515,8 +473,7 @@
 
         function generateSubFilterOptions() {
             const select = document.getElementById('subFilterSelect');
-            const label = document.getElementById('subFilterLabel');
-            allPeriodOptions = [];
+            select.innerHTML = '<option value="current">Current / Latest</option>';
             if(timeFilter === 'all') return;
             const uniquePeriods = new Set();
             allSubmissions.forEach(s => {
@@ -531,7 +488,6 @@
             });
             allPeriodOptions = Array.from(uniquePeriods).sort().reverse();
             renderPeriodDropdown(allPeriodOptions);
-            label.innerText = `Select ${timeFilter}`;
         }
 
         function renderPeriodDropdown(options) {
@@ -542,8 +498,7 @@
 
         function searchPeriods() {
             const query = document.getElementById('periodSearch').value.toLowerCase();
-            const filtered = allPeriodOptions.filter(opt => opt.toLowerCase().includes(query));
-            renderPeriodDropdown(filtered);
+            renderPeriodDropdown(allPeriodOptions.filter(opt => opt.toLowerCase().includes(query)));
         }
 
         function filterFeed() {
@@ -552,39 +507,42 @@
             const now = new Date();
             const filtered = allSubmissions.filter(s => {
                 const sDate = new Date(s.staffTime);
-                const isCorrectTab = (currentTab === 'AM') ? (s.category === 'AM' || s.category === 'AREA MANAGER') : (s.category === currentTab);
-                const matchSearch = s.staff.toLowerCase().includes(q) || s.outlet.toLowerCase().includes(q);
+                const isCorrectTab = (currentTab === 'AM') ? (s.category === 'AM' || s.category === 'AREA MANAGER') : (s.tabName === 'Submissions_' + currentTab.charAt(0) + currentTab.slice(1).toLowerCase() || s.tabName.includes(currentTab));
+                const matchSearch = s.staff.toLowerCase().includes(q) || s.outlet.toLowerCase().includes(q) || s.task.toLowerCase().includes(q);
                 let matchTime = true;
-                if(timeFilter === 'week' && subVal !== 'current') {
-                    const startOfYear = new Date(sDate.getFullYear(), 0, 1);
-                    const week = Math.ceil((((sDate - startOfYear) / 86400000) + startOfYear.getDay() + 1) / 7);
-                    matchTime = `Week ${week} (${sDate.getFullYear()})` === subVal;
-                } else if(timeFilter === 'month' && subVal !== 'current') {
-                    matchTime = `${sDate.toLocaleString('default', { month: 'long' })} ${sDate.getFullYear()}` === subVal;
-                } else if(timeFilter === 'year' && subVal !== 'current') {
-                    matchTime = sDate.getFullYear().toString() === subVal;
-                } else if (subVal === 'current') {
+                if(timeFilter !== 'all' && subVal === 'current') {
                     if(timeFilter === 'week') matchTime = (now - sDate) < (7 * 86400000);
                     if(timeFilter === 'month') matchTime = sDate.getMonth() === now.getMonth();
                     if(timeFilter === 'year') matchTime = sDate.getFullYear() === now.getFullYear();
+                } else if (subVal !== 'current' && subVal !== '') {
+                    // Selection Matching
                 }
                 return isCorrectTab && matchSearch && matchTime;
             });
-            
-            document.getElementById('feedList').innerHTML = filtered.map(s => {
-                let photoHtml = s.urls?.length ? `<div class="gallery-container no-scrollbar">${s.urls.map(u => `<div class="gallery-item"><img src="${u}" onclick="window.open('${u}')"></div>`).join('')}</div>` : (s.url ? `<img src="${s.url}" onclick="window.open('${s.url}')" class="w-full h-44 object-cover rounded-2xl border">` : '');
-                const targetTab = s.tabName || ((currentTab === 'AM') ? 'Submissions_AM' : (currentTab === 'MARKETING' ? 'Submissions_Marketing' : 'Submissions_Staff'));
-                return `<div class="bg-white p-5 rounded-3xl border shadow-sm">
-                    <div class="flex justify-between items-start mb-2">
-                        <div><h4 class="font-black text-sm uppercase">${s.staff}</h4><p class="text-[9px] font-black text-blue-600 uppercase">${s.outlet}</p></div>
-                        <span class="text-[9px] font-black text-slate-300 uppercase">${s.staffTime}</span>
+            renderFeed(filtered);
+            document.getElementById('totalCount').innerText = filtered.length + " Reports";
+            document.getElementById('bulkBar').classList.toggle('hidden', filtered.length === 0);
+        }
+
+        function renderFeed(items) {
+            const feed = document.getElementById('feedList');
+            if (items.length === 0) {
+                feed.innerHTML = `<div class="text-center p-10 bg-white rounded-2xl border border-dashed"><p class="text-slate-400 font-medium">No reports found.</p></div>`;
+                return;
+            }
+            feed.innerHTML = items.map((s) => {
+                let photoHtml = s.urls?.length ? `<div class="gallery-container no-scrollbar">${s.urls.map(u => `<div class="gallery-item"><img src="${u}" onclick="window.open('${u}')"></div>`).join('')}</div>` : (s.url ? `<img src="${s.url}" class="w-full h-44 object-cover rounded-2xl border">` : '');
+                return `<div class="bg-white p-5 rounded-3xl border shadow-sm relative">
+                    <div class="absolute top-4 right-4"><input type="checkbox" value="${s.rowId}|${s.tabName}" class="report-checkbox" onchange="updateSelectedCount()"></div>
+                    <div class="mb-2">
+                        <h4 class="font-black text-sm uppercase">${s.staff}</h4>
+                        <p class="text-[9px] font-black text-blue-600 uppercase">${s.outlet} | ${s.staffTime}</p>
                     </div>
                     <div class="bg-slate-50 p-2 rounded-lg text-[10px] font-bold text-slate-500 mb-2">${s.task}</div>
                     ${photoHtml}
-                    <button onclick="downloadIndividualPDF(${s.rowId}, '${targetTab}')" class="w-full mt-3 py-2 border rounded-xl text-[9px] font-black uppercase text-slate-400"><i class="fas fa-file-pdf mr-1"></i> VIEW INDIVIDUAL PDF</button>
+                    <button onclick="downloadIndividualPDF(${s.rowId}, '${s.tabName}')" class="w-full mt-3 py-2 border rounded-xl text-[9px] font-black uppercase text-slate-400"><i class="fas fa-file-pdf mr-1"></i> VIEW INDIVIDUAL PDF</button>
                 </div>`;
             }).join('');
-            document.getElementById('totalCount').innerText = filtered.length + " Reports";
         }
 
         if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
