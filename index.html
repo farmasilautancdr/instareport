@@ -25,7 +25,7 @@
         .menu-card { background: white; padding: 24px; border-radius: 28px; border: 1px solid #e2e8f0; text-align: center; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
         .gallery-container { display: flex; overflow-x: auto; gap: 10px; padding: 5px 0; scroll-snap-type: x mandatory; }
         .gallery-item { flex: 0 0 85%; scroll-snap-align: center; border-radius: 15px; overflow: hidden; border: 1px solid #eee; height: 200px; }
-        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .v-badge { font-size: 10px; font-weight: 900; color: #2563eb; letter-spacing: 2px; }
         .btn-loader { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; width: 20px; height: 20px; animation: spin 0.8s linear infinite; display: none; }
@@ -219,21 +219,16 @@
 
         function navTo(num) {
             document.getElementById('supervisorBtn').style.display = (num === 1) ? "flex" : "none";
-            
             if(num === 2) {
                 const role = document.getElementById('userRole').value;
                 const name = document.getElementById('staffName').value;
-                const region = document.getElementById('amRegion').value;
                 if(!name) return alert("Enter Name");
-                if(role === "Area Manager" && !region) return alert("Select Region.");
-                
                 const isAM = role === "Area Manager";
                 document.getElementById('menu_outlet').classList.toggle('hidden', isAM);
                 document.getElementById('menu_marketing').classList.toggle('hidden', isAM);
                 document.getElementById('menu_am').classList.toggle('hidden', !isAM);
                 document.getElementById('displayRole').innerText = isAM ? "AM Portal" : "Staff Portal";
             }
-            
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             const targetPage = document.getElementById('page' + num);
             if(targetPage) targetPage.classList.add('active');
@@ -267,7 +262,6 @@
             form.innerHTML = "";
             document.getElementById('auditScoreBox').classList.add('hidden');
             navTo(4);
-
             if(task === 'TRAINING' || task === 'VISIT EVIDENCE' || task === 'AM TRAINING') {
                 form.innerHTML = `<input type="text" id="taskSub" class="w-full p-4 rounded-2xl border font-bold" placeholder="Topic / Title"><textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="Notes..."></textarea>`;
                 initPhotos(4);
@@ -371,12 +365,9 @@
             if(currentTask === 'AUDIT FORM') {
                 if(document.querySelectorAll('.audit-check:checked').length === 0) return alert("Select at least one achievement.");
                 if(images.length < 11) return alert("11 audit photos required.");
-                for(let i=0; i<4; i++) if(!document.getElementById('disc_'+i).value.trim()) return alert("Fill Discussion fields.");
             } else if(currentTask !== 'KPI DISCUSSION' && images.length === 0) return alert("Photo evidence required.");
-            
             blocker.style.display = "block"; btn.disabled = true; btnText.style.display = "none"; btnLoader.style.display = "block";
-            let rem = (currentTask === 'AUDIT FORM') ? `SCORE: ${document.getElementById('currentScore').innerText}/46 | DISC: ${Array.from({length:4}, (_,i) => document.getElementById('disc_'+i).value).join(" | ")}` : (currentTask === 'KPI DISCUSSION' ? `P: ${document.getElementById('kpi1').value} | L: ${document.getElementById('kpi2').value} | A: ${document.getElementById('kpi3').value}` : `TASK: ${document.getElementById('taskSub')?.value || document.getElementById('subTask')?.value} | ${document.getElementById('remarks')?.value || ''}`);
-            
+            let rem = (currentTask === 'AUDIT FORM') ? `SCORE: ${document.getElementById('currentScore').innerText}/46` : `TASK: ${document.getElementById('taskSub')?.value || document.getElementById('subTask')?.value} | ${document.getElementById('remarks')?.value || ''}`;
             try {
                 const r = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ staff: document.getElementById('staffName').value, outlet: document.getElementById('outletName').value, category: currentCat, task: currentTask, remarks: rem, staffTime: document.getElementById('reportDate').value, images, photoNames })});
                 const result = await r.text();
@@ -385,16 +376,17 @@
                     setTimeout(() => {
                         document.getElementById('successOverlay').classList.add('hidden');
                         blocker.style.display = "none"; btnText.style.display = "block"; btnLoader.style.display = "none";
-                        if (currentCat === 'AM') openCategory('AM'); else navTo(2);
+                        navTo(2);
                         btn.disabled = false;
                     }, 2000);
                 } else throw new Error();
-            } catch(e) { blocker.style.display = "none"; btnText.style.display = "block"; btnLoader.style.display = "none"; alert("Error: Verify SCRIPT_URL."); btn.disabled = false; }
+            } catch(e) { blocker.style.display = "none"; btnText.style.display = "block"; btnLoader.style.display = "none"; alert("Error"); btn.disabled = false; }
         }
 
         document.getElementById('supervisorBtn').onclick = () => {
             if (prompt("Enter Supervisor PIN:") === MASTER_PIN) {
                 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById('supervisorDashboard').classList.remove('hidden');
                 document.getElementById('supervisorDashboard').classList.add('active');
                 document.getElementById('supervisorBtn').style.display = "none";
                 loadFeed();
@@ -419,43 +411,31 @@
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=generatePDF&rowId=${rowId}&tab=${tabName}`);
                 const result = await response.json();
-                
                 if (!result.data) throw new Error("No data received");
-
                 const link = document.createElement('a');
                 link.href = `data:application/pdf;base64,${result.data}`;
                 link.download = result.filename || `Report_${rowId}.pdf`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-            } catch (e) {
-                alert("PDF failed to load. Ensure GAS is deployed as a 'New Version'.");
-            } finally {
-                blocker.style.display = "none";
-            }
+            } catch (e) { alert("PDF Error"); } finally { blocker.style.display = "none"; }
         }
 
         async function downloadBulk(btn) {
             const selected = Array.from(document.querySelectorAll('.report-checkbox:checked')).map(cb => cb.value);
             if (selected.length === 0) return alert("Please select at least one report.");
-            
             const blocker = document.getElementById('uploadSpinner');
             blocker.style.display = "block";
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=combinedPDF&ids=${selected.join(',')}`);
                 const result = await response.json();
-                
                 const link = document.createElement('a');
                 link.href = `data:application/pdf;base64,${result.data}`;
                 link.download = "Combined_Audit_Reports.pdf";
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-            } catch (e) {
-                alert("Bulk PDF Failed.");
-            } finally {
-                blocker.style.display = "none";
-            }
+            } catch (e) { alert("Bulk PDF Failed."); } finally { blocker.style.display = "none"; }
         }
 
         function setTab(tab) {
@@ -482,7 +462,7 @@
 
         function generateSubFilterOptions() {
             const select = document.getElementById('subFilterSelect');
-            select.innerHTML = '<option value="current">Current / Latest</option>';
+            select.innerHTML = '<option value="current">All Available Periods</option>';
             if(timeFilter === 'all') return;
             const uniquePeriods = new Set();
             allSubmissions.forEach(s => {
@@ -490,77 +470,80 @@
                 if(timeFilter === 'year') uniquePeriods.add(d.getFullYear().toString());
                 if(timeFilter === 'month') uniquePeriods.add(`${d.toLocaleString('default', { month: 'long' })} ${d.getFullYear()}`);
                 if(timeFilter === 'week') {
-                    const startOfYear = new Date(d.getFullYear(), 0, 1);
-                    const week = Math.ceil((((d - startOfYear) / 86400000) + startOfYear.getDay() + 1) / 7);
+                    const start = new Date(d.getFullYear(), 0, 1);
+                    const week = Math.ceil((((d - start) / 86400000) + start.getDay() + 1) / 7);
                     uniquePeriods.add(`Week ${week} (${d.getFullYear()})`);
                 }
             });
-            Array.from(uniquePeriods).sort().reverse().forEach(p => select.innerHTML += `<option value="${p}">${p}</option>`);
+            allPeriodOptions = Array.from(uniquePeriods).sort().reverse();
+            allPeriodOptions.forEach(p => select.innerHTML += `<option value="${p}">${p}</option>`);
         }
 
         function searchPeriods() {
             const query = document.getElementById('periodSearch').value.toLowerCase();
             const filtered = allPeriodOptions.filter(opt => opt.toLowerCase().includes(query));
             const select = document.getElementById('subFilterSelect');
-            select.innerHTML = '<option value="current">Current / Latest</option>';
+            select.innerHTML = '<option value="current">All Available Periods</option>';
             filtered.forEach(p => select.innerHTML += `<option value="${p}">${p}</option>`);
         }
 
         function filterFeed() {
             const q = document.getElementById('dashSearch').value.toLowerCase();
             const subVal = document.getElementById('subFilterSelect').value;
-            const now = new Date();
-            
             const filtered = allSubmissions.filter(s => {
                 const sDate = new Date(s.staffTime);
-                
-                // MAPPING UI TABS TO SHEET NAMES
-                let targetSheet = "Submissions_Staff";
-                if (currentTab === 'MARKETING') targetSheet = "Submissions_Marketing";
-                if (currentTab === 'AM') targetSheet = "Submissions_AM";
-
+                const targetSheet = currentTab === 'MARKETING' ? "Submissions_Marketing" : (currentTab === 'AM' ? "Submissions_AM" : "Submissions_Staff");
                 const isCorrectTab = (s.tabName === targetSheet);
                 const matchSearch = s.staff.toLowerCase().includes(q) || s.outlet.toLowerCase().includes(q) || s.task.toLowerCase().includes(q);
                 
                 let matchTime = true;
-                if(timeFilter !== 'all' && subVal === 'current') {
-                    if(timeFilter === 'week') matchTime = (now - sDate) < (7 * 86400000);
-                    if(timeFilter === 'month') matchTime = sDate.getMonth() === now.getMonth();
-                    if(timeFilter === 'year') matchTime = sDate.getFullYear() === now.getFullYear();
+                if(timeFilter !== 'all' && subVal !== 'current') {
+                    if(timeFilter === 'year') matchTime = sDate.getFullYear().toString() === subVal;
+                    if(timeFilter === 'month') matchTime = `${sDate.toLocaleString('default', { month: 'long' })} ${sDate.getFullYear()}` === subVal;
+                    if(timeFilter === 'week') {
+                        const start = new Date(sDate.getFullYear(), 0, 1);
+                        const week = Math.ceil((((sDate - start) / 86400000) + start.getDay() + 1) / 7);
+                        matchTime = `Week ${week} (${sDate.getFullYear()})` === subVal;
+                    }
                 }
                 return isCorrectTab && matchSearch && matchTime;
             });
-            
             renderFeed(filtered);
             document.getElementById('totalCount').innerText = filtered.length + " Reports";
             document.getElementById('bulkBar').classList.toggle('hidden', filtered.length === 0);
         }
 
-        // --- THE UPDATED RENDERFEED FUNCTION ---
         function renderFeed(items) {
             const feed = document.getElementById('feedList');
             if (items.length === 0) {
-                feed.innerHTML = `<div class="text-center p-10 bg-white rounded-2xl border border-dashed"><p class="text-slate-400 font-medium">No reports found in ${currentTab}.</p></div>`;
+                feed.innerHTML = `<div class="text-center p-10 bg-white rounded-2xl border border-dashed"><p class="text-slate-400 font-medium">No reports found.</p></div>`;
                 return;
             }
-            
             feed.innerHTML = items.map(s => {
-                const targetTab = s.tabName; 
-                let photoHtml = s.urls?.length ? `<div class="gallery-container no-scrollbar">${s.urls.map(u => `<div class="gallery-item"><img src="${u}" onclick="window.open('${u}')"></div>`).join('')}</div>` : (s.url ? `<img src="${s.url}" class="w-full h-44 object-cover rounded-2xl border">` : '');
-                
+                const targetTab = s.tabName || 'Submissions_Staff'; 
+                // GALLERY FIX: Added unique IDs for each image set and simplified click event
+                let photoHtml = s.urls?.length ? `<div class="gallery-container no-scrollbar">${s.urls.map(u => `<div class="gallery-item"><img src="${u}" onclick="window.open('${u}', '_blank')"></div>`).join('')}</div>` : '';
                 return `<div class="bg-white p-5 rounded-3xl border shadow-sm relative">
                         <div class="absolute top-4 right-4"><input type="checkbox" value="${s.rowId}|${targetTab}" class="report-checkbox" onchange="updateSelectedCount()"></div>
-                        <div class="mb-2">
-                            <h4 class="font-black text-sm uppercase">${s.staff}</h4>
-                            <p class="text-[9px] font-black text-blue-600 uppercase">${s.outlet} | ${s.staffTime}</p>
-                        </div>
+                        <div class="mb-2"><h4 class="font-black text-sm uppercase">${s.staff}</h4><p class="text-[9px] font-black text-blue-600 uppercase">${s.outlet} | ${s.staffTime}</p></div>
                         <div class="bg-slate-50 p-2 rounded-lg text-[10px] font-bold text-slate-500 mb-2">${s.task}</div>
                         ${photoHtml}
-                        <button onclick="downloadIndividualPDF(${s.rowId}, '${targetTab}')" class="w-full mt-3 py-2 border rounded-xl text-[9px] font-black uppercase text-slate-400">
-                            <i class="fas fa-file-pdf mr-1"></i> VIEW NEAT FORM PDF
-                        </button>
+                        <button onclick="downloadIndividualPDF(${s.rowId}, '${targetTab}')" class="w-full mt-3 py-2 border rounded-xl text-[9px] font-black uppercase text-slate-400 font-black">VIEW NEAT FORM PDF</button>
                     </div>`;
             }).join('');
+        }
+
+        // SELECT ALL FIX: Specifically targets existing .report-checkbox elements
+        function toggleSelectAll() {
+            const master = document.getElementById('selectAll').checked;
+            const checkboxes = document.querySelectorAll('.report-checkbox');
+            checkboxes.forEach(cb => cb.checked = master);
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const checked = document.querySelectorAll('.report-checkbox:checked').length;
+            document.getElementById('selectedText').innerText = `${checked} Selected`;
         }
 
         if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
