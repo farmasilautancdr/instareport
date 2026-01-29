@@ -21,7 +21,6 @@
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* OVERLAY TO BLOCK INTERACTION DURING UPLOAD */
         #uploadSpinner {
             display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.4);
             z-index: 20000; cursor: wait;
@@ -45,7 +44,9 @@
         .gallery-item { flex: 0 0 85%; scroll-snap-align: center; border-radius: 15px; overflow: hidden; border: 1px solid #eee; height: 200px; }
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        select, input, textarea { font-size: 16px !important; }
+        
+        /* Version Branding */
+        .v-badge { font-size: 10px; font-weight: 900; color: #2563eb; letter-spacing: 2px; }
 
         /* BUTTON SPINNER */
         .btn-loader { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; width: 20px; height: 20px; animation: spin 0.8s linear infinite; display: none; }
@@ -64,7 +65,7 @@
     <div id="page1" class="page active min-h-screen p-6">
         <header class="text-center mt-4 mb-10">
             <h1 class="text-4xl font-black text-blue-600 tracking-tighter">InstaReport</h1>
-            <p class="text-slate-400 text-[10px] font-black tracking-[0.2em] uppercase mt-1">Enterprise Portal v2.1</p>
+            <p class="v-badge uppercase mt-1">Enterprise Portal v2.1</p>
         </header>
 
         <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 space-y-6">
@@ -156,18 +157,26 @@
                     <span class="bg-blue-600 text-white text-[9px] font-black px-3 py-1.5 rounded-full shadow-lg" id="totalCount">0</span>
                 </div>
             </div>
+            
             <div class="flex border-b mb-4 text-[10px] font-black overflow-x-auto whitespace-nowrap gap-4 px-2 no-scrollbar">
                 <button onclick="setTab('STAFF')" class="tab-btn active px-2 py-2">STAFF</button>
                 <button onclick="setTab('MARKETING')" class="tab-btn px-2 py-2">MARKETING</button>
                 <button onclick="setTab('AM')" class="tab-btn px-2 py-2">AM PORTAL</button>
             </div>
+
             <div class="space-y-3">
                 <input type="text" id="dashSearch" onkeyup="filterFeed()" placeholder="Search Name/Outlet..." class="w-full p-4 bg-slate-50 rounded-2xl text-sm font-bold outline-none border border-slate-100">
+                
                 <div class="grid grid-cols-4 gap-2">
-                    <button onclick="setTimeFilter('all')" class="time-btn bg-blue-600 text-white p-2 rounded-lg text-[8px] font-black">ALL</button>
-                    <button onclick="setTimeFilter('week')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black">WEEK</button>
-                    <button onclick="setTimeFilter('month')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black">MONTH</button>
-                    <button onclick="setTimeFilter('year')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black">YEAR</button>
+                    <button id="btn-all" onclick="setTimeFilter('all')" class="time-btn bg-blue-600 text-white p-2 rounded-lg text-[8px] font-black uppercase">ALL</button>
+                    <button id="btn-week" onclick="setTimeFilter('week')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black uppercase">Week</button>
+                    <button id="btn-month" onclick="setTimeFilter('month')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black uppercase">Month</button>
+                    <button id="btn-year" onclick="setTimeFilter('year')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black uppercase">Year</button>
+                </div>
+
+                <div id="subFilterContainer" class="hidden grid grid-cols-1 gap-2 bg-slate-50 p-2 rounded-xl border border-slate-100">
+                    <label id="subFilterLabel" class="text-[8px] font-black text-blue-600 uppercase ml-1">Select Period</label>
+                    <select id="subFilterSelect" onchange="filterFeed()" class="w-full p-2 bg-white rounded-lg text-xs font-bold outline-none border border-slate-100"></select>
                 </div>
             </div>
         </nav>
@@ -178,10 +187,11 @@
     <div id="supervisorBtn"><i class="fas fa-lock"></i></div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzgsyV3uymPOyKXx8KdwAe_TvNuMozuW5jIqzUX1YwHYf1Qn3I3_vu-FtvJUYPtm-c/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzgsyV3uymPOyKXx8KdwAe_TvNuMozuW5jIqzUX1YwHYf1Qn3I3_vu-FtvJUYPtm-c/exec"; // REPLACE THIS WITH YOUR DEPLOYMENT URL
         const AM_PASS = "AM2026", SUPER_PASS = "8899";
         
         let isAmAuthenticated = false;
+        let currentCat = "", currentTask = "", timeFilter = "all", currentTab = "STAFF", allSubmissions = [];
 
         const regions = {
             "R1 - AMIRUL": ["DG", "DGD", "KMD", "KMN", "KMSK", "MR"],
@@ -198,8 +208,6 @@
         const allOutlets = ["AJ", "B6", "BB", "BJR", "BP", "CDR", "CK", "DG", "DGD", "GB", "GBD", "GM", "HL", "HQ", "HQCT", "JL", "JLD", "JTH", "KB", "KBKK", "KBKS", "KBTJ", "KKR", "KL", "KMD", "KMN", "KMSK", "KS", "MC", "MLR", "MR", "PC", "PK", "PM", "PP", "PPK", "PSPD", "PT", "RJ", "SLS", "SMR", "ST", "TM", "TMD", "TMT", "TPOH", "TPT", "WM"];
         const productsList = ["Mom & Baby", "Health Supplement", "Food Supplement", "OTC", "Personal Care", "Rehab", "Dressing", "Back Counter"];
         const planogramTasks = ["House Brand Products", "Focused Products 1", "Focused Products 2 & 3", "End Cap", "Store Layout", "Housekeeping", "Clear Price Tag", "Shelf Tags", "Pharmacist Tags", "Store Display", "Welcoming Board", "Updated Promo"];
-        
-        let currentCat = "", currentTask = "", timeFilter = "all", currentTab = "STAFF", allSubmissions = [];
 
         window.onload = () => {
             document.getElementById('reportDate').valueAsDate = new Date();
@@ -228,16 +236,14 @@
 
         function navTo(num) {
             const superBtn = document.getElementById('supervisorBtn');
-            if (num === 1) superBtn.style.display = "flex";
-            else superBtn.style.display = "none";
+            superBtn.style.display = (num === 1) ? "flex" : "none";
 
             if(num === 2) {
                 const role = document.getElementById('userRole').value;
                 const name = document.getElementById('staffName').value;
                 const region = document.getElementById('amRegion').value;
-                
                 if(!name) return alert("Enter Name");
-                if(role === "Area Manager" && !region) return alert("Please select your AM Region to proceed.");
+                if(role === "Area Manager" && !region) return alert("Select Region to proceed.");
 
                 const isAM = role === "Area Manager";
                 document.getElementById('menu_outlet').classList.toggle('hidden', isAM);
@@ -252,11 +258,8 @@
 
         function openCategory(cat) {
             if(cat === 'AM' && !isAmAuthenticated) {
-                if(prompt("Security: Enter AM PIN") === AM_PASS) {
-                    isAmAuthenticated = true;
-                } else {
-                    return;
-                }
+                if(prompt("Enter AM PIN") === AM_PASS) isAmAuthenticated = true;
+                else return;
             }
             currentCat = cat;
             document.getElementById('catTitle').innerText = cat;
@@ -282,8 +285,7 @@
             navTo(4);
 
             if(task === 'TRAINING' || task === 'VISIT EVIDENCE' || task === 'AM TRAINING') {
-                form.innerHTML = `<input type="text" id="taskSub" class="w-full p-4 rounded-2xl border font-bold" placeholder="Topic / Title">
-                                 <textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="Notes..."></textarea>`;
+                form.innerHTML = `<input type="text" id="taskSub" class="w-full p-4 rounded-2xl border font-bold" placeholder="Topic / Title"><textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="Notes..."></textarea>`;
                 initPhotos(4);
             } else if(task === 'PLANOGRAM' || task === 'ALL PRODUCTS') {
                 const opts = task === 'PLANOGRAM' ? planogramTasks : productsList;
@@ -296,14 +298,13 @@
                 buildAuditForm(form);
             } else if(task === 'KPI DISCUSSION') {
                 form.innerHTML = `<div class="space-y-4">
-                    <div class="bg-white p-5 rounded-3xl border"><label class="text-[9px] font-black text-slate-400">PROGRESSION</label><textarea id="kpi1" class="w-full mt-2 h-24 outline-none font-bold text-sm"></textarea></div>
-                    <div class="bg-white p-5 rounded-3xl border"><label class="text-[9px] font-black text-slate-400">LIMITATIONS</label><textarea id="kpi2" class="w-full mt-2 h-24 outline-none font-bold text-sm"></textarea></div>
-                    <div class="bg-white p-5 rounded-3xl border"><label class="text-[9px] font-black text-slate-400">ACTION PLAN</label><textarea id="kpi3" class="w-full mt-2 h-24 outline-none font-bold text-sm"></textarea></div>
+                    <div class="bg-white p-5 rounded-3xl border"><label class="text-[9px] font-black text-slate-400 uppercase">PROGRESSION</label><textarea id="kpi1" class="w-full mt-2 h-24 outline-none font-bold text-sm"></textarea></div>
+                    <div class="bg-white p-5 rounded-3xl border"><label class="text-[9px] font-black text-slate-400 uppercase">LIMITATIONS</label><textarea id="kpi2" class="w-full mt-2 h-24 outline-none font-bold text-sm"></textarea></div>
+                    <div class="bg-white p-5 rounded-3xl border"><label class="text-[9px] font-black text-slate-400 uppercase">ACTION PLAN</label><textarea id="kpi3" class="w-full mt-2 h-24 outline-none font-bold text-sm"></textarea></div>
                 </div>`;
                 initPhotos(0);
             } else {
-                form.innerHTML = `<input type="text" id="taskSub" class="w-full p-4 rounded-2xl border font-bold bg-slate-50" placeholder="Topic Title">
-                                 <textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="Notes..."></textarea>`;
+                form.innerHTML = `<input type="text" id="taskSub" class="w-full p-4 rounded-2xl border font-bold bg-slate-50" placeholder="Topic Title"><textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="Notes..."></textarea>`;
                 initPhotos(8);
             }
         }
@@ -331,8 +332,7 @@
             ];
 
             let photoIdx = 0;
-            const grid = document.getElementById('photoGrid');
-            grid.innerHTML = "";
+            container.innerHTML = "";
 
             auditData.forEach(sec => {
                 let h = `<div class="audit-section"><h4 class="text-blue-600 font-black text-[10px] mb-4 border-b pb-2 uppercase tracking-widest">${sec.title}</h4>`;
@@ -340,15 +340,11 @@
                     if(item.header) {
                         h += `<div class="mt-4 mb-2"><span class="text-[10px] font-black text-slate-400 uppercase">${item.n}</span></div>`;
                     } else {
-                        h += `<div class="py-3 border-b border-slate-50 last:border-0">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-xs font-black text-slate-600 leading-tight pr-4">${item.n}</span>
-                                    <input type="checkbox" class="audit-check" onchange="calcAudit()">
-                                </div>`;
+                        h += `<div class="py-3 border-b border-slate-50 last:border-0"><div class="flex justify-between items-center"><span class="text-xs font-black text-slate-600 pr-4">${item.n}</span><input type="checkbox" class="audit-check" onchange="calcAudit()"></div>`;
                         if(item.snap) {
                             h += `<div class="photo-slot">
                                     <div class="preview-box"><img id="prev_${photoIdx}" class="hidden"><i class="fas fa-camera text-slate-300 absolute inset-0 flex items-center justify-center"></i></div>
-                                    <button onclick="document.getElementById('cam_${photoIdx}').click()" class="bg-blue-50 text-blue-600 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest">Snap Evidence</button>
+                                    <button onclick="document.getElementById('cam_${photoIdx}').click()" class="bg-blue-50 text-blue-600 py-3 rounded-xl text-[9px] font-black uppercase">Snap Evidence</button>
                                     <input type="file" id="cam_${photoIdx}" class="hidden" accept="image/*" capture="environment" onchange="handleImg(${photoIdx})">
                                     <input type="hidden" id="label_${photoIdx}" value="${item.n}">
                                   </div>`;
@@ -363,10 +359,7 @@
             const discItems = ["DISCUSSION WITH PIC", "Staff Challenges", "Ground feedback", "Event Plan & Update"];
             let dHtml = `<div class="audit-section"><h4 class="text-blue-800 font-black text-[10px] mb-4 border-b pb-2 uppercase tracking-widest">Discussion & Brainstorming</h4>`;
             discItems.forEach((di, idx) => {
-                dHtml += `<div class="mb-4">
-                    <div class="flex justify-between items-center mb-2"><label class="text-[10px] font-black text-slate-500 uppercase">${di}</label><input type="checkbox" class="audit-check" onchange="calcAudit()"></div>
-                    <textarea id="disc_${idx}" class="w-full p-4 rounded-2xl bg-slate-50 border-none font-bold text-sm h-24" placeholder="Input details here..."></textarea>
-                </div>`;
+                dHtml += `<div class="mb-4"><div class="flex justify-between items-center mb-2"><label class="text-[10px] font-black text-slate-500 uppercase">${di}</label><input type="checkbox" class="audit-check" onchange="calcAudit()"></div><textarea id="disc_${idx}" class="w-full p-4 rounded-2xl bg-slate-50 border-none font-bold text-sm h-24" placeholder="Input details here..."></textarea></div>`;
             });
             container.innerHTML += dHtml + `</div>`;
         }
@@ -377,7 +370,7 @@
             for(let i=0; i<count; i++) {
                 grid.innerHTML += `<div class="photo-slot">
                     <div class="preview-box"><img id="prev_${i}" class="hidden"><i class="fas fa-camera text-slate-300 absolute inset-0 flex items-center justify-center"></i></div>
-                    <input type="text" id="label_${i}" class="p-3 text-xs font-black border-b border-dashed outline-none" placeholder="Photo Description">
+                    <input type="text" id="label_${i}" class="p-3 text-xs font-black border-b border-dashed outline-none" placeholder="Description">
                     <button onclick="document.getElementById('cam_${i}').click()" class="bg-slate-100 py-3 rounded-xl text-[9px] font-black uppercase">Open Camera</button>
                     <input type="file" id="cam_${i}" class="hidden" accept="image/*" capture="environment" onchange="handleImg(${i})">
                 </div>`;
@@ -398,26 +391,15 @@
                     const ctx = canvas.getContext('2d');
                     canvas.width = 1000; canvas.height = (img.height/img.width)*1000;
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    
-                    const barH = canvas.height * 0.08;
-                    ctx.fillStyle = "rgba(0,0,0,0.6)"; ctx.fillRect(0, canvas.height-barH, canvas.width, barH);
+                    ctx.fillStyle = "rgba(0,0,0,0.6)"; ctx.fillRect(0, canvas.height-(canvas.height*0.08), canvas.width, canvas.height*0.08);
                     ctx.fillStyle = "white"; ctx.font = "bold 32px sans-serif";
-                    
                     const role = document.getElementById('userRole').value;
                     const outlet = document.getElementById('outletName').value;
-                    const name = document.getElementById('staffName').value;
+                    const name = document.getElementById('staffName').value.toUpperCase();
                     const date = document.getElementById('reportDate').value;
                     const time = new Date().toLocaleTimeString();
-                    
-                    // Unified timestamp for staff and AM portals
-                    let stamp = "";
-                    if (role === "Area Manager") {
-                        stamp = `${outlet} - ${name.toUpperCase()} - ${date} - ${time}`;
-                    } else {
-                        stamp = `${outlet} | ${name.toUpperCase()} | ${date} | ${time}`;
-                    }
-                    ctx.fillText(stamp, 30, canvas.height-(barH/2)+12);
-                    
+                    const stamp = (role === "Area Manager") ? `${outlet} - ${name} - ${date} - ${time}` : `${outlet} | ${name} | ${date} | ${time}`;
+                    ctx.fillText(stamp, 30, canvas.height-(canvas.height*0.08/2)+12);
                     const prev = document.getElementById(`prev_${idx}`);
                     prev.src = canvas.toDataURL('image/jpeg', 0.7);
                     prev.classList.remove('hidden');
@@ -428,72 +410,40 @@
         }
 
         async function submitReport() {
-            const btn = document.getElementById('submitBtn');
-            const btnText = document.getElementById('btnText');
-            const btnLoader = document.getElementById('btnLoader');
-            const interactionBlocker = document.getElementById('uploadSpinner');
-
+            const btn = document.getElementById('submitBtn'), btnText = document.getElementById('btnText'), btnLoader = document.getElementById('btnLoader'), blocker = document.getElementById('uploadSpinner');
             const images = [], photoNames = [];
             document.querySelectorAll('img[id^="prev_"]:not(.hidden)').forEach((img, i) => {
                 images.push(img.src.split(',')[1]);
                 const lblInput = document.getElementById('label_'+i);
-                const lbl = lblInput ? (lblInput.value || 'Evidence') : 'Evidence';
-                photoNames.push(`${currentTask}_${lbl}.jpg`);
+                photoNames.push(`${currentTask}_${lblInput ? (lblInput.value || 'Evidence') : 'Evidence'}.jpg`);
             });
 
             if(currentTask === 'AUDIT FORM') {
                 if(document.querySelectorAll('.audit-check:checked').length === 0) return alert("Must tick at least one achievement.");
-                // Point 1: Fixed check to 11 mandatory photos
                 if(images.length < 11) return alert("All 11 mandatory audit photos required.");
-                for(let i=0; i<4; i++) {
-                    if(!document.getElementById('disc_'+i).value.trim()) return alert("Fill all Discussion fields.");
-                }
-            } else if(currentTask !== 'KPI DISCUSSION' && images.length === 0) {
-                return alert("Photo evidence required.");
-            }
+                for(let i=0; i<4; i++) if(!document.getElementById('disc_'+i).value.trim()) return alert("Fill all Discussion fields.");
+            } else if(currentTask !== 'KPI DISCUSSION' && images.length === 0) return alert("Photo evidence required.");
 
-            // ACTIVATE LOADING STATE
-            interactionBlocker.style.display = "block";
-            btn.disabled = true;
-            btnText.style.display = "none";
-            btnLoader.style.display = "block";
+            blocker.style.display = "block"; btn.disabled = true; btnText.style.display = "none"; btnLoader.style.display = "block";
             
             let rem = "";
-            if(currentTask === 'AUDIT FORM') {
-                const disc = Array.from({length:4}, (_,i) => document.getElementById('disc_'+i).value).join(" | ");
-                rem = `SCORE: ${document.getElementById('currentScore').innerText}/46 | DISC: ${disc}`;
-            } else if(currentTask === 'KPI DISCUSSION') {
-                rem = `P: ${document.getElementById('kpi1').value} | L: ${document.getElementById('kpi2').value} | A: ${document.getElementById('kpi3').value}`;
-            } else {
-                rem = `TASK: ${document.getElementById('taskSub')?.value || document.getElementById('subTask')?.value} | ${document.getElementById('remarks')?.value || ''}`;
-            }
+            if(currentTask === 'AUDIT FORM') rem = `SCORE: ${document.getElementById('currentScore').innerText}/46 | DISC: ${Array.from({length:4}, (_,i) => document.getElementById('disc_'+i).value).join(" | ")}`;
+            else if(currentTask === 'KPI DISCUSSION') rem = `P: ${document.getElementById('kpi1').value} | L: ${document.getElementById('kpi2').value} | A: ${document.getElementById('kpi3').value}`;
+            else rem = `TASK: ${document.getElementById('taskSub')?.value || document.getElementById('subTask')?.value} | ${document.getElementById('remarks')?.value || ''}`;
 
             try {
                 const r = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ staff: document.getElementById('staffName').value, outlet: document.getElementById('outletName').value, category: currentCat, task: currentTask, remarks: rem, staffTime: document.getElementById('reportDate').value, images, photoNames })});
                 const result = await r.text();
-                
                 if(result.includes("Success")) {
                     document.getElementById('successOverlay').classList.remove('hidden');
                     setTimeout(() => {
                         document.getElementById('successOverlay').classList.add('hidden');
-                        interactionBlocker.style.display = "none";
-                        btnText.style.display = "block";
-                        btnLoader.style.display = "none";
-                        if (currentCat === 'AM') {
-                           openCategory('AM'); 
-                        } else {
-                           navTo(2); 
-                        }
+                        blocker.style.display = "none"; btnText.style.display = "block"; btnLoader.style.display = "none";
+                        if (currentCat === 'AM') openCategory('AM'); else navTo(2);
                         btn.disabled = false;
                     }, 2000);
-                }
-            } catch(e) { 
-                interactionBlocker.style.display = "none";
-                btnText.style.display = "block";
-                btnLoader.style.display = "none";
-                alert("Network Error"); 
-                btn.disabled = false; 
-            }
+                } else throw new Error();
+            } catch(e) { blocker.style.display = "none"; btnText.style.display = "block"; btnLoader.style.display = "none"; alert("Upload Failed. Check SCRIPT_URL."); btn.disabled = false; }
         }
 
         document.getElementById('supervisorBtn').onclick = () => {
@@ -508,74 +458,103 @@
         async function loadFeed() {
             const r = await fetch(SCRIPT_URL + "?action=read");
             const d = await r.json();
-            allSubmissions = d.submissions;
+            allSubmissions = d.submissions || [];
+            generateSubFilterOptions();
             filterFeed();
         }
 
         function setTab(tab) {
             currentTab = tab;
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.innerText === tab || (tab==='AM' && b.innerText==='AM PORTAL')));
+            generateSubFilterOptions();
             filterFeed();
         }
 
         function setTimeFilter(f) {
             timeFilter = f;
             document.querySelectorAll('.time-btn').forEach(b => {
-                b.classList.replace('bg-blue-600', 'bg-white');
-                b.classList.replace('text-white', 'text-slate-400');
+                const isSelected = b.id === `btn-${f}`;
+                b.classList.toggle('bg-blue-600', isSelected);
+                b.classList.toggle('text-white', isSelected);
+                b.classList.toggle('bg-white', !isSelected);
+                b.classList.toggle('text-slate-400', !isSelected);
             });
-            event.target.classList.replace('bg-white', 'bg-blue-600');
-            event.target.classList.replace('text-slate-400', 'text-white');
+            document.getElementById('subFilterContainer').classList.toggle('hidden', f === 'all');
+            generateSubFilterOptions();
             filterFeed();
+        }
+
+        function generateSubFilterOptions() {
+            const select = document.getElementById('subFilterSelect');
+            const label = document.getElementById('subFilterLabel');
+            select.innerHTML = '<option value="current">Current / Latest</option>';
+            
+            if(timeFilter === 'all') return;
+
+            const uniquePeriods = new Set();
+            allSubmissions.forEach(s => {
+                const d = new Date(s.staffTime);
+                if(timeFilter === 'year') uniquePeriods.add(d.getFullYear());
+                if(timeFilter === 'month') uniquePeriods.add(`${d.toLocaleString('default', { month: 'long' })} ${d.getFullYear()}`);
+                if(timeFilter === 'week') {
+                    const startOfYear = new Date(d.getFullYear(), 0, 1);
+                    const week = Math.ceil((((d - startOfYear) / 86400000) + startOfYear.getDay() + 1) / 7);
+                    uniquePeriods.add(`Week ${week} (${d.getFullYear()})`);
+                }
+            });
+
+            Array.from(uniquePeriods).sort().reverse().forEach(p => select.innerHTML += `<option value="${p}">${p}</option>`);
+            label.innerText = `Select ${timeFilter}`;
         }
 
         function filterFeed() {
             const q = document.getElementById('dashSearch').value.toLowerCase();
+            const subVal = document.getElementById('subFilterSelect').value;
             const now = new Date();
+
             const filtered = allSubmissions.filter(s => {
+                const sDate = new Date(s.staffTime);
                 const isCorrectTab = (currentTab === 'AM') ? (s.category === 'AM' || s.category === 'AREA MANAGER') : s.category === currentTab;
                 const matchSearch = s.staff.toLowerCase().includes(q) || s.outlet.toLowerCase().includes(q);
-                const sDate = new Date(s.staffTime);
+                
                 let matchTime = true;
-                if(timeFilter === 'week') matchTime = (now - sDate) < (7 * 86400000);
-                if(timeFilter === 'month') matchTime = sDate.getMonth() === now.getMonth();
-                if(timeFilter === 'year') matchTime = sDate.getFullYear() === now.getFullYear();
+                if(timeFilter === 'week' && subVal !== 'current') {
+                    const startOfYear = new Date(sDate.getFullYear(), 0, 1);
+                    const week = Math.ceil((((sDate - startOfYear) / 86400000) + startOfYear.getDay() + 1) / 7);
+                    matchTime = `Week ${week} (${sDate.getFullYear()})` === subVal;
+                } else if(timeFilter === 'month' && subVal !== 'current') {
+                    matchTime = `${sDate.toLocaleString('default', { month: 'long' })} ${sDate.getFullYear()}` === subVal;
+                } else if(timeFilter === 'year' && subVal !== 'current') {
+                    matchTime = sDate.getFullYear().toString() === subVal;
+                } else if (subVal === 'current') {
+                    if(timeFilter === 'week') matchTime = (now - sDate) < (7 * 86400000);
+                    if(timeFilter === 'month') matchTime = sDate.getMonth() === now.getMonth();
+                    if(timeFilter === 'year') matchTime = sDate.getFullYear() === now.getFullYear();
+                }
+
                 return isCorrectTab && matchSearch && matchTime;
             });
             
             document.getElementById('feedList').innerHTML = filtered.map(s => {
-                let photoHtml = '';
-                if(s.urls && s.urls.length > 0) {
-                    photoHtml = `<div class="gallery-container no-scrollbar">` + 
-                        s.urls.map(u => `<div class="gallery-item"><img src="${u}" onclick="window.open('${u}')"></div>`).join('') + 
-                        `</div>`;
-                } else if(s.url) {
-                    photoHtml = `<img src="${s.url}" onclick="window.open('${s.url}')" class="w-full h-44 object-cover rounded-2xl border">`;
-                }
-
-                return `
-                <div class="bg-white p-5 rounded-3xl border shadow-sm">
+                let photoHtml = s.urls?.length ? `<div class="gallery-container no-scrollbar">${s.urls.map(u => `<div class="gallery-item"><img src="${u}" onclick="window.open('${u}')"></div>`).join('')}</div>` : (s.url ? `<img src="${s.url}" onclick="window.open('${s.url}')" class="w-full h-44 object-cover rounded-2xl border">` : '');
+                return `<div class="bg-white p-5 rounded-3xl border shadow-sm">
                     <div class="flex justify-between items-start mb-2">
                         <div><h4 class="font-black text-sm uppercase">${s.staff}</h4><p class="text-[9px] font-black text-blue-600 uppercase">${s.outlet}</p></div>
                         <span class="text-[9px] font-black text-slate-300 uppercase">${s.staffTime}</span>
                     </div>
                     <div class="bg-slate-50 p-2 rounded-lg text-[10px] font-bold text-slate-500 mb-2">${s.task}</div>
                     ${photoHtml}
-                    <button onclick="window.open('${SCRIPT_URL}?action=generatePDF&rowId=${s.rowId}')" class="w-full mt-3 py-2 border rounded-xl text-[9px] font-black uppercase text-slate-400"><i class="fas fa-file-pdf mr-1"></i> VIEW INDIVIDUAL PDF</button>
-                </div>
-            `}).join('');
+                    <button onclick="window.open('${SCRIPT_URL}?action=generatePDF&rowId=${s.rowId}&tab=${currentTab === 'AM' ? 'Submissions_AM' : (currentTab === 'MARKETING' ? 'Submissions_Marketing' : 'Submissions_Staff')}')" class="w-full mt-3 py-2 border rounded-xl text-[9px] font-black uppercase text-slate-400"><i class="fas fa-file-pdf mr-1"></i> VIEW INDIVIDUAL PDF</button>
+                </div>`;
+            }).join('');
             document.getElementById('totalCount').innerText = filtered.length;
         }
 
         function downloadAllPDF() {
-            const queryParams = `?action=combinedPDF&tab=${currentTab}&time=${timeFilter}`;
-            window.open(SCRIPT_URL + queryParams);
+            window.open(`${SCRIPT_URL}?action=combinedPDF&tab=${currentTab}&time=${timeFilter}`);
         }
 
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js').then(() => console.log("Service Worker Registered"));
-        }
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
     </script>
 </body>
 </html>
