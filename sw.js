@@ -1,4 +1,4 @@
-const CACHE_NAME = 'instareport-v11-5';
+const CACHE_NAME = 'instareport-v2-1';
 const assets = [
   './',
   './index.html',
@@ -21,4 +21,5 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
+
 });
