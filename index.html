@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>InstaReport Pro v11.5</title>
+    <title>InstaReport Pro v2.1</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -46,7 +46,6 @@
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         select, input, textarea { font-size: 16px !important; }
-        .tab-btn.active { border-bottom: 3px solid #2563eb; color: #2563eb; }
 
         /* BUTTON SPINNER */
         .btn-loader { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; width: 20px; height: 20px; animation: spin 0.8s linear infinite; display: none; }
@@ -65,7 +64,7 @@
     <div id="page1" class="page active min-h-screen p-6">
         <header class="text-center mt-4 mb-10">
             <h1 class="text-4xl font-black text-blue-600 tracking-tighter">InstaReport</h1>
-            <p class="text-slate-400 text-[10px] font-black tracking-[0.2em] uppercase mt-1">Enterprise Portal v11.5</p>
+            <p class="text-slate-400 text-[10px] font-black tracking-[0.2em] uppercase mt-1">Enterprise Portal v2.1</p>
         </header>
 
         <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 space-y-6">
@@ -196,7 +195,7 @@
             "R9 - IFFAH / RAIHAN": ["GM", "CK"]
         };
 
-        const allOutlets = ["AJ", "B6", "BB", "BJR", "BP", "CDR", "CK", "DG", "DGD", "GB", "GBD", "GM", "HL", "HQ", "HQCT", "JL", "JLD", "JTH", "KB", "KBKK", "KBKS", "KBTJ", "KKR", "KL", "KMD", "KMN", "KMSK", "KS", "MC", "MLR", "MR", "PC", "PK", "PM", "PP", "PPK", "PSPD", "PT", "RJ", "RP", "SLS", "SMR", "ST", "TM", "TMD", "TMT", "TPOH", "TPT", "WM"];
+        const allOutlets = ["AJ", "B6", "BB", "BJR", "BP", "CDR", "CK", "DG", "DGD", "GB", "GBD", "GM", "HL", "HQ", "HQCT", "JL", "JLD", "JTH", "KB", "KBKK", "KBKS", "KBTJ", "KKR", "KL", "KMD", "KMN", "KMSK", "KS", "MC", "MLR", "MR", "PC", "PK", "PM", "PP", "PPK", "PSPD", "PT", "RJ", "SLS", "SMR", "ST", "TM", "TMD", "TMT", "TPOH", "TPT", "WM"];
         const productsList = ["Mom & Baby", "Health Supplement", "Food Supplement", "OTC", "Personal Care", "Rehab", "Dressing", "Back Counter"];
         const planogramTasks = ["House Brand Products", "Focused Products 1", "Focused Products 2 & 3", "End Cap", "Store Layout", "Housekeeping", "Clear Price Tag", "Shelf Tags", "Pharmacist Tags", "Store Display", "Welcoming Board", "Updated Promo"];
         
@@ -233,8 +232,13 @@
             else superBtn.style.display = "none";
 
             if(num === 2) {
-                if(!document.getElementById('staffName').value) return alert("Enter Name");
                 const role = document.getElementById('userRole').value;
+                const name = document.getElementById('staffName').value;
+                const region = document.getElementById('amRegion').value;
+                
+                if(!name) return alert("Enter Name");
+                if(role === "Area Manager" && !region) return alert("Please select your AM Region to proceed.");
+
                 const isAM = role === "Area Manager";
                 document.getElementById('menu_outlet').classList.toggle('hidden', isAM);
                 document.getElementById('menu_marketing').classList.toggle('hidden', isAM);
@@ -356,7 +360,7 @@
                 container.innerHTML += h + `</div>`;
             });
             
-            const discItems = ["Discussion with BM", "Staff Challenges", "Ground feedback", "Event Plan & Update"];
+            const discItems = ["DISCUSSION WITH PIC", "Staff Challenges", "Ground feedback", "Event Plan & Update"];
             let dHtml = `<div class="audit-section"><h4 class="text-blue-800 font-black text-[10px] mb-4 border-b pb-2 uppercase tracking-widest">Discussion & Brainstorming</h4>`;
             discItems.forEach((di, idx) => {
                 dHtml += `<div class="mb-4">
@@ -405,7 +409,7 @@
                     const date = document.getElementById('reportDate').value;
                     const time = new Date().toLocaleTimeString();
                     
-                    // Logic: Enhanced Timestamps
+                    // Unified timestamp for staff and AM portals
                     let stamp = "";
                     if (role === "Area Manager") {
                         stamp = `${outlet} - ${name.toUpperCase()} - ${date} - ${time}`;
@@ -439,7 +443,8 @@
 
             if(currentTask === 'AUDIT FORM') {
                 if(document.querySelectorAll('.audit-check:checked').length === 0) return alert("Must tick at least one achievement.");
-                if(images.length < 12) return alert("All 12 mandatory audit photos required.");
+                // Point 1: Fixed check to 11 mandatory photos
+                if(images.length < 11) return alert("All 11 mandatory audit photos required.");
                 for(let i=0; i<4; i++) {
                     if(!document.getElementById('disc_'+i).value.trim()) return alert("Fill all Discussion fields.");
                 }
