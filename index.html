@@ -420,21 +420,17 @@
         const response = await fetch(`${SCRIPT_URL}?action=generatePDF&rowId=${rowId}&tab=${tabName}`);
         const result = await response.json();
         
-        if (!result.data) {
-            alert("Error: No data received from server.");
-            return;
-        }
+        if (!result.data) throw new Error("No data received");
 
-        // Create a hidden link and trigger download
+        // Convert Base64 string to a downloadable link
         const link = document.createElement('a');
         link.href = `data:application/pdf;base64,${result.data}`;
         link.download = result.filename || `Report_${rowId}.pdf`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        
     } catch (e) {
-        alert("PDF Generation Failed. Please ensure your GAS is deployed as a 'New Version'.");
+        alert("PDF failed to load. Ensure GAS is deployed as a 'New Version'.");
     } finally {
         blocker.style.display = "none";
     }
@@ -558,4 +554,5 @@
     </script>
 </body>
 </html>
+
 
