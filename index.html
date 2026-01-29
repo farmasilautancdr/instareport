@@ -45,12 +45,11 @@
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* Version Branding */
         .v-badge { font-size: 10px; font-weight: 900; color: #2563eb; letter-spacing: 2px; }
-
-        /* BUTTON SPINNER */
         .btn-loader { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; width: 20px; height: 20px; animation: spin 0.8s linear infinite; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .tab-btn.active { border-bottom: 3px solid #2563eb; color: #2563eb; }
     </style>
 </head>
 <body class="antialiased text-slate-900">
@@ -174,9 +173,12 @@
                     <button id="btn-year" onclick="setTimeFilter('year')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black uppercase">Year</button>
                 </div>
 
-                <div id="subFilterContainer" class="hidden grid grid-cols-1 gap-2 bg-slate-50 p-2 rounded-xl border border-slate-100">
-                    <label id="subFilterLabel" class="text-[8px] font-black text-blue-600 uppercase ml-1">Select Period</label>
-                    <select id="subFilterSelect" onchange="filterFeed()" class="w-full p-2 bg-white rounded-lg text-xs font-bold outline-none border border-slate-100"></select>
+                <div id="subFilterContainer" class="hidden space-y-2 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-3 top-3.5 text-slate-300 text-xs"></i>
+                        <input type="text" id="periodSearch" onkeyup="searchPeriods()" placeholder="Search week/month..." class="w-full pl-8 p-3 bg-white rounded-xl text-xs font-bold border border-slate-100 outline-none">
+                    </div>
+                    <select id="subFilterSelect" onchange="filterFeed()" class="w-full p-3 bg-white rounded-xl text-xs font-bold border border-slate-100 outline-none"></select>
                 </div>
             </div>
         </nav>
@@ -187,11 +189,12 @@
     <div id="supervisorBtn"><i class="fas fa-lock"></i></div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzgsyV3uymPOyKXx8KdwAe_TvNuMozuW5jIqzUX1YwHYf1Qn3I3_vu-FtvJUYPtm-c/exec"; // REPLACE THIS WITH YOUR DEPLOYMENT URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzgsyV3uymPOyKXx8KdwAe_TvNuMozuW5jIqzUX1YwHYf1Qn3I3_vu-FtvJUYPtm-c/exec"; // REPLACE THIS
         const AM_PASS = "AM2026", SUPER_PASS = "8899";
         
         let isAmAuthenticated = false;
         let currentCat = "", currentTask = "", timeFilter = "all", currentTab = "STAFF", allSubmissions = [];
+        let allPeriodOptions = []; // For searchable sub-filters
 
         const regions = {
             "R1 - AMIRUL": ["DG", "DGD", "KMD", "KMN", "KMSK", "MR"],
@@ -205,7 +208,7 @@
             "R9 - IFFAH / RAIHAN": ["GM", "CK"]
         };
 
-        const allOutlets = ["AJ", "B6", "BB", "BJR", "BP", "CDR", "CK", "DG", "DGD", "GB", "GBD", "GM", "HL", "HQ", "HQCT", "JL", "JLD", "JTH", "KB", "KBKK", "KBKS", "KBTJ", "KKR", "KL", "KMD", "KMN", "KMSK", "KS", "MC", "MLR", "MR", "PC", "PK", "PM", "PP", "PPK", "PSPD", "PT", "RJ", "SLS", "SMR", "ST", "TM", "TMD", "TMT", "TPOH", "TPT", "WM"];
+        const allOutlets = ["AJ", "B6", "BB", "BJR", "BP", "CDR", "CK", "DG", "DGD", "GB", "GBD", "GM", "HL", "HQ", "HQCT", "JL", "JLD", "JTH", "KB", "KBKK", "KBKS", "KBTJ", "KKR", "KL", "KMD", "KMN", "KMSK", "KS", "MC", "MLR", "MR", "PC", "PK", "PM", "PP", "PPK", "PSPD", "PT", "RJ", "RP", "SLS", "SMR", "ST", "TM", "TMD", "TMT", "TPOH", "TPT", "WM"];
         const productsList = ["Mom & Baby", "Health Supplement", "Food Supplement", "OTC", "Personal Care", "Rehab", "Dressing", "Back Counter"];
         const planogramTasks = ["House Brand Products", "Focused Products 1", "Focused Products 2 & 3", "End Cap", "Store Layout", "Housekeeping", "Clear Price Tag", "Shelf Tags", "Pharmacist Tags", "Store Display", "Welcoming Board", "Updated Promo"];
 
@@ -258,7 +261,7 @@
 
         function openCategory(cat) {
             if(cat === 'AM' && !isAmAuthenticated) {
-                if(prompt("Enter AM PIN") === AM_PASS) isAmAuthenticated = true;
+                if(prompt("Security: Enter AM PIN") === AM_PASS) isAmAuthenticated = true;
                 else return;
             }
             currentCat = cat;
@@ -333,18 +336,17 @@
 
             let photoIdx = 0;
             container.innerHTML = "";
-
             auditData.forEach(sec => {
                 let h = `<div class="audit-section"><h4 class="text-blue-600 font-black text-[10px] mb-4 border-b pb-2 uppercase tracking-widest">${sec.title}</h4>`;
                 sec.items.forEach(item => {
                     if(item.header) {
-                        h += `<div class="mt-4 mb-2"><span class="text-[10px] font-black text-slate-400 uppercase">${item.n}</span></div>`;
+                        h += `<div class="mt-4 mb-2"><span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">${item.n}</span></div>`;
                     } else {
                         h += `<div class="py-3 border-b border-slate-50 last:border-0"><div class="flex justify-between items-center"><span class="text-xs font-black text-slate-600 pr-4">${item.n}</span><input type="checkbox" class="audit-check" onchange="calcAudit()"></div>`;
                         if(item.snap) {
                             h += `<div class="photo-slot">
                                     <div class="preview-box"><img id="prev_${photoIdx}" class="hidden"><i class="fas fa-camera text-slate-300 absolute inset-0 flex items-center justify-center"></i></div>
-                                    <button onclick="document.getElementById('cam_${photoIdx}').click()" class="bg-blue-50 text-blue-600 py-3 rounded-xl text-[9px] font-black uppercase">Snap Evidence</button>
+                                    <button onclick="document.getElementById('cam_${photoIdx}').click()" class="bg-blue-50 text-blue-600 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest">Snap Evidence</button>
                                     <input type="file" id="cam_${photoIdx}" class="hidden" accept="image/*" capture="environment" onchange="handleImg(${photoIdx})">
                                     <input type="hidden" id="label_${photoIdx}" value="${item.n}">
                                   </div>`;
@@ -443,7 +445,7 @@
                         btn.disabled = false;
                     }, 2000);
                 } else throw new Error();
-            } catch(e) { blocker.style.display = "none"; btnText.style.display = "block"; btnLoader.style.display = "none"; alert("Upload Failed. Check SCRIPT_URL."); btn.disabled = false; }
+            } catch(e) { blocker.style.display = "none"; btnText.style.display = "block"; btnLoader.style.display = "none"; alert("Upload Failed."); btn.disabled = false; }
         }
 
         document.getElementById('supervisorBtn').onclick = () => {
@@ -463,6 +465,25 @@
             filterFeed();
         }
 
+        async function downloadIndividualPDF(rowId, tabName) {
+            const blocker = document.getElementById('uploadSpinner');
+            blocker.style.display = "block";
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=generatePDF&rowId=${rowId}&tab=${tabName}`);
+                const result = await response.json();
+                const link = document.createElement('a');
+                link.href = `data:application/pdf;base64,${result.data}`;
+                link.download = result.filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (e) {
+                alert("PDF Generation Failed.");
+            } finally {
+                blocker.style.display = "none";
+            }
+        }
+
         function setTab(tab) {
             currentTab = tab;
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.innerText === tab || (tab==='AM' && b.innerText==='AM PORTAL')));
@@ -480,6 +501,7 @@
                 b.classList.toggle('text-slate-400', !isSelected);
             });
             document.getElementById('subFilterContainer').classList.toggle('hidden', f === 'all');
+            document.getElementById('periodSearch').value = "";
             generateSubFilterOptions();
             filterFeed();
         }
@@ -487,14 +509,14 @@
         function generateSubFilterOptions() {
             const select = document.getElementById('subFilterSelect');
             const label = document.getElementById('subFilterLabel');
-            select.innerHTML = '<option value="current">Current / Latest</option>';
+            allPeriodOptions = [];
             
             if(timeFilter === 'all') return;
 
             const uniquePeriods = new Set();
             allSubmissions.forEach(s => {
                 const d = new Date(s.staffTime);
-                if(timeFilter === 'year') uniquePeriods.add(d.getFullYear());
+                if(timeFilter === 'year') uniquePeriods.add(d.getFullYear().toString());
                 if(timeFilter === 'month') uniquePeriods.add(`${d.toLocaleString('default', { month: 'long' })} ${d.getFullYear()}`);
                 if(timeFilter === 'week') {
                     const startOfYear = new Date(d.getFullYear(), 0, 1);
@@ -503,20 +525,31 @@
                 }
             });
 
-            Array.from(uniquePeriods).sort().reverse().forEach(p => select.innerHTML += `<option value="${p}">${p}</option>`);
+            allPeriodOptions = Array.from(uniquePeriods).sort().reverse();
+            renderPeriodDropdown(allPeriodOptions);
             label.innerText = `Select ${timeFilter}`;
+        }
+
+        function renderPeriodDropdown(options) {
+            const select = document.getElementById('subFilterSelect');
+            select.innerHTML = '<option value="current">Current / Latest</option>';
+            options.forEach(p => select.innerHTML += `<option value="${p}">${p}</option>`);
+        }
+
+        function searchPeriods() {
+            const query = document.getElementById('periodSearch').value.toLowerCase();
+            const filtered = allPeriodOptions.filter(opt => opt.toLowerCase().includes(query));
+            renderPeriodDropdown(filtered);
         }
 
         function filterFeed() {
             const q = document.getElementById('dashSearch').value.toLowerCase();
             const subVal = document.getElementById('subFilterSelect').value;
             const now = new Date();
-
             const filtered = allSubmissions.filter(s => {
                 const sDate = new Date(s.staffTime);
                 const isCorrectTab = (currentTab === 'AM') ? (s.category === 'AM' || s.category === 'AREA MANAGER') : s.category === currentTab;
                 const matchSearch = s.staff.toLowerCase().includes(q) || s.outlet.toLowerCase().includes(q);
-                
                 let matchTime = true;
                 if(timeFilter === 'week' && subVal !== 'current') {
                     const startOfYear = new Date(sDate.getFullYear(), 0, 1);
@@ -531,12 +564,12 @@
                     if(timeFilter === 'month') matchTime = sDate.getMonth() === now.getMonth();
                     if(timeFilter === 'year') matchTime = sDate.getFullYear() === now.getFullYear();
                 }
-
                 return isCorrectTab && matchSearch && matchTime;
             });
             
             document.getElementById('feedList').innerHTML = filtered.map(s => {
                 let photoHtml = s.urls?.length ? `<div class="gallery-container no-scrollbar">${s.urls.map(u => `<div class="gallery-item"><img src="${u}" onclick="window.open('${u}')"></div>`).join('')}</div>` : (s.url ? `<img src="${s.url}" onclick="window.open('${s.url}')" class="w-full h-44 object-cover rounded-2xl border">` : '');
+                const targetTab = (currentTab === 'AM') ? 'Submissions_AM' : (currentTab === 'MARKETING' ? 'Submissions_Marketing' : 'Submissions_Staff');
                 return `<div class="bg-white p-5 rounded-3xl border shadow-sm">
                     <div class="flex justify-between items-start mb-2">
                         <div><h4 class="font-black text-sm uppercase">${s.staff}</h4><p class="text-[9px] font-black text-blue-600 uppercase">${s.outlet}</p></div>
@@ -544,7 +577,7 @@
                     </div>
                     <div class="bg-slate-50 p-2 rounded-lg text-[10px] font-bold text-slate-500 mb-2">${s.task}</div>
                     ${photoHtml}
-                    <button onclick="window.open('${SCRIPT_URL}?action=generatePDF&rowId=${s.rowId}&tab=${currentTab === 'AM' ? 'Submissions_AM' : (currentTab === 'MARKETING' ? 'Submissions_Marketing' : 'Submissions_Staff')}')" class="w-full mt-3 py-2 border rounded-xl text-[9px] font-black uppercase text-slate-400"><i class="fas fa-file-pdf mr-1"></i> VIEW INDIVIDUAL PDF</button>
+                    <button onclick="downloadIndividualPDF(${s.rowId}, '${targetTab}')" class="w-full mt-3 py-2 border rounded-xl text-[9px] font-black uppercase text-slate-400"><i class="fas fa-file-pdf mr-1"></i> VIEW INDIVIDUAL PDF</button>
                 </div>`;
             }).join('');
             document.getElementById('totalCount').innerText = filtered.length;
