@@ -98,7 +98,7 @@
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Reporting Date</label>
                 <input type="date" id="reportDate" class="w-full mt-1.5 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-blue-600">
             </div>
-            <button onclick="navTo(2)" class="w-full bg-blue-600 text-white font-black py-5 rounded-3xl shadow-xl active:scale-95 transition-all">DASHBOARD <i class="fas fa-arrow-right ml-2"></i></button>
+            <button onclick="navTo(2)" class="w-full bg-blue-600 text-white font-black py-5 rounded-3xl shadow-xl active:scale-95 transition-all uppercase tracking-widest">Dashboard <i class="fas fa-arrow-right ml-2"></i></button>
         </div>
     </div>
 
@@ -165,14 +165,13 @@
 
             <div class="space-y-3">
                 <input type="text" id="dashSearch" onkeyup="filterFeed()" placeholder="Search Name/Outlet..." class="w-full p-4 bg-slate-50 rounded-2xl text-sm font-bold outline-none border border-slate-100">
-                
                 <div class="grid grid-cols-4 gap-2">
                     <button id="btn-all" onclick="setTimeFilter('all')" class="time-btn bg-blue-600 text-white p-2 rounded-lg text-[8px] font-black uppercase">ALL</button>
                     <button id="btn-week" onclick="setTimeFilter('week')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black uppercase">Week</button>
                     <button id="btn-month" onclick="setTimeFilter('month')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black uppercase">Month</button>
                     <button id="btn-year" onclick="setTimeFilter('year')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black uppercase">Year</button>
                 </div>
-
+                
                 <div id="subFilterContainer" class="hidden space-y-2 bg-slate-50 p-3 rounded-2xl border border-slate-100">
                     <div class="relative">
                         <i class="fas fa-search absolute left-3 top-3.5 text-slate-300 text-xs"></i>
@@ -189,12 +188,12 @@
     <div id="supervisorBtn"><i class="fas fa-lock"></i></div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzgsyV3uymPOyKXx8KdwAe_TvNuMozuW5jIqzUX1YwHYf1Qn3I3_vu-FtvJUYPtm-c/exec"; // REPLACE THIS
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzgsyV3uymPOyKXx8KdwAe_TvNuMozuW5jIqzUX1YwHYf1Qn3I3_vu-FtvJUYPtm-c/exec";
         const AM_PASS = "AM2026", SUPER_PASS = "8899";
         
         let isAmAuthenticated = false;
         let currentCat = "", currentTask = "", timeFilter = "all", currentTab = "STAFF", allSubmissions = [];
-        let allPeriodOptions = []; // For searchable sub-filters
+        let allPeriodOptions = [];
 
         const regions = {
             "R1 - AMIRUL": ["DG", "DGD", "KMD", "KMN", "KMSK", "MR"],
@@ -335,7 +334,10 @@
             ];
 
             let photoIdx = 0;
+            const photoGrid = document.getElementById('photoGrid');
             container.innerHTML = "";
+            photoGrid.innerHTML = ""; // Ensure global photo grid is cleared
+
             auditData.forEach(sec => {
                 let h = `<div class="audit-section"><h4 class="text-blue-600 font-black text-[10px] mb-4 border-b pb-2 uppercase tracking-widest">${sec.title}</h4>`;
                 sec.items.forEach(item => {
@@ -471,14 +473,15 @@
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=generatePDF&rowId=${rowId}&tab=${tabName}`);
                 const result = await response.json();
+                if(!result.data) throw new Error("No PDF data");
                 const link = document.createElement('a');
                 link.href = `data:application/pdf;base64,${result.data}`;
-                link.download = result.filename;
+                link.download = result.filename || "report.pdf";
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
             } catch (e) {
-                alert("PDF Generation Failed.");
+                alert("PDF Generation Failed. Ensure latest GAS (v2.3) is deployed as a New Version.");
             } finally {
                 blocker.style.display = "none";
             }
@@ -510,9 +513,7 @@
             const select = document.getElementById('subFilterSelect');
             const label = document.getElementById('subFilterLabel');
             allPeriodOptions = [];
-            
             if(timeFilter === 'all') return;
-
             const uniquePeriods = new Set();
             allSubmissions.forEach(s => {
                 const d = new Date(s.staffTime);
@@ -524,7 +525,6 @@
                     uniquePeriods.add(`Week ${week} (${d.getFullYear()})`);
                 }
             });
-
             allPeriodOptions = Array.from(uniquePeriods).sort().reverse();
             renderPeriodDropdown(allPeriodOptions);
             label.innerText = `Select ${timeFilter}`;
@@ -548,7 +548,7 @@
             const now = new Date();
             const filtered = allSubmissions.filter(s => {
                 const sDate = new Date(s.staffTime);
-                const isCorrectTab = (currentTab === 'AM') ? (s.category === 'AM' || s.category === 'AREA MANAGER') : s.category === currentTab;
+                const isCorrectTab = (currentTab === 'AM') ? (s.category === 'AM' || s.category === 'AREA MANAGER') : (s.category === currentTab);
                 const matchSearch = s.staff.toLowerCase().includes(q) || s.outlet.toLowerCase().includes(q);
                 let matchTime = true;
                 if(timeFilter === 'week' && subVal !== 'current') {
@@ -569,7 +569,8 @@
             
             document.getElementById('feedList').innerHTML = filtered.map(s => {
                 let photoHtml = s.urls?.length ? `<div class="gallery-container no-scrollbar">${s.urls.map(u => `<div class="gallery-item"><img src="${u}" onclick="window.open('${u}')"></div>`).join('')}</div>` : (s.url ? `<img src="${s.url}" onclick="window.open('${s.url}')" class="w-full h-44 object-cover rounded-2xl border">` : '');
-                const targetTab = (currentTab === 'AM') ? 'Submissions_AM' : (currentTab === 'MARKETING' ? 'Submissions_Marketing' : 'Submissions_Staff');
+                // Correctly fallback to staff tab if tabName is missing
+                const targetTab = s.tabName || ((currentTab === 'AM') ? 'Submissions_AM' : (currentTab === 'MARKETING' ? 'Submissions_Marketing' : 'Submissions_Staff'));
                 return `<div class="bg-white p-5 rounded-3xl border shadow-sm">
                     <div class="flex justify-between items-start mb-2">
                         <div><h4 class="font-black text-sm uppercase">${s.staff}</h4><p class="text-[9px] font-black text-blue-600 uppercase">${s.outlet}</p></div>
