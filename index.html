@@ -33,7 +33,6 @@
         .tab-btn.active { border-bottom: 3px solid #2563eb; color: #2563eb; }
         #bulkBar { position: fixed; bottom: 0; left: 0; right: 0; background: #2563eb; color: white; padding: 15px; z-index: 1000; border-radius: 20px 20px 0 0; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -10px 25px rgba(0,0,0,0.1); }
         
-        /* NEW GALLERY OVERLAY */
         #galleryOverlay { display:none; position:fixed; inset:0; background:black; z-index:50000; flex-direction:column; }
         #galleryContent { flex:1; display:flex; overflow-x:auto; scroll-snap-type:x mandatory; }
         .gallery-full-img { flex:0 0 100%; scroll-snap-align:center; display:flex; align-items:center; justify-content:center; padding:20px; }
@@ -232,15 +231,12 @@
             list.forEach(o => select.innerHTML += `<option value="${o}">${o}</option>`);
         }
 
-        /* 1. AM BLOCKER FIX */
         function navTo(num) {
             if(num === 2) {
                 const role = document.getElementById('userRole').value;
                 const name = document.getElementById('staffName').value;
                 const region = document.getElementById('amRegion').value;
-                
                 if(!name) return alert("Please enter your name.");
-                // Check if role is AM but region not selected
                 if(role === "Area Manager" && !region) return alert("Area Managers must select an AM Region to proceed.");
                 
                 const isAM = role === "Area Manager";
@@ -249,7 +245,6 @@
                 document.getElementById('menu_am').classList.toggle('hidden', !isAM);
                 document.getElementById('displayRole').innerText = isAM ? "AM Portal" : "Staff Portal";
             }
-            
             document.getElementById('supervisorBtn').style.display = (num === 1) ? "flex" : "none";
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             const targetPage = document.getElementById('page' + num);
@@ -353,7 +348,6 @@
 
         function calcAudit() { document.getElementById('currentScore').innerText = document.querySelectorAll('.audit-check:checked').length; }
 
-        /* 3. TIMESTAMP & STAMPED OVERLAY FIX */
         function handleImg(idx) {
             const file = document.getElementById(`cam_${idx}`).files[0];
             const reader = new FileReader();
@@ -363,24 +357,15 @@
                     const canvas = document.getElementById('compressCanvas'), ctx = canvas.getContext('2d');
                     canvas.width = 1000; canvas.height = (img.height/img.width)*1000;
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    
-                    // TIMESTAMP BOX
                     ctx.fillStyle = "rgba(0,0,0,0.6)"; 
                     ctx.fillRect(0, canvas.height-60, canvas.width, 60);
-                    
-                    // TEXT STYLING
                     ctx.fillStyle = "white"; 
                     ctx.font = "bold 24px sans-serif";
-                    
-                    const role = document.getElementById('userRole').value;
                     const outlet = document.getElementById('outletName').value;
                     const name = document.getElementById('staffName').value.toUpperCase();
                     const dateStr = new Date().toLocaleString('en-MY', { timeZone: 'Asia/Kuala Lumpur' });
-                    
-                    // WATERMARK TEXT
                     const stamp = `${outlet} | ${name} | ${dateStr} | STAMPED`;
                     ctx.fillText(stamp, 20, canvas.height-22);
-                    
                     const prev = document.getElementById(`prev_${idx}`);
                     prev.src = canvas.toDataURL('image/jpeg', 0.7);
                     prev.classList.remove('hidden');
@@ -524,23 +509,15 @@
             filtered.forEach(p => select.innerHTML += `<option value="${p}">${p}</option>`);
         }
 
-        /* 2. SPECIFIC TIME FILTERING LOGIC FIX */
         function filterFeed() {
             const q = document.getElementById('dashSearch').value.toLowerCase();
             const subVal = document.getElementById('subFilterSelect').value;
-            
             const filtered = allSubmissions.filter(s => {
                 const sDate = new Date(s.staffTime);
                 const targetSheet = currentTab === 'MARKETING' ? "Submissions_Marketing" : (currentTab === 'AM' ? "Submissions_AM" : "Submissions_Staff");
-                
-                // Portal Check
                 if (s.tabName !== targetSheet) return false;
-                
-                // Search Check
                 const matchSearch = s.staff.toLowerCase().includes(q) || s.outlet.toLowerCase().includes(q) || s.task.toLowerCase().includes(q);
                 if (!matchSearch) return false;
-
-                // Date Filtering Check
                 if(timeFilter !== 'all' && subVal !== 'current') {
                     if(timeFilter === 'year') return sDate.getFullYear().toString() === subVal;
                     if(timeFilter === 'month') return `${sDate.toLocaleString('default', { month: 'long' })} ${sDate.getFullYear()}` === subVal;
@@ -552,12 +529,12 @@
                 }
                 return true;
             });
-            
             renderFeed(filtered);
             document.getElementById('totalCount').innerText = filtered.length + " Reports";
             document.getElementById('bulkBar').classList.toggle('hidden', filtered.length === 0);
         }
 
+        /* 1. RENDER FEED WITH THUMBNAIL PROXY FIX */
         function renderFeed(items) {
             const feed = document.getElementById('feedList');
             if (items.length === 0) {
@@ -567,10 +544,18 @@
             feed.innerHTML = items.map(s => {
                 const targetTab = s.tabName || 'Submissions_Staff'; 
                 
-                /* 2. GALLERY FIX: Pass all urls as an array string to openGallery */
-                const urlList = s.urls ? JSON.stringify(s.urls).replace(/"/g, "&quot;") : "[]";
+                // CRITICAL FIX: Convert standard Drive URLs into public-peek thumbnail proxies
+                const processedUrls = (s.urls || []).map(u => {
+                    if (u.includes("id=")) {
+                        const id = u.split("id=")[1].split("&")[0];
+                        return `https://drive.google.com/thumbnail?id=${id}&sz=w1000`;
+                    }
+                    return u;
+                });
+
+                const urlListStr = JSON.stringify(processedUrls).replace(/"/g, "&quot;");
                 
-                let photoHtml = s.urls?.length ? `<div class="gallery-container no-scrollbar">${s.urls.map((u, index) => `<div class="gallery-item"><img src="${u}" onclick="openGallery(${urlList}, ${index})"></div>`).join('')}</div>` : (s.url ? `<img src="${s.url}" class="w-full h-44 object-cover rounded-2xl border" onclick="openGallery(['${s.url}'], 0)">` : '');
+                let photoHtml = processedUrls.length ? `<div class="gallery-container no-scrollbar">${processedUrls.map((u, index) => `<div class="gallery-item"><img src="${u}" onclick="openGallery(${urlListStr}, ${index})"></div>`).join('')}</div>` : '';
                 
                 return `<div class="bg-white p-5 rounded-3xl border shadow-sm relative">
                         <div class="absolute top-4 right-4"><input type="checkbox" value="${s.rowId}|${targetTab}" class="report-checkbox" onchange="updateSelectedCount()"></div>
@@ -580,41 +565,26 @@
                         </div>
                         <div class="bg-slate-50 p-2 rounded-lg text-[10px] font-bold text-slate-500 mb-2">${s.task}</div>
                         ${photoHtml}
-                        <button onclick="downloadIndividualPDF(${s.rowId}, '${targetTab}')" class="w-full mt-3 py-2 border rounded-xl text-[9px] font-black uppercase text-slate-400">
-                            <i class="fas fa-file-pdf mr-1"></i> VIEW NEAT FORM PDF
-                        </button>
+                        <button onclick="downloadIndividualPDF(${s.rowId}, '${targetTab}')" class="w-full mt-3 py-2 border rounded-xl text-[9px] font-black uppercase text-slate-400">VIEW NEAT FORM PDF</button>
                     </div>`;
             }).join('');
         }
 
-        /* 2. MULTI-PHOTO GALLERY FUNCTIONS */
         function openGallery(urls, startIndex) {
             const overlay = document.getElementById('galleryOverlay');
             const content = document.getElementById('galleryContent');
             content.innerHTML = "";
-            
-            urls.forEach((u, i) => {
-                content.innerHTML += `<div class="gallery-full-img"><img src="${u}"></div>`;
-            });
-            
+            urls.forEach((u, i) => { content.innerHTML += `<div class="gallery-full-img"><img src="${u}"></div>`; });
             overlay.style.display = "flex";
             document.getElementById('galleryCounter').innerText = `${startIndex + 1} / ${urls.length}`;
-            
-            // Scroll to clicked image
-            setTimeout(() => {
-                content.scrollLeft = content.clientWidth * startIndex;
-            }, 50);
-
-            // Update counter on scroll
+            setTimeout(() => { content.scrollLeft = content.clientWidth * startIndex; }, 50);
             content.onscroll = () => {
                 const index = Math.round(content.scrollLeft / content.clientWidth);
                 document.getElementById('galleryCounter').innerText = `${index + 1} / ${urls.length}`;
             };
         }
 
-        function closeGallery() {
-            document.getElementById('galleryOverlay').style.display = "none";
-        }
+        function closeGallery() { document.getElementById('galleryOverlay').style.display = "none"; }
 
         function toggleSelectAll() {
             const master = document.getElementById('selectAll').checked;
