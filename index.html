@@ -414,17 +414,31 @@
         }
 
         async function downloadIndividualPDF(rowId, tabName) {
-            const blocker = document.getElementById('uploadSpinner');
-            blocker.style.display = "block";
-            try {
-                const response = await fetch(`${SCRIPT_URL}?action=generatePDF&rowId=${rowId}&tab=${tabName}`);
-                const result = await response.json();
-                const link = document.createElement('a');
-                link.href = `data:application/pdf;base64,${result.data}`;
-                link.download = result.filename;
-                document.body.appendChild(link); link.click(); document.body.removeChild(link);
-            } catch (e) { alert("Download Failed"); } finally { blocker.style.display = "none"; }
+    const blocker = document.getElementById('uploadSpinner');
+    blocker.style.display = "block";
+    try {
+        const response = await fetch(`${SCRIPT_URL}?action=generatePDF&rowId=${rowId}&tab=${tabName}`);
+        const result = await response.json();
+        
+        if (!result.data) {
+            alert("Error: No data received from server.");
+            return;
         }
+
+        // Create a hidden link and trigger download
+        const link = document.createElement('a');
+        link.href = `data:application/pdf;base64,${result.data}`;
+        link.download = result.filename || `Report_${rowId}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+    } catch (e) {
+        alert("PDF Generation Failed. Please ensure your GAS is deployed as a 'New Version'.");
+    } finally {
+        blocker.style.display = "none";
+    }
+}
 
         async function downloadBulk(btn) {
             const selected = Array.from(document.querySelectorAll('.report-checkbox:checked')).map(cb => cb.value);
@@ -544,3 +558,4 @@
     </script>
 </body>
 </html>
+
