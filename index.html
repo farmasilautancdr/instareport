@@ -413,16 +413,17 @@
             } catch (e) { alert("Load Error"); } finally { syncIcon.classList.remove('fa-spin'); }
         }
 
-        async function downloadIndividualPDF(rowId, tabName) {
+        // FIX 1: STAFF LINKING & INDIVIDUAL PDF IMAGE VISIBILITY
+async function downloadIndividualPDF(rowId, tabName) {
     const blocker = document.getElementById('uploadSpinner');
     blocker.style.display = "block";
     try {
+        // We request the raw Base64 data from GAS to bypass security blocks
         const response = await fetch(`${SCRIPT_URL}?action=generatePDF&rowId=${rowId}&tab=${tabName}`);
         const result = await response.json();
         
-        if (!result.data) throw new Error("No data received");
+        if (!result.data) throw new Error("No data");
 
-        // Convert Base64 string to a downloadable link
         const link = document.createElement('a');
         link.href = `data:application/pdf;base64,${result.data}`;
         link.download = result.filename || `Report_${rowId}.pdf`;
@@ -430,26 +431,36 @@
         link.click();
         document.body.removeChild(link);
     } catch (e) {
-        alert("PDF failed to load. Ensure GAS is deployed as a 'New Version'.");
+        alert("PDF Error: Please ensure GAS is deployed as a 'New Version'.");
     } finally {
         blocker.style.display = "none";
     }
 }
 
-        async function downloadBulk(btn) {
-            const selected = Array.from(document.querySelectorAll('.report-checkbox:checked')).map(cb => cb.value);
-            if (selected.length === 0) return alert("Select reports.");
-            const blocker = document.getElementById('uploadSpinner');
-            blocker.style.display = "block";
-            try {
-                const response = await fetch(`${SCRIPT_URL}?action=combinedPDF&ids=${selected.join(',')}`);
-                const result = await response.json();
-                const link = document.createElement('a');
-                link.href = `data:application/pdf;base64,${result.data}`;
-                link.download = "Combined_Report.pdf";
-                document.body.appendChild(link); link.click(); document.body.removeChild(link);
-            } catch (e) { alert("Bulk PDF Failed."); } finally { blocker.style.display = "none"; }
-        }
+// FIX 2: COMBINED PDF BUTTON ACTIVATION
+async function downloadBulk(btn) {
+    const selected = Array.from(document.querySelectorAll('.report-checkbox:checked')).map(cb => cb.value);
+    if (selected.length === 0) return alert("Please select at least one report.");
+    
+    const blocker = document.getElementById('uploadSpinner');
+    blocker.style.display = "block";
+    try {
+        // Collects all IDs (format: rowId|tabName) and sends to GAS bulk engine
+        const response = await fetch(`${SCRIPT_URL}?action=combinedPDF&ids=${selected.join(',')}`);
+        const result = await response.json();
+        
+        const link = document.createElement('a');
+        link.href = `data:application/pdf;base64,${result.data}`;
+        link.download = "Combined_Audit_Reports.pdf";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (e) {
+        alert("Bulk Download Failed.");
+    } finally {
+        blocker.style.display = "none";
+    }
+}
 
         function setTab(tab) {
             currentTab = tab;
@@ -554,5 +565,6 @@
     </script>
 </body>
 </html>
+
 
 
