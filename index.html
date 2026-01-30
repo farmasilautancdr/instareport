@@ -32,7 +32,6 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .tab-btn.active { border-bottom: 3px solid #2563eb; color: #2563eb; }
         #bulkBar { position: fixed; bottom: 0; left: 0; right: 0; background: #2563eb; color: white; padding: 15px; z-index: 1000; border-radius: 20px 20px 0 0; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -10px 25px rgba(0,0,0,0.1); }
-        
         #galleryOverlay { display:none; position:fixed; inset:0; background:black; z-index:50000; flex-direction:column; }
         #galleryContent { flex:1; display:flex; overflow-x:auto; scroll-snap-type:x mandatory; }
         .gallery-full-img { flex:0 0 100%; scroll-snap-align:center; display:flex; align-items:center; justify-content:center; padding:20px; }
@@ -348,8 +347,12 @@
 
         function calcAudit() { document.getElementById('currentScore').innerText = document.querySelectorAll('.audit-check:checked').length; }
 
+        // --- CORE PHOTO HANDLING FIX ---
         function handleImg(idx) {
-            const file = document.getElementById(`cam_${idx}`).files[0];
+            const input = document.getElementById(`cam_${idx}`);
+            if (!input || !input.files[0]) return;
+
+            const file = input.files[0];
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = new Image();
@@ -357,18 +360,30 @@
                     const canvas = document.getElementById('compressCanvas'), ctx = canvas.getContext('2d');
                     canvas.width = 1000; canvas.height = (img.height/img.width)*1000;
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    // TIMESTAMP BOX
                     ctx.fillStyle = "rgba(0,0,0,0.6)"; 
                     ctx.fillRect(0, canvas.height-60, canvas.width, 60);
+                    
+                    // TEXT STYLING
                     ctx.fillStyle = "white"; 
                     ctx.font = "bold 24px sans-serif";
+                    
                     const outlet = document.getElementById('outletName').value;
                     const name = document.getElementById('staffName').value.toUpperCase();
                     const dateStr = new Date().toLocaleString('en-MY', { timeZone: 'Asia/Kuala Lumpur' });
+                    
                     const stamp = `${outlet} | ${name} | ${dateStr} | STAMPED`;
                     ctx.fillText(stamp, 20, canvas.height-22);
+                    
                     const prev = document.getElementById(`prev_${idx}`);
-                    prev.src = canvas.toDataURL('image/jpeg', 0.7);
-                    prev.classList.remove('hidden');
+                    if (prev) {
+                        prev.src = canvas.toDataURL('image/jpeg', 0.7);
+                        prev.classList.remove('hidden');
+                        // Remove camera icon if present in parent
+                        const icon = prev.parentElement.querySelector('i');
+                        if(icon) icon.style.display = 'none';
+                    }
                 };
                 img.src = e.target.result;
             };
@@ -378,17 +393,24 @@
         async function submitReport() {
             const btn = document.getElementById('submitBtn'), btnText = document.getElementById('btnText'), btnLoader = document.getElementById('btnLoader'), blocker = document.getElementById('uploadSpinner');
             const images = [], photoNames = [];
-            document.querySelectorAll('img[id^="prev_"]:not(.hidden)').forEach((img, i) => {
-                images.push(img.src.split(',')[1]);
-                const lblInput = document.getElementById('label_'+i);
-                photoNames.push(`${currentTask}_${lblInput ? (lblInput.value || 'Evidence') : 'Evidence'}.jpg`);
+            
+            // Re-targeting only visible images to ensure capture
+            document.querySelectorAll('img[id^="prev_"]').forEach((img, i) => {
+                if (!img.classList.contains('hidden')) {
+                    images.push(img.src.split(',')[1]);
+                    const lblInput = document.getElementById('label_'+i);
+                    photoNames.push(`${currentTask}_${lblInput ? (lblInput.value || 'Evidence') : 'Evidence'}.jpg`);
+                }
             });
+
             if(currentTask === 'AUDIT FORM') {
                 if(document.querySelectorAll('.audit-check:checked').length === 0) return alert("Select at least one achievement.");
                 if(images.length < 11) return alert("11 audit photos required.");
             } else if(currentTask !== 'KPI DISCUSSION' && images.length === 0) return alert("Photo evidence required.");
+            
             blocker.style.display = "block"; btn.disabled = true; btnText.style.display = "none"; btnLoader.style.display = "block";
             let rem = (currentTask === 'AUDIT FORM') ? `SCORE: ${document.getElementById('currentScore').innerText}/46` : `TASK: ${document.getElementById('taskSub')?.value || document.getElementById('subTask')?.value} | ${document.getElementById('remarks')?.value || ''}`;
+            
             try {
                 const r = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ staff: document.getElementById('staffName').value, outlet: document.getElementById('outletName').value, category: currentCat, task: currentTask, remarks: rem, staffTime: document.getElementById('reportDate').value, images, photoNames })});
                 const result = await r.text();
@@ -534,7 +556,6 @@
             document.getElementById('bulkBar').classList.toggle('hidden', filtered.length === 0);
         }
 
-        /* 1. RENDER FEED WITH THUMBNAIL PROXY FIX */
         function renderFeed(items) {
             const feed = document.getElementById('feedList');
             if (items.length === 0) {
@@ -543,8 +564,6 @@
             }
             feed.innerHTML = items.map(s => {
                 const targetTab = s.tabName || 'Submissions_Staff'; 
-                
-                // CRITICAL FIX: Convert standard Drive URLs into public-peek thumbnail proxies
                 const processedUrls = (s.urls || []).map(u => {
                     if (u.includes("id=")) {
                         const id = u.split("id=")[1].split("&")[0];
@@ -552,9 +571,7 @@
                     }
                     return u;
                 });
-
                 const urlListStr = JSON.stringify(processedUrls).replace(/"/g, "&quot;");
-                
                 let photoHtml = processedUrls.length ? `<div class="gallery-container no-scrollbar">${processedUrls.map((u, index) => `<div class="gallery-item"><img src="${u}" onclick="openGallery(${urlListStr}, ${index})"></div>`).join('')}</div>` : '';
                 
                 return `<div class="bg-white p-5 rounded-3xl border shadow-sm relative">
