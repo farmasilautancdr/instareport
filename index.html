@@ -17,8 +17,9 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         #uploadSpinner { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.4); z-index: 20000; cursor: wait; }
         .photo-slot { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 16px; background: #fff; margin-top: 8px; }
-        .preview-box { width: 100%; height: 140px; border-radius: 12px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0; position: relative; }
-        .preview-box img { width: 100%; height: 100%; object-fit: cover; }
+        .preview-box { width: 100%; height: 140px; border-radius: 12px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0; position: relative; display: flex; align-items: center; justify-content: center; }
+        .preview-box img { width: 100%; height: 100%; object-fit: cover; z-index: 10; }
+        .preview-box i { position: absolute; z-index: 1; }
         .audit-section { background: white; padding: 16px; border-radius: 24px; border: 1px solid #e2e8f0; margin-bottom: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         .score-box { position: sticky; bottom: 100px; background: #2563eb; color: white; padding: 16px; border-radius: 20px; text-align: center; font-weight: 900; z-index: 100; box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4); }
         #supervisorBtn { position: fixed; bottom: 25px; right: 25px; width: 56px; height: 56px; background: white; color: var(--primary); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 9999; cursor: pointer; border: 2px solid #e2e8f0; }
@@ -32,6 +33,7 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .tab-btn.active { border-bottom: 3px solid #2563eb; color: #2563eb; }
         #bulkBar { position: fixed; bottom: 0; left: 0; right: 0; background: #2563eb; color: white; padding: 15px; z-index: 1000; border-radius: 20px 20px 0 0; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -10px 25px rgba(0,0,0,0.1); }
+        
         #galleryOverlay { display:none; position:fixed; inset:0; background:black; z-index:50000; flex-direction:column; }
         #galleryContent { flex:1; display:flex; overflow-x:auto; scroll-snap-type:x mandatory; }
         .gallery-full-img { flex:0 0 100%; scroll-snap-align:center; display:flex; align-items:center; justify-content:center; padding:20px; }
@@ -321,7 +323,7 @@
                     else {
                         h += `<div class="py-3 border-b border-slate-50 last:border-0"><div class="flex justify-between items-center"><span class="text-xs font-black text-slate-600 pr-4">${item.n}</span><input type="checkbox" class="audit-check" onchange="calcAudit()"></div>`;
                         if(item.snap) {
-                            h += `<div class="photo-slot"><div class="preview-box"><img id="prev_${photoIdx}" class="hidden"><i class="fas fa-camera text-slate-300 absolute inset-0 flex items-center justify-center"></i></div><button onclick="document.getElementById('cam_${photoIdx}').click()" class="bg-blue-50 text-blue-600 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest">Snap Evidence</button><input type="file" id="cam_${photoIdx}" class="hidden" accept="image/*" capture="environment" onchange="handleImg(${photoIdx})"><input type="hidden" id="label_${photoIdx}" value="${item.n}"></div>`;
+                            h += `<div class="photo-slot"><div class="preview-box"><i class="fas fa-camera text-slate-300"></i><img id="prev_${photoIdx}" class="hidden"></div><button onclick="document.getElementById('cam_${photoIdx}').click()" class="bg-blue-50 text-blue-600 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest">Snap Evidence</button><input type="file" id="cam_${photoIdx}" class="hidden" accept="image/*" capture="environment" onchange="handleImg(${photoIdx})"><input type="hidden" id="label_${photoIdx}" value="${item.n}"></div>`;
                             photoIdx++;
                         }
                         h += `</div>`;
@@ -341,49 +343,53 @@
             const grid = document.getElementById('photoGrid');
             grid.innerHTML = "";
             for(let i=0; i<count; i++) {
-                grid.innerHTML += `<div class="photo-slot"><div class="preview-box"><img id="prev_${i}" class="hidden"><i class="fas fa-camera text-slate-300 absolute inset-0 flex items-center justify-center"></i></div><input type="text" id="label_${i}" class="p-3 text-xs font-black border-b border-dashed outline-none" placeholder="Description"><button onclick="document.getElementById('cam_${i}').click()" class="bg-slate-100 py-3 rounded-xl text-[9px] font-black uppercase">Open Camera</button><input type="file" id="cam_${i}" class="hidden" accept="image/*" capture="environment" onchange="handleImg(${i})"></div>`;
+                grid.innerHTML += `<div class="photo-slot"><div class="preview-box"><i class="fas fa-camera text-slate-300"></i><img id="prev_${i}" class="hidden"></div><input type="text" id="label_${i}" class="p-3 text-xs font-black border-b border-dashed outline-none" placeholder="Description"><button onclick="document.getElementById('cam_${i}').click()" class="bg-slate-100 py-3 rounded-xl text-[9px] font-black uppercase">Open Camera</button><input type="file" id="cam_${i}" class="hidden" accept="image/*" capture="environment" onchange="handleImg(${i})"></div>`;
             }
         }
 
         function calcAudit() { document.getElementById('currentScore').innerText = document.querySelectorAll('.audit-check:checked').length; }
 
-        // --- CORE PHOTO HANDLING FIX ---
+        // --- FINAL REPAIRED PHOTO HANDLING ---
         function handleImg(idx) {
             const input = document.getElementById(`cam_${idx}`);
-            if (!input || !input.files[0]) return;
+            const prev = document.getElementById(`prev_${idx}`);
+            if (!input || !input.files || !input.files[0]) return;
 
             const file = input.files[0];
             const reader = new FileReader();
-            reader.onload = (e) => {
+            
+            reader.onload = function(e) {
                 const img = new Image();
-                img.onload = () => {
-                    const canvas = document.getElementById('compressCanvas'), ctx = canvas.getContext('2d');
-                    canvas.width = 1000; canvas.height = (img.height/img.width)*1000;
+                img.onload = function() {
+                    const canvas = document.getElementById('compressCanvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Scale image
+                    canvas.width = 1000;
+                    canvas.height = (img.height / img.width) * 1000;
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     
-                    // TIMESTAMP BOX
+                    // Apply STAMPED Background
                     ctx.fillStyle = "rgba(0,0,0,0.6)"; 
-                    ctx.fillRect(0, canvas.height-60, canvas.width, 60);
+                    ctx.fillRect(0, canvas.height - 60, canvas.width, 60);
                     
-                    // TEXT STYLING
+                    // Apply Text
                     ctx.fillStyle = "white"; 
                     ctx.font = "bold 24px sans-serif";
-                    
                     const outlet = document.getElementById('outletName').value;
                     const name = document.getElementById('staffName').value.toUpperCase();
                     const dateStr = new Date().toLocaleString('en-MY', { timeZone: 'Asia/Kuala Lumpur' });
-                    
                     const stamp = `${outlet} | ${name} | ${dateStr} | STAMPED`;
-                    ctx.fillText(stamp, 20, canvas.height-22);
+                    ctx.fillText(stamp, 20, canvas.height - 22);
                     
-                    const prev = document.getElementById(`prev_${idx}`);
-                    if (prev) {
-                        prev.src = canvas.toDataURL('image/jpeg', 0.7);
-                        prev.classList.remove('hidden');
-                        // Remove camera icon if present in parent
-                        const icon = prev.parentElement.querySelector('i');
-                        if(icon) icon.style.display = 'none';
-                    }
+                    // UPDATE PREVIEW
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    prev.src = dataUrl;
+                    prev.classList.remove('hidden');
+                    
+                    // Hide the icon icon
+                    const icon = prev.parentElement.querySelector('i');
+                    if (icon) icon.classList.add('hidden');
                 };
                 img.src = e.target.result;
             };
@@ -394,25 +400,44 @@
             const btn = document.getElementById('submitBtn'), btnText = document.getElementById('btnText'), btnLoader = document.getElementById('btnLoader'), blocker = document.getElementById('uploadSpinner');
             const images = [], photoNames = [];
             
-            // Re-targeting only visible images to ensure capture
-            document.querySelectorAll('img[id^="prev_"]').forEach((img, i) => {
-                if (!img.classList.contains('hidden')) {
-                    images.push(img.src.split(',')[1]);
-                    const lblInput = document.getElementById('label_'+i);
-                    photoNames.push(`${currentTask}_${lblInput ? (lblInput.value || 'Evidence') : 'Evidence'}.jpg`);
+            // Collect all non-hidden images
+            const previews = document.querySelectorAll('img[id^="prev_"]');
+            previews.forEach((img, i) => {
+                if (!img.classList.contains('hidden') && img.src) {
+                    // Extract base64 content
+                    const base64Data = img.src.split(',')[1];
+                    if(base64Data) {
+                        images.push(base64Data);
+                        const lblInput = document.getElementById('label_'+i);
+                        const labelValue = lblInput ? (lblInput.value || 'Evidence') : 'Evidence';
+                        photoNames.push(`${currentTask}_${labelValue}.jpg`);
+                    }
                 }
             });
 
             if(currentTask === 'AUDIT FORM') {
                 if(document.querySelectorAll('.audit-check:checked').length === 0) return alert("Select at least one achievement.");
-                if(images.length < 11) return alert("11 audit photos required.");
-            } else if(currentTask !== 'KPI DISCUSSION' && images.length === 0) return alert("Photo evidence required.");
+                if(images.length < 11) return alert("11 audit photos required for Audit Form.");
+            } else if(currentTask !== 'KPI DISCUSSION' && images.length === 0) {
+                return alert("Photo evidence required.");
+            }
             
             blocker.style.display = "block"; btn.disabled = true; btnText.style.display = "none"; btnLoader.style.display = "block";
             let rem = (currentTask === 'AUDIT FORM') ? `SCORE: ${document.getElementById('currentScore').innerText}/46` : `TASK: ${document.getElementById('taskSub')?.value || document.getElementById('subTask')?.value} | ${document.getElementById('remarks')?.value || ''}`;
             
             try {
-                const r = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ staff: document.getElementById('staffName').value, outlet: document.getElementById('outletName').value, category: currentCat, task: currentTask, remarks: rem, staffTime: document.getElementById('reportDate').value, images, photoNames })});
+                const payload = {
+                    staff: document.getElementById('staffName').value,
+                    outlet: document.getElementById('outletName').value,
+                    category: currentCat,
+                    task: currentTask,
+                    remarks: rem,
+                    staffTime: document.getElementById('reportDate').value,
+                    images: images,
+                    photoNames: photoNames
+                };
+
+                const r = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload)});
                 const result = await r.text();
                 if(result.includes("Success")) {
                     document.getElementById('successOverlay').classList.remove('hidden');
@@ -423,7 +448,11 @@
                         btn.disabled = false;
                     }, 2000);
                 } else throw new Error();
-            } catch(e) { blocker.style.display = "none"; btnText.style.display = "block"; btnLoader.style.display = "none"; alert("Error"); btn.disabled = false; }
+            } catch(e) { 
+                blocker.style.display = "none"; btnText.style.display = "block"; btnLoader.style.display = "none"; 
+                alert("Upload Error. Please try again."); 
+                btn.disabled = false; 
+            }
         }
 
         document.getElementById('supervisorBtn').onclick = () => {
@@ -611,7 +640,8 @@
 
         function updateSelectedCount() {
             const checked = document.querySelectorAll('.report-checkbox:checked').length;
-            document.getElementById('selectedText').innerText = `${checked} Selected`;
+            const text = document.getElementById('selectedText');
+            if(text) text.innerText = `${checked} Selected`;
         }
 
         if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
