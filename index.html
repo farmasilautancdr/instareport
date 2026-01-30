@@ -18,7 +18,7 @@
         #uploadSpinner { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.4); z-index: 20000; cursor: wait; }
         .photo-slot { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 16px; background: #fff; margin-top: 8px; }
         .preview-box { width: 100%; height: 140px; border-radius: 12px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0; position: relative; display: flex; align-items: center; justify-content: center; }
-        .preview-box img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 20; }
+        .preview-box img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 20; background: white; }
         .preview-box i { position: relative; z-index: 5; font-size: 2rem; color: #cbd5e1; }
         .audit-section { background: white; padding: 16px; border-radius: 24px; border: 1px solid #e2e8f0; margin-bottom: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         .score-box { position: sticky; bottom: 100px; background: #2563eb; color: white; padding: 16px; border-radius: 20px; text-align: center; font-weight: 900; z-index: 100; box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4); }
@@ -349,7 +349,7 @@
 
         function calcAudit() { document.getElementById('currentScore').innerText = document.querySelectorAll('.audit-check:checked').length; }
 
-        /* RE-ENGINEERED PHOTO HANDLING FOR MAXIMUM STABILITY */
+        // --- ENHANCED PHOTO HANDLING FOR RELIABILITY ---
         function handleImg(idx) {
             const input = document.getElementById(`cam_${idx}`);
             const prev = document.getElementById(`prev_${idx}`);
@@ -358,14 +358,17 @@
             const file = input.files[0];
             const reader = new FileReader();
             
+            // Show Spinner while processing
+            document.getElementById('uploadSpinner').style.display = "block";
+
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.getElementById('compressCanvas');
                     const ctx = canvas.getContext('2d');
                     
-                    // Force orientation correction & high resolution scaling
-                    const MAX_WIDTH = 1000;
+                    // Fixed resolution to prevent memory crashes while keeping quality
+                    const MAX_WIDTH = 1200;
                     const scale = MAX_WIDTH / img.width;
                     canvas.width = MAX_WIDTH;
                     canvas.height = img.height * scale;
@@ -373,29 +376,40 @@
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     
                     // Digital Watermark Box
-                    ctx.fillStyle = "rgba(0,0,0,0.6)"; 
-                    ctx.fillRect(0, canvas.height - 70, canvas.width, 70);
+                    ctx.fillStyle = "rgba(0,0,0,0.65)"; 
+                    ctx.fillRect(0, canvas.height - 80, canvas.width, 80);
                     
                     // Text Styling
                     ctx.fillStyle = "white"; 
-                    ctx.font = "bold 26px Arial, sans-serif";
+                    ctx.font = "bold 28px Arial, sans-serif";
                     const outlet = document.getElementById('outletName').value;
                     const name = document.getElementById('staffName').value.toUpperCase();
-                    const dateStr = new Date().toLocaleString('en-MY', { timeZone: 'Asia/Kuala Lumpur', hour12: true });
+                    // Using MY locale for Terengganu time
+                    const dateStr = new Date().toLocaleString('en-MY', { 
+                        timeZone: 'Asia/Kuala_Lumpur',
+                        day: '2-digit', month: '2-digit', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit', second: '2-digit'
+                    });
                     const stamp = `${outlet} | ${name} | ${dateStr} | STAMPED`;
                     
-                    ctx.fillText(stamp, 25, canvas.height - 28);
+                    ctx.fillText(stamp, 30, canvas.height - 30);
                     
-                    // Generate Final Image
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    // Export as Data URL
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
                     
-                    // Sync to UI
+                    // Force DOM update
                     prev.src = dataUrl;
-                    prev.onload = () => {
-                        prev.classList.remove('hidden');
-                        const icon = prev.parentElement.querySelector('i');
-                        if (icon) icon.classList.add('hidden');
-                    };
+                    prev.classList.remove('hidden');
+                    
+                    // Hide the placeholder icon
+                    const icon = prev.parentElement.querySelector('i');
+                    if (icon) icon.style.display = 'none';
+
+                    document.getElementById('uploadSpinner').style.display = "none";
+                };
+                img.onerror = () => {
+                    alert("Image processing failed. Try again.");
+                    document.getElementById('uploadSpinner').style.display = "none";
                 };
                 img.src = e.target.result;
             };
@@ -406,23 +420,27 @@
             const btn = document.getElementById('submitBtn'), btnText = document.getElementById('btnText'), btnLoader = document.getElementById('btnLoader'), blocker = document.getElementById('uploadSpinner');
             const images = [], photoNames = [];
             
-            // Selector to find all generated previews
-            const previews = document.querySelectorAll('img[id^="prev_"]');
-            previews.forEach((img, i) => {
+            // Gather all processed images from the DOM
+            const allImgElements = document.querySelectorAll('img[id^="prev_"]');
+            allImgElements.forEach((img, i) => {
+                // Ensure image is captured and contains valid base64 data
                 if (img.src && img.src.startsWith('data:image') && !img.classList.contains('hidden')) {
                     const base64Data = img.src.split(',')[1];
                     images.push(base64Data);
+                    
+                    // Get Label
                     const lblInput = document.getElementById('label_'+i);
-                    const labelValue = lblInput ? (lblInput.value || 'Evidence') : 'Evidence';
+                    const labelValue = lblInput ? (lblInput.value || 'Evidence') : (img.parentElement.nextElementSibling?.value || 'Evidence');
                     photoNames.push(`${currentTask}_${labelValue}.jpg`);
                 }
             });
 
+            // Validation logic
             if(currentTask === 'AUDIT FORM') {
                 if(document.querySelectorAll('.audit-check:checked').length === 0) return alert("Select at least one achievement.");
-                if(images.length < 11) return alert("11 audit photos required for Audit Form.");
+                if(images.length < 11) return alert("Audit Form requires 11 snap evidences.");
             } else if(currentTask !== 'KPI DISCUSSION' && images.length === 0) {
-                return alert("Photo evidence required.");
+                return alert("Please capture at least one photo.");
             }
             
             blocker.style.display = "block"; btn.disabled = true; btnText.style.display = "none"; btnLoader.style.display = "block";
@@ -453,7 +471,7 @@
                 } else throw new Error();
             } catch(e) { 
                 blocker.style.display = "none"; btnText.style.display = "block"; btnLoader.style.display = "none"; 
-                alert("Capture failed. Ensure camera permissions are enabled."); 
+                alert("Network Error. Check your connection."); 
                 btn.disabled = false; 
             }
         }
