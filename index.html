@@ -18,8 +18,8 @@
         #uploadSpinner { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.4); z-index: 20000; cursor: wait; }
         .photo-slot { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 16px; background: #fff; margin-top: 8px; }
         .preview-box { width: 100%; height: 140px; border-radius: 12px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0; position: relative; display: flex; align-items: center; justify-content: center; }
-        .preview-box img { width: 100%; height: 100%; object-fit: cover; z-index: 10; }
-        .preview-box i { position: absolute; z-index: 1; }
+        .preview-box img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 20; }
+        .preview-box i { position: relative; z-index: 5; font-size: 2rem; color: #cbd5e1; }
         .audit-section { background: white; padding: 16px; border-radius: 24px; border: 1px solid #e2e8f0; margin-bottom: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         .score-box { position: sticky; bottom: 100px; background: #2563eb; color: white; padding: 16px; border-radius: 20px; text-align: center; font-weight: 900; z-index: 100; box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4); }
         #supervisorBtn { position: fixed; bottom: 25px; right: 25px; width: 56px; height: 56px; background: white; color: var(--primary); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 9999; cursor: pointer; border: 2px solid #e2e8f0; }
@@ -349,7 +349,7 @@
 
         function calcAudit() { document.getElementById('currentScore').innerText = document.querySelectorAll('.audit-check:checked').length; }
 
-        // --- FINAL REPAIRED PHOTO HANDLING ---
+        // --- REPAIRED PHOTO HANDLING ---
         function handleImg(idx) {
             const input = document.getElementById(`cam_${idx}`);
             const prev = document.getElementById(`prev_${idx}`);
@@ -364,7 +364,6 @@
                     const canvas = document.getElementById('compressCanvas');
                     const ctx = canvas.getContext('2d');
                     
-                    // Scale image
                     canvas.width = 1000;
                     canvas.height = (img.height / img.width) * 1000;
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -382,14 +381,15 @@
                     const stamp = `${outlet} | ${name} | ${dateStr} | STAMPED`;
                     ctx.fillText(stamp, 20, canvas.height - 22);
                     
-                    // UPDATE PREVIEW
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-                    prev.src = dataUrl;
-                    prev.classList.remove('hidden');
                     
-                    // Hide the icon icon
-                    const icon = prev.parentElement.querySelector('i');
-                    if (icon) icon.classList.add('hidden');
+                    // Using requestAnimationFrame to ensure DOM is ready
+                    window.requestAnimationFrame(() => {
+                        prev.src = dataUrl;
+                        prev.classList.remove('hidden');
+                        const icon = prev.parentElement.querySelector('i');
+                        if (icon) icon.classList.add('hidden');
+                    });
                 };
                 img.src = e.target.result;
             };
@@ -400,18 +400,15 @@
             const btn = document.getElementById('submitBtn'), btnText = document.getElementById('btnText'), btnLoader = document.getElementById('btnLoader'), blocker = document.getElementById('uploadSpinner');
             const images = [], photoNames = [];
             
-            // Collect all non-hidden images
-            const previews = document.querySelectorAll('img[id^="prev_"]');
-            previews.forEach((img, i) => {
-                if (!img.classList.contains('hidden') && img.src) {
-                    // Extract base64 content
+            // Fixed selector for images
+            const allImages = document.querySelectorAll('img[id^="prev_"]');
+            allImages.forEach((img, i) => {
+                if (!img.classList.contains('hidden') && img.src && img.src.startsWith('data:image')) {
                     const base64Data = img.src.split(',')[1];
-                    if(base64Data) {
-                        images.push(base64Data);
-                        const lblInput = document.getElementById('label_'+i);
-                        const labelValue = lblInput ? (lblInput.value || 'Evidence') : 'Evidence';
-                        photoNames.push(`${currentTask}_${labelValue}.jpg`);
-                    }
+                    images.push(base64Data);
+                    const lblInput = document.getElementById('label_'+i);
+                    const labelValue = lblInput ? (lblInput.value || 'Evidence') : 'Evidence';
+                    photoNames.push(`${currentTask}_${labelValue}.jpg`);
                 }
             });
 
@@ -450,7 +447,7 @@
                 } else throw new Error();
             } catch(e) { 
                 blocker.style.display = "none"; btnText.style.display = "block"; btnLoader.style.display = "none"; 
-                alert("Upload Error. Please try again."); 
+                alert("Upload Error. Please check connection."); 
                 btn.disabled = false; 
             }
         }
@@ -611,7 +608,7 @@
                         </div>
                         <div class="bg-slate-50 p-2 rounded-lg text-[10px] font-bold text-slate-500 mb-2">${s.task}</div>
                         ${photoHtml}
-                        <button onclick="downloadIndividualPDF(${s.rowId}, '${targetTab}')" class="w-full mt-3 py-2 border rounded-xl text-[9px] font-black uppercase text-slate-400">VIEW NEAT FORM PDF</button>
+                        <button onclick="downloadIndividualPDF(${s.rowId}, '${targetTab}')" class="w-full mt-3 py-2 border rounded-xl text-[9px] font-black uppercase text-slate-400 font-black">VIEW NEAT FORM PDF</button>
                     </div>`;
             }).join('');
         }
