@@ -349,7 +349,7 @@
 
         function calcAudit() { document.getElementById('currentScore').innerText = document.querySelectorAll('.audit-check:checked').length; }
 
-        // --- REPAIRED PHOTO HANDLING ---
+        /* RE-ENGINEERED PHOTO HANDLING FOR MAXIMUM STABILITY */
         function handleImg(idx) {
             const input = document.getElementById(`cam_${idx}`);
             const prev = document.getElementById(`prev_${idx}`);
@@ -364,32 +364,38 @@
                     const canvas = document.getElementById('compressCanvas');
                     const ctx = canvas.getContext('2d');
                     
-                    canvas.width = 1000;
-                    canvas.height = (img.height / img.width) * 1000;
+                    // Force orientation correction & high resolution scaling
+                    const MAX_WIDTH = 1000;
+                    const scale = MAX_WIDTH / img.width;
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = img.height * scale;
+                    
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     
-                    // Apply STAMPED Background
+                    // Digital Watermark Box
                     ctx.fillStyle = "rgba(0,0,0,0.6)"; 
-                    ctx.fillRect(0, canvas.height - 60, canvas.width, 60);
+                    ctx.fillRect(0, canvas.height - 70, canvas.width, 70);
                     
-                    // Apply Text
+                    // Text Styling
                     ctx.fillStyle = "white"; 
-                    ctx.font = "bold 24px sans-serif";
+                    ctx.font = "bold 26px Arial, sans-serif";
                     const outlet = document.getElementById('outletName').value;
                     const name = document.getElementById('staffName').value.toUpperCase();
-                    const dateStr = new Date().toLocaleString('en-MY', { timeZone: 'Asia/Kuala Lumpur' });
+                    const dateStr = new Date().toLocaleString('en-MY', { timeZone: 'Asia/Kuala Lumpur', hour12: true });
                     const stamp = `${outlet} | ${name} | ${dateStr} | STAMPED`;
-                    ctx.fillText(stamp, 20, canvas.height - 22);
                     
+                    ctx.fillText(stamp, 25, canvas.height - 28);
+                    
+                    // Generate Final Image
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
                     
-                    // Using requestAnimationFrame to ensure DOM is ready
-                    window.requestAnimationFrame(() => {
-                        prev.src = dataUrl;
+                    // Sync to UI
+                    prev.src = dataUrl;
+                    prev.onload = () => {
                         prev.classList.remove('hidden');
                         const icon = prev.parentElement.querySelector('i');
                         if (icon) icon.classList.add('hidden');
-                    });
+                    };
                 };
                 img.src = e.target.result;
             };
@@ -400,10 +406,10 @@
             const btn = document.getElementById('submitBtn'), btnText = document.getElementById('btnText'), btnLoader = document.getElementById('btnLoader'), blocker = document.getElementById('uploadSpinner');
             const images = [], photoNames = [];
             
-            // Fixed selector for images
-            const allImages = document.querySelectorAll('img[id^="prev_"]');
-            allImages.forEach((img, i) => {
-                if (!img.classList.contains('hidden') && img.src && img.src.startsWith('data:image')) {
+            // Selector to find all generated previews
+            const previews = document.querySelectorAll('img[id^="prev_"]');
+            previews.forEach((img, i) => {
+                if (img.src && img.src.startsWith('data:image') && !img.classList.contains('hidden')) {
                     const base64Data = img.src.split(',')[1];
                     images.push(base64Data);
                     const lblInput = document.getElementById('label_'+i);
@@ -447,7 +453,7 @@
                 } else throw new Error();
             } catch(e) { 
                 blocker.style.display = "none"; btnText.style.display = "block"; btnLoader.style.display = "none"; 
-                alert("Upload Error. Please check connection."); 
+                alert("Capture failed. Ensure camera permissions are enabled."); 
                 btn.disabled = false; 
             }
         }
@@ -608,7 +614,7 @@
                         </div>
                         <div class="bg-slate-50 p-2 rounded-lg text-[10px] font-bold text-slate-500 mb-2">${s.task}</div>
                         ${photoHtml}
-                        <button onclick="downloadIndividualPDF(${s.rowId}, '${targetTab}')" class="w-full mt-3 py-2 border rounded-xl text-[9px] font-black uppercase text-slate-400 font-black">VIEW NEAT FORM PDF</button>
+                        <button onclick="downloadIndividualPDF(${s.rowId}, '${targetTab}')" class="w-full mt-3 py-2 border rounded-xl text-[9px] font-black uppercase text-slate-400">VIEW NEAT FORM PDF</button>
                     </div>`;
             }).join('');
         }
