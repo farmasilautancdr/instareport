@@ -18,7 +18,7 @@
         #uploadSpinner { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.4); z-index: 20000; cursor: wait; }
         .photo-slot { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 16px; background: #fff; margin-top: 8px; }
         .preview-box { width: 100%; height: 140px; border-radius: 12px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0; position: relative; display: flex; align-items: center; justify-content: center; }
-        .preview-box img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 20; background: white; }
+        .preview-box img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 20; }
         .preview-box i { position: relative; z-index: 5; font-size: 2rem; color: #cbd5e1; }
         .audit-section { background: white; padding: 16px; border-radius: 24px; border: 1px solid #e2e8f0; margin-bottom: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         .score-box { position: sticky; bottom: 100px; background: #2563eb; color: white; padding: 16px; border-radius: 20px; text-align: center; font-weight: 900; z-index: 100; box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4); }
@@ -33,7 +33,6 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .tab-btn.active { border-bottom: 3px solid #2563eb; color: #2563eb; }
         #bulkBar { position: fixed; bottom: 0; left: 0; right: 0; background: #2563eb; color: white; padding: 15px; z-index: 1000; border-radius: 20px 20px 0 0; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -10px 25px rgba(0,0,0,0.1); }
-        
         #galleryOverlay { display:none; position:fixed; inset:0; background:black; z-index:50000; flex-direction:column; }
         #galleryContent { flex:1; display:flex; overflow-x:auto; scroll-snap-type:x mandatory; }
         .gallery-full-img { flex:0 0 100%; scroll-snap-align:center; display:flex; align-items:center; justify-content:center; padding:20px; }
@@ -367,7 +366,6 @@
                     const canvas = document.getElementById('compressCanvas');
                     const ctx = canvas.getContext('2d');
                     
-                    // Fixed resolution to prevent memory crashes while keeping quality
                     const MAX_WIDTH = 1200;
                     const scale = MAX_WIDTH / img.width;
                     canvas.width = MAX_WIDTH;
@@ -384,7 +382,6 @@
                     ctx.font = "bold 28px Arial, sans-serif";
                     const outlet = document.getElementById('outletName').value;
                     const name = document.getElementById('staffName').value.toUpperCase();
-                    // Using MY locale for Terengganu time
                     const dateStr = new Date().toLocaleString('en-MY', { 
                         timeZone: 'Asia/Kuala_Lumpur',
                         day: '2-digit', month: '2-digit', year: 'numeric',
@@ -394,10 +391,9 @@
                     
                     ctx.fillText(stamp, 30, canvas.height - 30);
                     
-                    // Export as Data URL
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
                     
-                    // Force DOM update
+                    // Update preview source
                     prev.src = dataUrl;
                     prev.classList.remove('hidden');
                     
@@ -423,19 +419,16 @@
             // Gather all processed images from the DOM
             const allImgElements = document.querySelectorAll('img[id^="prev_"]');
             allImgElements.forEach((img, i) => {
-                // Ensure image is captured and contains valid base64 data
                 if (img.src && img.src.startsWith('data:image') && !img.classList.contains('hidden')) {
                     const base64Data = img.src.split(',')[1];
                     images.push(base64Data);
                     
-                    // Get Label
                     const lblInput = document.getElementById('label_'+i);
                     const labelValue = lblInput ? (lblInput.value || 'Evidence') : (img.parentElement.nextElementSibling?.value || 'Evidence');
                     photoNames.push(`${currentTask}_${labelValue}.jpg`);
                 }
             });
 
-            // Validation logic
             if(currentTask === 'AUDIT FORM') {
                 if(document.querySelectorAll('.audit-check:checked').length === 0) return alert("Select at least one achievement.");
                 if(images.length < 11) return alert("Audit Form requires 11 snap evidences.");
@@ -471,7 +464,7 @@
                 } else throw new Error();
             } catch(e) { 
                 blocker.style.display = "none"; btnText.style.display = "block"; btnLoader.style.display = "none"; 
-                alert("Network Error. Check your connection."); 
+                alert("Upload Error. Please check connection."); 
                 btn.disabled = false; 
             }
         }
@@ -606,6 +599,7 @@
             document.getElementById('bulkBar').classList.toggle('hidden', filtered.length === 0);
         }
 
+        /* 1. RE-ENGINEERED RENDERFEED WITH HIERARCHICAL TASK LOGIC */
         function renderFeed(items) {
             const feed = document.getElementById('feedList');
             if (items.length === 0) {
@@ -614,6 +608,24 @@
             }
             feed.innerHTML = items.map(s => {
                 const targetTab = s.tabName || 'Submissions_Staff'; 
+                
+                // Parse the remarks to extract Sub-Task and Photo Description
+                // Remarks format: "TASK: [SubTask] | [PhotoDescription]"
+                let subTaskDisplay = "";
+                let descriptionDisplay = "";
+                
+                if (s.remarks && s.remarks.includes("|")) {
+                    const parts = s.remarks.split("|");
+                    subTaskDisplay = parts[0].replace("TASK:", "").trim();
+                    descriptionDisplay = parts[1].trim();
+                } else if (s.remarks && s.remarks.startsWith("SCORE:")) {
+                    subTaskDisplay = "Audit Form Data";
+                    descriptionDisplay = s.remarks;
+                } else {
+                    subTaskDisplay = "Notes";
+                    descriptionDisplay = s.remarks || "No additional data";
+                }
+
                 const processedUrls = (s.urls || []).map(u => {
                     if (u.includes("id=")) {
                         const id = u.split("id=")[1].split("&")[0];
@@ -626,13 +638,20 @@
                 
                 return `<div class="bg-white p-5 rounded-3xl border shadow-sm relative">
                         <div class="absolute top-4 right-4"><input type="checkbox" value="${s.rowId}|${targetTab}" class="report-checkbox" onchange="updateSelectedCount()"></div>
-                        <div class="mb-2">
+                        <div class="mb-3">
                             <h4 class="font-black text-sm uppercase">${s.staff}</h4>
-                            <p class="text-[9px] font-black text-blue-600 uppercase">${s.outlet} | ${s.staffTime}</p>
+                            <p class="text-[9px] font-black text-blue-600 uppercase tracking-tighter">${s.outlet} | ${s.staffTime}</p>
                         </div>
-                        <div class="bg-slate-50 p-2 rounded-lg text-[10px] font-bold text-slate-500 mb-2">${s.task}</div>
+                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 mb-3">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="bg-blue-600 text-white text-[8px] font-black px-2 py-0.5 rounded uppercase">${s.task}</span>
+                                <i class="fas fa-chevron-right text-slate-300 text-[8px]"></i>
+                                <span class="text-slate-700 text-[10px] font-black uppercase truncate">${subTaskDisplay}</span>
+                            </div>
+                            <p class="text-[9px] text-slate-400 font-bold leading-relaxed italic border-l-2 border-slate-200 pl-2 mt-2">${descriptionDisplay}</p>
+                        </div>
                         ${photoHtml}
-                        <button onclick="downloadIndividualPDF(${s.rowId}, '${targetTab}')" class="w-full mt-3 py-2 border rounded-xl text-[9px] font-black uppercase text-slate-400">VIEW NEAT FORM PDF</button>
+                        <button onclick="downloadIndividualPDF(${s.rowId}, '${targetTab}')" class="w-full mt-3 py-3 border rounded-xl text-[9px] font-black uppercase text-slate-400">VIEW NEAT FORM PDF</button>
                     </div>`;
             }).join('');
         }
