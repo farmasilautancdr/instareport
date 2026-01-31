@@ -33,10 +33,20 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .tab-btn.active { border-bottom: 3px solid #2563eb; color: #2563eb; }
         #bulkBar { position: fixed; bottom: 0; left: 0; right: 0; background: #2563eb; color: white; padding: 15px; z-index: 1000; border-radius: 20px 20px 0 0; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -10px 25px rgba(0,0,0,0.1); }
+        
         #galleryOverlay { display:none; position:fixed; inset:0; background:black; z-index:50000; flex-direction:column; }
         #galleryContent { flex:1; display:flex; overflow-x:auto; scroll-snap-type:x mandatory; }
         .gallery-full-img { flex:0 0 100%; scroll-snap-align:center; display:flex; align-items:center; justify-content:center; padding:20px; }
         .gallery-full-img img { max-width:100%; max-height:80vh; object-fit:contain; border-radius:10px; }
+
+        .criteria-badge { font-size: 8px; font-weight: 900; padding: 2px 6px; border-radius: 6px; background: #f1f5f9; color: #64748b; text-transform: uppercase; border: 1px solid #e2e8f0; }
+        .detail-line { border-left: 2px solid #e2e8f0; padding-left: 10px; margin-left: 5px; }
+
+        /* COLLAPSIBLE ANIMATION */
+        .collapsible-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; opacity: 0; }
+        .submission-card.open .collapsible-body { max-height: 5000px; opacity: 1; transition: max-height 0.6s ease-in; }
+        .chevron-icon { transition: transform 0.3s ease; }
+        .submission-card.open .chevron-icon { transform: rotate(180deg); }
     </style>
 </head>
 <body class="antialiased text-slate-900">
@@ -96,6 +106,47 @@
         </div>
     </div>
 
+    <div id="supervisorDashboard" class="page hidden min-h-screen bg-slate-50 p-4 pb-32">
+        <nav class="bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-100 mb-6 sticky top-4 z-[100]">
+            <div class="flex justify-between items-center mb-5">
+                <button onclick="window.location.reload()" class="font-black text-[10px] text-slate-400 uppercase">Exit Portal</button>
+                <div class="flex gap-2">
+                    <i id="syncIcon" class="fas fa-sync-alt text-blue-600 mt-1"></i>
+                    <span id="totalCount" class="bg-blue-600 text-white text-[9px] font-black px-3 py-1.5 rounded-full shadow-lg">0 Reports</span>
+                </div>
+            </div>
+            <div class="flex border-b mb-4 text-[10px] font-black overflow-x-auto whitespace-nowrap gap-4 px-2 no-scrollbar">
+                <button onclick="setTab('STAFF')" class="tab-btn active px-2 py-2">STAFF</button>
+                <button onclick="setTab('MARKETING')" class="tab-btn px-2 py-2">MARKETING</button>
+                <button onclick="setTab('AM')" class="tab-btn px-2 py-2">AM PORTAL</button>
+            </div>
+            <div class="space-y-3">
+                <input type="text" id="dashSearch" onkeyup="filterFeed()" placeholder="Search Name/Outlet..." class="w-full p-4 bg-slate-50 rounded-2xl text-sm font-bold outline-none border border-slate-100">
+                <div class="grid grid-cols-4 gap-2">
+                    <button id="btn-all" onclick="setTimeFilter('all')" class="time-btn bg-blue-600 text-white p-2 rounded-lg text-[8px] font-black uppercase">ALL</button>
+                    <button id="btn-week" onclick="setTimeFilter('week')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black uppercase">Week</button>
+                    <button id="btn-month" onclick="setTimeFilter('month')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black uppercase">Month</button>
+                    <button id="btn-year" onclick="setTimeFilter('year')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black uppercase">Year</button>
+                </div>
+                <div id="subFilterContainer" class="hidden space-y-2 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-3 top-3.5 text-slate-300 text-xs"></i>
+                        <input type="text" id="periodSearch" onkeyup="searchPeriods()" placeholder="Search period..." class="w-full pl-8 p-3 bg-white rounded-xl text-xs font-bold border border-slate-100 outline-none">
+                    </div>
+                    <select id="subFilterSelect" onchange="filterFeed()" class="w-full p-3 bg-white rounded-xl text-xs font-bold border border-slate-100 outline-none"></select>
+                </div>
+            </div>
+        </nav>
+        <div id="feedList" class="space-y-4"></div>
+        <div id="bulkBar" class="hidden">
+            <div class="flex items-center gap-3">
+                <input type="checkbox" id="selectAll" onchange="toggleSelectAll()" class="w-5 h-5 rounded border-white">
+                <span id="selectedText" class="text-xs font-black">0 Selected</span>
+            </div>
+            <button onclick="downloadBulk(this)" class="bg-white text-blue-600 px-4 py-2 rounded-xl font-black text-[10px]">COMBINED PDF</button>
+        </div>
+    </div>
+
     <div id="page2" class="page min-h-screen p-6">
         <div class="flex items-center justify-between mb-8 mt-2">
             <button onclick="navTo(1)" class="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400"><i class="fas fa-arrow-left"></i></button>
@@ -138,47 +189,6 @@
                 <span id="btnText">FINISH & UPLOAD</span>
                 <div id="btnLoader" class="btn-loader"></div>
             </button>
-        </div>
-    </div>
-
-    <div id="supervisorDashboard" class="page hidden min-h-screen bg-slate-50 p-4 pb-32">
-        <nav class="bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-100 mb-6 sticky top-4 z-[100]">
-            <div class="flex justify-between items-center mb-5">
-                <button onclick="window.location.reload()" class="font-black text-[10px] text-slate-400 uppercase">Exit Portal</button>
-                <div class="flex gap-2">
-                    <i id="syncIcon" class="fas fa-sync-alt text-blue-600 mt-1"></i>
-                    <span id="totalCount" class="bg-blue-600 text-white text-[9px] font-black px-3 py-1.5 rounded-full shadow-lg">0 Reports</span>
-                </div>
-            </div>
-            <div class="flex border-b mb-4 text-[10px] font-black overflow-x-auto whitespace-nowrap gap-4 px-2 no-scrollbar">
-                <button onclick="setTab('STAFF')" class="tab-btn active px-2 py-2">STAFF</button>
-                <button onclick="setTab('MARKETING')" class="tab-btn px-2 py-2">MARKETING</button>
-                <button onclick="setTab('AM')" class="tab-btn px-2 py-2">AM PORTAL</button>
-            </div>
-            <div class="space-y-3">
-                <input type="text" id="dashSearch" onkeyup="filterFeed()" placeholder="Search Name/Outlet..." class="w-full p-4 bg-slate-50 rounded-2xl text-sm font-bold outline-none border border-slate-100">
-                <div class="grid grid-cols-4 gap-2">
-                    <button id="btn-all" onclick="setTimeFilter('all')" class="time-btn bg-blue-600 text-white p-2 rounded-lg text-[8px] font-black uppercase">ALL</button>
-                    <button id="btn-week" onclick="setTimeFilter('week')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black uppercase">Week</button>
-                    <button id="btn-month" onclick="setTimeFilter('month')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black uppercase">Month</button>
-                    <button id="btn-year" onclick="setTimeFilter('year')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black uppercase">Year</button>
-                </div>
-                <div id="subFilterContainer" class="hidden space-y-2 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                    <div class="relative">
-                        <i class="fas fa-search absolute left-3 top-3.5 text-slate-300 text-xs"></i>
-                        <input type="text" id="periodSearch" onkeyup="searchPeriods()" placeholder="Search period..." class="w-full pl-8 p-3 bg-white rounded-xl text-xs font-bold border border-slate-100 outline-none">
-                    </div>
-                    <select id="subFilterSelect" onchange="filterFeed()" class="w-full p-3 bg-white rounded-xl text-xs font-bold border border-slate-100 outline-none"></select>
-                </div>
-            </div>
-        </nav>
-        <div id="feedList" class="space-y-4"></div>
-        <div id="bulkBar" class="hidden">
-            <div class="flex items-center gap-3">
-                <input type="checkbox" id="selectAll" onchange="toggleSelectAll()" class="w-5 h-5 rounded border-white">
-                <span id="selectedText" class="text-xs font-black">0 Selected</span>
-            </div>
-            <button onclick="downloadBulk(this)" class="bg-white text-blue-600 px-4 py-2 rounded-xl font-black text-[10px]">COMBINED PDF</button>
         </div>
     </div>
 
@@ -268,7 +278,7 @@
                 'AM': ['VISIT EVIDENCE', 'AM TRAINING', 'AUDIT FORM', 'KPI DISCUSSION']
             };
             tasks[cat].forEach(t => {
-                list.innerHTML += `<button onclick="setupTask('${t}')" class="w-full bg-white p-6 rounded-[2rem] border text-left font-black flex justify-between items-center shadow-sm uppercase">${t} <i class="fas fa-chevron-right text-slate-200"></i></button>`;
+                list.innerHTML += `<button onclick="setupTask('${t}')" class="w-full bg-white p-6 rounded-[2rem] border text-left font-black flex justify-between items-center shadow-sm uppercase">${t} <i class="fas fa-chevron-right text-slate-300"></i></button>`;
             });
         }
 
@@ -348,7 +358,6 @@
 
         function calcAudit() { document.getElementById('currentScore').innerText = document.querySelectorAll('.audit-check:checked').length; }
 
-        // --- ENHANCED PHOTO HANDLING FOR RELIABILITY ---
         function handleImg(idx) {
             const input = document.getElementById(`cam_${idx}`);
             const prev = document.getElementById(`prev_${idx}`);
@@ -357,7 +366,6 @@
             const file = input.files[0];
             const reader = new FileReader();
             
-            // Show Spinner while processing
             document.getElementById('uploadSpinner').style.display = "block";
 
             reader.onload = function(e) {
@@ -365,19 +373,13 @@
                 img.onload = function() {
                     const canvas = document.getElementById('compressCanvas');
                     const ctx = canvas.getContext('2d');
-                    
                     const MAX_WIDTH = 1200;
                     const scale = MAX_WIDTH / img.width;
                     canvas.width = MAX_WIDTH;
                     canvas.height = img.height * scale;
-                    
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    
-                    // Digital Watermark Box
                     ctx.fillStyle = "rgba(0,0,0,0.65)"; 
                     ctx.fillRect(0, canvas.height - 80, canvas.width, 80);
-                    
-                    // Text Styling
                     ctx.fillStyle = "white"; 
                     ctx.font = "bold 28px Arial, sans-serif";
                     const outlet = document.getElementById('outletName').value;
@@ -388,23 +390,12 @@
                         hour: '2-digit', minute: '2-digit', second: '2-digit'
                     });
                     const stamp = `${outlet} | ${name} | ${dateStr} | STAMPED`;
-                    
                     ctx.fillText(stamp, 30, canvas.height - 30);
-                    
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                    
-                    // Update preview source
                     prev.src = dataUrl;
                     prev.classList.remove('hidden');
-                    
-                    // Hide the placeholder icon
                     const icon = prev.parentElement.querySelector('i');
                     if (icon) icon.style.display = 'none';
-
-                    document.getElementById('uploadSpinner').style.display = "none";
-                };
-                img.onerror = () => {
-                    alert("Image processing failed. Try again.");
                     document.getElementById('uploadSpinner').style.display = "none";
                 };
                 img.src = e.target.result;
@@ -415,30 +406,24 @@
         async function submitReport() {
             const btn = document.getElementById('submitBtn'), btnText = document.getElementById('btnText'), btnLoader = document.getElementById('btnLoader'), blocker = document.getElementById('uploadSpinner');
             const images = [], photoNames = [];
-            
-            // Gather all processed images from the DOM
             const allImgElements = document.querySelectorAll('img[id^="prev_"]');
             allImgElements.forEach((img, i) => {
                 if (img.src && img.src.startsWith('data:image') && !img.classList.contains('hidden')) {
                     const base64Data = img.src.split(',')[1];
                     images.push(base64Data);
-                    
                     const lblInput = document.getElementById('label_'+i);
-                    const labelValue = lblInput ? (lblInput.value || 'Evidence') : (img.parentElement.nextElementSibling?.value || 'Evidence');
-                    photoNames.push(`${currentTask}_${labelValue}.jpg`);
+                    const labelValue = lblInput ? (lblInput.value || 'Evidence') : 'Evidence';
+                    photoNames.push(`${currentTask}|${labelValue}`);
                 }
             });
-
             if(currentTask === 'AUDIT FORM') {
                 if(document.querySelectorAll('.audit-check:checked').length === 0) return alert("Select at least one achievement.");
                 if(images.length < 11) return alert("Audit Form requires 11 snap evidences.");
             } else if(currentTask !== 'KPI DISCUSSION' && images.length === 0) {
                 return alert("Please capture at least one photo.");
             }
-            
             blocker.style.display = "block"; btn.disabled = true; btnText.style.display = "none"; btnLoader.style.display = "block";
             let rem = (currentTask === 'AUDIT FORM') ? `SCORE: ${document.getElementById('currentScore').innerText}/46` : `TASK: ${document.getElementById('taskSub')?.value || document.getElementById('subTask')?.value} | ${document.getElementById('remarks')?.value || ''}`;
-            
             try {
                 const payload = {
                     staff: document.getElementById('staffName').value,
@@ -450,7 +435,6 @@
                     images: images,
                     photoNames: photoNames
                 };
-
                 const r = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload)});
                 const result = await r.text();
                 if(result.includes("Success")) {
@@ -599,61 +583,92 @@
             document.getElementById('bulkBar').classList.toggle('hidden', filtered.length === 0);
         }
 
-        /* 1. RE-ENGINEERED RENDERFEED WITH HIERARCHICAL TASK LOGIC */
+        // --- NEW DEEP SCAN COLLAPSIBLE RENDERER ---
         function renderFeed(items) {
             const feed = document.getElementById('feedList');
             if (items.length === 0) {
-                feed.innerHTML = `<div class="text-center p-10 bg-white rounded-2xl border border-dashed"><p class="text-slate-400 font-medium">No reports found in ${currentTab}.</p></div>`;
+                feed.innerHTML = `<div class="text-center p-10 bg-white rounded-2xl border border-dashed"><p class="text-slate-400 font-medium">No reports found.</p></div>`;
                 return;
             }
             feed.innerHTML = items.map(s => {
                 const targetTab = s.tabName || 'Submissions_Staff'; 
+                let taskPath = "", mainRemarks = "";
                 
-                // Parse the remarks to extract Sub-Task and Photo Description
-                // Remarks format: "TASK: [SubTask] | [PhotoDescription]"
-                let subTaskDisplay = "";
-                let descriptionDisplay = "";
-                
-                if (s.remarks && s.remarks.includes("|")) {
+                if (s.remarks && s.remarks.startsWith("TASK:")) {
                     const parts = s.remarks.split("|");
-                    subTaskDisplay = parts[0].replace("TASK:", "").trim();
-                    descriptionDisplay = parts[1].trim();
+                    taskPath = parts[0].replace("TASK:", "").trim();
+                    mainRemarks = parts[1]?.trim() || "No additional notes";
                 } else if (s.remarks && s.remarks.startsWith("SCORE:")) {
-                    subTaskDisplay = "Audit Form Data";
-                    descriptionDisplay = s.remarks;
+                    taskPath = "Audit Summary";
+                    mainRemarks = s.remarks;
                 } else {
-                    subTaskDisplay = "Notes";
-                    descriptionDisplay = s.remarks || "No additional data";
+                    taskPath = "Submission";
+                    mainRemarks = s.remarks || "No data";
                 }
 
                 const processedUrls = (s.urls || []).map(u => {
-                    if (u.includes("id=")) {
-                        const id = u.split("id=")[1].split("&")[0];
-                        return `https://drive.google.com/thumbnail?id=${id}&sz=w1000`;
-                    }
-                    return u;
+                    const fileId = u.split("id=")[1]?.split("&")[0] || "";
+                    return { thumb: `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`, full: u };
                 });
-                const urlListStr = JSON.stringify(processedUrls).replace(/"/g, "&quot;");
-                let photoHtml = processedUrls.length ? `<div class="gallery-container no-scrollbar">${processedUrls.map((u, index) => `<div class="gallery-item"><img src="${u}" onclick="openGallery(${urlListStr}, ${index})"></div>`).join('')}</div>` : '';
+
+                const thumbList = processedUrls.map(p => p.thumb);
+                const urlListStr = JSON.stringify(thumbList).replace(/"/g, "&quot;");
                 
-                return `<div class="bg-white p-5 rounded-3xl border shadow-sm relative">
-                        <div class="absolute top-4 right-4"><input type="checkbox" value="${s.rowId}|${targetTab}" class="report-checkbox" onchange="updateSelectedCount()"></div>
-                        <div class="mb-3">
+                return `
+                <div id="card_${s.rowId}" class="submission-card bg-white rounded-3xl border shadow-sm relative mb-4 overflow-hidden">
+                    <div class="p-5 flex justify-between items-center" onclick="toggleCard(${s.rowId})">
+                        <div class="flex-1">
                             <h4 class="font-black text-sm uppercase">${s.staff}</h4>
                             <p class="text-[9px] font-black text-blue-600 uppercase tracking-tighter">${s.outlet} | ${s.staffTime}</p>
-                        </div>
-                        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 mb-3">
-                            <div class="flex items-center gap-2 mb-1">
+                            <div class="mt-2 flex items-center gap-2">
                                 <span class="bg-blue-600 text-white text-[8px] font-black px-2 py-0.5 rounded uppercase">${s.task}</span>
                                 <i class="fas fa-chevron-right text-slate-300 text-[8px]"></i>
-                                <span class="text-slate-700 text-[10px] font-black uppercase truncate">${subTaskDisplay}</span>
+                                <span class="text-slate-700 text-[9px] font-black uppercase truncate">${taskPath}</span>
                             </div>
-                            <p class="text-[9px] text-slate-400 font-bold leading-relaxed italic border-l-2 border-slate-200 pl-2 mt-2">${descriptionDisplay}</p>
                         </div>
-                        ${photoHtml}
-                        <button onclick="downloadIndividualPDF(${s.rowId}, '${targetTab}')" class="w-full mt-3 py-3 border rounded-xl text-[9px] font-black uppercase text-slate-400">VIEW NEAT FORM PDF</button>
-                    </div>`;
+                        <div class="flex flex-col items-end gap-3 ml-4">
+                            <input type="checkbox" value="${s.rowId}|${targetTab}" class="report-checkbox w-5 h-5 rounded-lg border-slate-200" onchange="updateSelectedCount()">
+                            <i class="fas fa-chevron-down text-slate-300 chevron-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="collapsible-body bg-slate-50/50 border-t border-slate-50">
+                        <div class="p-5 space-y-4">
+                            <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
+                                <p class="text-[10px] text-slate-500 font-bold leading-relaxed">${mainRemarks}</p>
+                            </div>
+
+                            <div class="space-y-4">
+                                ${processedUrls.map((p, idx) => `
+                                    <div class="detail-line">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                                            <span class="text-[9px] font-black text-slate-500 uppercase">Evidence #${idx + 1}</span>
+                                        </div>
+                                        <div class="h-48 w-full rounded-2xl overflow-hidden border border-white shadow-md bg-white">
+                                            <img src="${p.thumb}" class="w-full h-full object-cover" onclick="openGallery(${urlListStr}, ${idx})">
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <button onclick="downloadIndividualPDF(${s.rowId}, '${targetTab}')" class="w-full mt-2 py-3 bg-white border border-slate-200 rounded-2xl text-[9px] font-black uppercase text-slate-400 shadow-sm">
+                                <i class="fas fa-file-pdf mr-1 text-red-400"></i> Generate Official Neat PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
             }).join('');
+        }
+
+        function toggleCard(id) {
+            const card = document.getElementById(`card_${id}`);
+            const allCards = document.querySelectorAll('.submission-card');
+            
+            // Optional: Close other cards when one opens (Accordion style)
+            // allCards.forEach(c => { if(c.id !== `card_${id}`) c.classList.remove('open'); });
+            
+            card.classList.toggle('open');
         }
 
         function openGallery(urls, startIndex) {
