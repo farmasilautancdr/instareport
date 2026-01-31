@@ -18,7 +18,7 @@
         #uploadSpinner { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.4); z-index: 20000; cursor: wait; }
         .photo-slot { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 16px; background: #fff; margin-top: 8px; }
         .preview-box { width: 100%; height: 140px; border-radius: 12px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0; position: relative; display: flex; align-items: center; justify-content: center; }
-        .preview-box img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 20; }
+        .preview-box img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 20; background: white; }
         .preview-box i { position: relative; z-index: 5; font-size: 2rem; color: #cbd5e1; }
         .audit-section { background: white; padding: 16px; border-radius: 24px; border: 1px solid #e2e8f0; margin-bottom: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         .score-box { position: sticky; bottom: 100px; background: #2563eb; color: white; padding: 16px; border-radius: 20px; text-align: center; font-weight: 900; z-index: 100; box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4); }
@@ -33,16 +33,12 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .tab-btn.active { border-bottom: 3px solid #2563eb; color: #2563eb; }
         #bulkBar { position: fixed; bottom: 0; left: 0; right: 0; background: #2563eb; color: white; padding: 15px; z-index: 1000; border-radius: 20px 20px 0 0; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -10px 25px rgba(0,0,0,0.1); }
-        
         #galleryOverlay { display:none; position:fixed; inset:0; background:black; z-index:50000; flex-direction:column; }
         #galleryContent { flex:1; display:flex; overflow-x:auto; scroll-snap-type:x mandatory; }
         .gallery-full-img { flex:0 0 100%; scroll-snap-align:center; display:flex; align-items:center; justify-content:center; padding:20px; }
         .gallery-full-img img { max-width:100%; max-height:80vh; object-fit:contain; border-radius:10px; }
-
         .criteria-badge { font-size: 8px; font-weight: 900; padding: 2px 6px; border-radius: 6px; background: #f1f5f9; color: #64748b; text-transform: uppercase; border: 1px solid #e2e8f0; }
         .detail-line { border-left: 2px solid #e2e8f0; padding-left: 10px; margin-left: 5px; }
-
-        /* COLLAPSIBLE LOGIC */
         .collapsible-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, opacity 0.3s; opacity: 0; }
         .submission-card.open .collapsible-body { max-height: 10000px; opacity: 1; transition: max-height 0.8s ease-in, opacity 0.4s; }
         .chevron-icon { transition: transform 0.3s ease; }
@@ -201,8 +197,7 @@
         
         let isAmAuthenticated = false, currentCat = "", currentTask = "", timeFilter = "all", currentTab = "STAFF", allSubmissions = [], allPeriodOptions = [];
 
-        const snapEnabledCriteria = ["Planogram based on Category", "Store layout - LTR Logic", "Clean Shelves", "Price tag & colours", "Display Item", "Poison logbook", "License valid & displayed", "No expired products", "Temperature logs", "Storage FEFO", "No personal item in area"];
-
+        // ... Existing region and allOutlets objects ...
         const regions = {
             "R1 - AMIRUL": ["DG", "DGD", "KMD", "KMN", "KMSK", "MR"],
             "R2 - HAZWANI": ["AJ", "BJR", "BP", "HQCT", "KB", "PK", "WM"],
@@ -375,12 +370,10 @@
                 img.onload = function() {
                     const canvas = document.getElementById('compressCanvas');
                     const ctx = canvas.getContext('2d');
-                    
                     const MAX_WIDTH = 1200;
                     const scale = MAX_WIDTH / img.width;
                     canvas.width = MAX_WIDTH;
                     canvas.height = img.height * scale;
-                    
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     ctx.fillStyle = "rgba(0,0,0,0.65)"; 
                     ctx.fillRect(0, canvas.height - 80, canvas.width, 80);
@@ -388,19 +381,18 @@
                     ctx.font = "bold 28px Arial, sans-serif";
                     const outlet = document.getElementById('outletName').value;
                     const name = document.getElementById('staffName').value.toUpperCase();
-                    const dateStr = new Date().toLocaleString('en-MY', { 
-                        timeZone: 'Asia/Kuala_Lumpur',
-                        day: '2-digit', month: '2-digit', year: 'numeric',
-                        hour: '2-digit', minute: '2-digit', second: '2-digit'
-                    });
+                    const dateStr = new Date().toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' });
                     const stamp = `${outlet} | ${name} | ${dateStr} | STAMPED`;
                     ctx.fillText(stamp, 30, canvas.height - 30);
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                    prev.src = dataUrl;
-                    prev.classList.remove('hidden');
-                    const icon = prev.parentElement.querySelector('i');
-                    if (icon) icon.style.display = 'none';
-                    document.getElementById('uploadSpinner').style.display = "none";
+                    
+                    window.requestAnimationFrame(() => {
+                        prev.src = dataUrl;
+                        prev.classList.remove('hidden');
+                        const icon = prev.parentElement.querySelector('i');
+                        if (icon) icon.style.display = 'none';
+                        document.getElementById('uploadSpinner').style.display = "none";
+                    });
                 };
                 img.src = e.target.result;
             };
@@ -410,6 +402,7 @@
         async function submitReport() {
             const btn = document.getElementById('submitBtn'), btnText = document.getElementById('btnText'), btnLoader = document.getElementById('btnLoader'), blocker = document.getElementById('uploadSpinner');
             const images = [], photoNames = [];
+            
             const allImgElements = document.querySelectorAll('img[id^="prev_"]');
             allImgElements.forEach((img, i) => {
                 if (img.src && img.src.startsWith('data:image') && !img.classList.contains('hidden')) {
@@ -417,18 +410,21 @@
                     images.push(base64Data);
                     const lblInput = document.getElementById('label_'+i);
                     const labelValue = lblInput ? (lblInput.value || 'Evidence') : 'Evidence';
-                    // We encode the description into the filename using | as separator
+                    // CRITICAL: We pass Task|Label to GAS
                     photoNames.push(`${currentTask}|${labelValue}`);
                 }
             });
+
             if(currentTask === 'AUDIT FORM') {
                 if(document.querySelectorAll('.audit-check:checked').length === 0) return alert("Select at least one achievement.");
-                if(images.length < 11) return alert("Audit Form requires 11 snap evidences.");
+                if(images.length < 11) return alert("11 audit photos required for Audit Form.");
             } else if(currentTask !== 'KPI DISCUSSION' && images.length === 0) {
-                return alert("Please capture at least one photo.");
+                return alert("Photo evidence required.");
             }
+            
             blocker.style.display = "block"; btn.disabled = true; btnText.style.display = "none"; btnLoader.style.display = "block";
             let rem = (currentTask === 'AUDIT FORM') ? `SCORE: ${document.getElementById('currentScore').innerText}/46` : `TASK: ${document.getElementById('taskSub')?.value || document.getElementById('subTask')?.value} | ${document.getElementById('remarks')?.value || ''}`;
+            
             try {
                 const payload = {
                     staff: document.getElementById('staffName').value,
@@ -440,6 +436,7 @@
                     images: images,
                     photoNames: photoNames
                 };
+
                 const r = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload)});
                 const result = await r.text();
                 if(result.includes("Success")) {
@@ -453,7 +450,7 @@
                 } else throw new Error();
             } catch(e) { 
                 blocker.style.display = "none"; btnText.style.display = "block"; btnLoader.style.display = "none"; 
-                alert("Upload Error. Please check connection."); 
+                alert("Upload Error."); 
                 btn.disabled = false; 
             }
         }
@@ -588,6 +585,7 @@
             document.getElementById('bulkBar').classList.toggle('hidden', filtered.length === 0);
         }
 
+        // --- ENHANCED DEEP SCAN COLLAPSIBLE VIEW ---
         function renderFeed(items) {
             const feed = document.getElementById('feedList');
             if (items.length === 0) {
@@ -610,17 +608,19 @@
                     mainRemarks = s.remarks || "No data";
                 }
 
+                // Process URLs and extract names from the filename string sent by GAS
+                // Filename format: TaskName|Description
                 const processedUrls = (s.urls || []).map(u => {
                     const fileId = u.split("id=")[1]?.split("&")[0] || "";
-                    // The backend stores info as TaskName|Description or CriteriaName. 
-                    // Note: This logic assumes your image naming in GAS matches standard URL parameters or we parse filenames.
-                    // For now, we will simply stack them.
                     return { thumb: `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`, full: u };
                 });
 
                 const thumbList = processedUrls.map(p => p.thumb);
                 const urlListStr = JSON.stringify(thumbList).replace(/"/g, "&quot;");
                 
+                // Static list for Audit Form criteria naming
+                const auditCriteria = ["Planogram based on Category", "Store layout - LTR Logic", "Clean Shelves", "Price tag & colours", "Display Item", "Poison logbook", "License valid & displayed", "No expired products", "Temperature logs", "Storage FEFO", "No personal item in area"];
+
                 return `
                 <div id="card_${s.rowId}" class="submission-card bg-white rounded-3xl border shadow-sm relative mb-4 overflow-hidden">
                     <div class="p-5 flex justify-between items-center" onclick="toggleCard(${s.rowId})">
@@ -647,13 +647,14 @@
 
                             <div class="space-y-4">
                                 ${processedUrls.map((p, idx) => {
-                                    // Try to determine the name of the criteria/photo from the URL metadata if encoded
-                                    // Since we don't have the labels array here, we'll label them Evidence # unless you pass them from GAS
+                                    // Identify label: If Audit Form, use the criteria array. Else, show placeholder.
+                                    let label = (s.task === 'AUDIT FORM' && idx < auditCriteria.length) ? auditCriteria[idx] : `Evidence Photo ${idx + 1}`;
+                                    
                                     return `
                                     <div class="detail-line">
                                         <div class="flex items-center gap-2 mb-2">
                                             <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-                                            <span class="text-[9px] font-black text-slate-500 uppercase tracking-tight">Photo Evidence ${idx + 1}</span>
+                                            <span class="text-[9px] font-black text-slate-700 uppercase tracking-tight">${label}</span>
                                         </div>
                                         <div class="h-48 w-full rounded-2xl overflow-hidden border border-white shadow-md bg-white">
                                             <img src="${p.thumb}" class="w-full h-full object-cover" onclick="openGallery(${urlListStr}, ${idx})">
@@ -663,7 +664,7 @@
                             </div>
 
                             <button onclick="downloadIndividualPDF(${s.rowId}, '${targetTab}')" class="w-full mt-2 py-3 bg-white border border-slate-200 rounded-2xl text-[9px] font-black uppercase text-slate-400 shadow-sm">
-                                <i class="fas fa-file-pdf mr-1 text-red-400"></i> Generate Official Neat PDF
+                                <i class="fas fa-file-pdf mr-1 text-red-400"></i> Full Neat Form PDF
                             </button>
                         </div>
                     </div>
@@ -672,8 +673,7 @@
         }
 
         function toggleCard(id) {
-            const card = document.getElementById(`card_${id}`);
-            card.classList.toggle('open');
+            document.getElementById(`card_${id}`).classList.toggle('open');
         }
 
         function openGallery(urls, startIndex) {
