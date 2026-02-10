@@ -18,7 +18,7 @@
         #uploadSpinner { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.4); z-index: 20000; cursor: wait; }
         .photo-slot { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 16px; background: #fff; margin-top: 8px; }
         .preview-box { width: 100%; height: 140px; border-radius: 12px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0; position: relative; display: flex; align-items: center; justify-content: center; }
-        .preview-box img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 20; background: white; }
+        .preview-box img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 20; }
         .preview-box i { position: relative; z-index: 5; font-size: 2rem; color: #cbd5e1; }
         .audit-section { background: white; padding: 16px; border-radius: 24px; border: 1px solid #e2e8f0; margin-bottom: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         .score-box { position: sticky; bottom: 100px; background: #2563eb; color: white; padding: 16px; border-radius: 20px; text-align: center; font-weight: 900; z-index: 100; box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4); }
@@ -197,7 +197,6 @@
         
         let isAmAuthenticated = false, currentCat = "", currentTask = "", timeFilter = "all", currentTab = "STAFF", allSubmissions = [], allPeriodOptions = [];
 
-        // ... Existing region and allOutlets objects ...
         const regions = {
             "R1 - AMIRUL": ["DG", "DGD", "KMD", "KMN", "KMSK", "MR"],
             "R2 - HAZWANI": ["AJ", "BJR", "BP", "HQCT", "KB", "PK", "WM"],
@@ -271,7 +270,7 @@
             list.innerHTML = "";
             const tasks = {
                 'OUTLET': ['TRAINING', 'ALL PRODUCTS', 'PLANOGRAM'],
-                'MARKETING': ['CLEARANCE', 'PWP', 'DISPLAY (INFORMED BY MARKETING)'],
+                'MARKETING': ['CLEARANCE', 'PWP', 'DISPLAY (INFORMED BY MARKETING)', 'COLLABORATION'],
                 'AM': ['VISIT EVIDENCE', 'AM TRAINING', 'AUDIT FORM', 'KPI DISCUSSION']
             };
             tasks[cat].forEach(t => {
@@ -294,6 +293,9 @@
                 let s = `<select id="subTask" class="w-full p-4 rounded-2xl border font-bold bg-slate-50 appearance-none">`;
                 opts.forEach(o => s += `<option value="${o}">${o}</option>`);
                 form.innerHTML = s + `</select><textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="Remarks..."></textarea>`;
+                initPhotos(8);
+            } else if(task === 'COLLABORATION' || task === 'DISPLAY (INFORMED BY MARKETING)' || task === 'CLEARANCE' || task === 'PWP') {
+                form.innerHTML = `<input type="text" id="taskSub" class="w-full p-4 rounded-2xl border font-bold" placeholder="Subject / Brand"><textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="Details..."></textarea>`;
                 initPhotos(8);
             } else if(task === 'AUDIT FORM') {
                 document.getElementById('auditScoreBox').classList.remove('hidden');
@@ -359,17 +361,13 @@
             const input = document.getElementById(`cam_${idx}`);
             const prev = document.getElementById(`prev_${idx}`);
             if (!input || !input.files || !input.files[0]) return;
-
             const file = input.files[0];
             const reader = new FileReader();
-            
             document.getElementById('uploadSpinner').style.display = "block";
-
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
-                    const canvas = document.getElementById('compressCanvas');
-                    const ctx = canvas.getContext('2d');
+                    const canvas = document.getElementById('compressCanvas'), ctx = canvas.getContext('2d');
                     const MAX_WIDTH = 1200;
                     const scale = MAX_WIDTH / img.width;
                     canvas.width = MAX_WIDTH;
@@ -385,7 +383,6 @@
                     const stamp = `${outlet} | ${name} | ${dateStr} | STAMPED`;
                     ctx.fillText(stamp, 30, canvas.height - 30);
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                    
                     window.requestAnimationFrame(() => {
                         prev.src = dataUrl;
                         prev.classList.remove('hidden');
@@ -402,28 +399,41 @@
         async function submitReport() {
             const btn = document.getElementById('submitBtn'), btnText = document.getElementById('btnText'), btnLoader = document.getElementById('btnLoader'), blocker = document.getElementById('uploadSpinner');
             const images = [], photoNames = [];
-            
             const allImgElements = document.querySelectorAll('img[id^="prev_"]');
+            
             allImgElements.forEach((img, i) => {
                 if (img.src && img.src.startsWith('data:image') && !img.classList.contains('hidden')) {
                     const base64Data = img.src.split(',')[1];
                     images.push(base64Data);
                     const lblInput = document.getElementById('label_'+i);
                     const labelValue = lblInput ? (lblInput.value || 'Evidence') : 'Evidence';
-                    // CRITICAL: We pass Task|Label to GAS
+                    // We encode the description into the filename using | as separator for GAS
                     photoNames.push(`${currentTask}|${labelValue}`);
                 }
             });
 
             if(currentTask === 'AUDIT FORM') {
                 if(document.querySelectorAll('.audit-check:checked').length === 0) return alert("Select at least one achievement.");
-                if(images.length < 11) return alert("11 audit photos required for Audit Form.");
+                if(images.length < 11) return alert("Audit Form requires 11 snap evidences.");
             } else if(currentTask !== 'KPI DISCUSSION' && images.length === 0) {
-                return alert("Photo evidence required.");
+                return alert("Please capture at least one photo.");
             }
             
             blocker.style.display = "block"; btn.disabled = true; btnText.style.display = "none"; btnLoader.style.display = "block";
-            let rem = (currentTask === 'AUDIT FORM') ? `SCORE: ${document.getElementById('currentScore').innerText}/46` : `TASK: ${document.getElementById('taskSub')?.value || document.getElementById('subTask')?.value} | ${document.getElementById('remarks')?.value || ''}`;
+            
+            // --- KPI DISCUSSION DATA FLOW FIX ---
+            let rem = "";
+            if (currentTask === 'KPI DISCUSSION') {
+                const p = document.getElementById('kpi1').value;
+                const l = document.getElementById('kpi2').value;
+                const a = document.getElementById('kpi3').value;
+                rem = `PROGRESSION: ${p} | LIMITATIONS: ${l} | ACTION PLAN: ${a}`;
+            } else if (currentTask === 'AUDIT FORM') {
+                rem = `SCORE: ${document.getElementById('currentScore').innerText}/46`;
+            } else {
+                const subName = document.getElementById('taskSub')?.value || document.getElementById('subTask')?.value || "General";
+                rem = `TASK: ${subName} | REMARKS: ${document.getElementById('remarks')?.value || 'N/A'}`;
+            }
             
             try {
                 const payload = {
@@ -436,7 +446,6 @@
                     images: images,
                     photoNames: photoNames
                 };
-
                 const r = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload)});
                 const result = await r.text();
                 if(result.includes("Success")) {
@@ -585,7 +594,7 @@
             document.getElementById('bulkBar').classList.toggle('hidden', filtered.length === 0);
         }
 
-        // --- ENHANCED DEEP SCAN COLLAPSIBLE VIEW ---
+        // --- NEW DEEP SCAN COLLAPSIBLE RENDERER WITH NAMING FIX ---
         function renderFeed(items) {
             const feed = document.getElementById('feedList');
             if (items.length === 0) {
@@ -594,31 +603,41 @@
             }
             feed.innerHTML = items.map(s => {
                 const targetTab = s.tabName || 'Submissions_Staff'; 
-                let taskPath = "", mainRemarks = "";
+                let subTaskPath = "N/A", finalRemark = "N/A";
                 
-                if (s.remarks && s.remarks.startsWith("TASK:")) {
-                    const parts = s.remarks.split("|");
-                    taskPath = parts[0].replace("TASK:", "").trim();
-                    mainRemarks = parts[1]?.trim() || "No additional notes";
+                // Parsing Remarks for Dashboard: "TASK: OTC | REMARKS: Clean shelves"
+                if (s.remarks && s.remarks.includes("|")) {
+                    const pts = s.remarks.split("|");
+                    subTaskPath = pts[0].replace("TASK:", "").trim();
+                    finalRemark = pts[1].replace("REMARKS:", "").trim();
                 } else if (s.remarks && s.remarks.startsWith("SCORE:")) {
-                    taskPath = "Audit Summary";
-                    mainRemarks = s.remarks;
+                    subTaskPath = "Audit Summary";
+                    finalRemark = s.remarks;
                 } else {
-                    taskPath = "Submission";
-                    mainRemarks = s.remarks || "No data";
+                    subTaskPath = "General";
+                    finalRemark = s.remarks || "No data";
                 }
 
-                // Process URLs and extract names from the filename string sent by GAS
-                // Filename format: TaskName|Description
                 const processedUrls = (s.urls || []).map(u => {
+                    const urlPart = u.split("?id=")[0];
                     const fileId = u.split("id=")[1]?.split("&")[0] || "";
-                    return { thumb: `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`, full: u };
+                    
+                    // NEW: EXTRACT FILENAME DESCRIPTION FROM DRIVE URL METADATA
+                    // If your GAS uses the file name correctly, we can extract the text after the '|'
+                    let label = "Evidence Photo";
+                    try {
+                        // This logic extracts the description from the custom string encoded in the photo name
+                        const nameMatch = u.match(/\|([^._]+)/);
+                        if (nameMatch) label = decodeURIComponent(nameMatch[1]);
+                    } catch(e) {}
+                    
+                    return { thumb: `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`, label: label };
                 });
 
                 const thumbList = processedUrls.map(p => p.thumb);
                 const urlListStr = JSON.stringify(thumbList).replace(/"/g, "&quot;");
                 
-                // Static list for Audit Form criteria naming
+                // Static list for Audit Form criteria naming fallback
                 const auditCriteria = ["Planogram based on Category", "Store layout - LTR Logic", "Clean Shelves", "Price tag & colours", "Display Item", "Poison logbook", "License valid & displayed", "No expired products", "Temperature logs", "Storage FEFO", "No personal item in area"];
 
                 return `
@@ -630,7 +649,7 @@
                             <div class="mt-2 flex items-center gap-2">
                                 <span class="bg-blue-600 text-white text-[8px] font-black px-2 py-0.5 rounded uppercase">${s.task}</span>
                                 <i class="fas fa-chevron-right text-slate-300 text-[8px]"></i>
-                                <span class="text-slate-700 text-[9px] font-black uppercase truncate">${taskPath}</span>
+                                <span class="text-slate-700 text-[9px] font-black uppercase truncate">${subTaskPath}</span>
                             </div>
                         </div>
                         <div class="flex flex-col items-end gap-3 ml-4">
@@ -642,19 +661,20 @@
                     <div class="collapsible-body bg-slate-50/50 border-t border-slate-50">
                         <div class="p-5 space-y-4">
                             <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
-                                <p class="text-[10px] text-slate-500 font-bold leading-relaxed">${mainRemarks}</p>
+                                <p class="text-[8px] font-black text-slate-300 uppercase mb-1">Overall Remark</p>
+                                <p class="text-[10px] text-slate-600 font-bold leading-relaxed">${finalRemark}</p>
                             </div>
 
                             <div class="space-y-4">
                                 ${processedUrls.map((p, idx) => {
-                                    // Identify label: If Audit Form, use the criteria array. Else, show placeholder.
-                                    let label = (s.task === 'AUDIT FORM' && idx < auditCriteria.length) ? auditCriteria[idx] : `Evidence Photo ${idx + 1}`;
+                                    // Use Audit List if it's an audit, otherwise use the encoded label
+                                    let displayLabel = (s.task === 'AUDIT FORM' && idx < auditCriteria.length) ? auditCriteria[idx] : p.label;
                                     
                                     return `
                                     <div class="detail-line">
                                         <div class="flex items-center gap-2 mb-2">
                                             <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-                                            <span class="text-[9px] font-black text-slate-700 uppercase tracking-tight">${label}</span>
+                                            <span class="text-[9px] font-black text-slate-700 uppercase tracking-tight">${displayLabel}</span>
                                         </div>
                                         <div class="h-48 w-full rounded-2xl overflow-hidden border border-white shadow-md bg-white">
                                             <img src="${p.thumb}" class="w-full h-full object-cover" onclick="openGallery(${urlListStr}, ${idx})">
@@ -664,7 +684,7 @@
                             </div>
 
                             <button onclick="downloadIndividualPDF(${s.rowId}, '${targetTab}')" class="w-full mt-2 py-3 bg-white border border-slate-200 rounded-2xl text-[9px] font-black uppercase text-slate-400 shadow-sm">
-                                <i class="fas fa-file-pdf mr-1 text-red-400"></i> Full Neat Form PDF
+                                <i class="fas fa-file-pdf mr-1 text-red-400"></i> Generate Official Neat PDF
                             </button>
                         </div>
                     </div>
