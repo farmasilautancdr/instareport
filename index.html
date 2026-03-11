@@ -3,431 +3,728 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>OPS PORTAL V2.2</title>
+    <title>InstaReport Pro v2.1</title>
     <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { --ocean: #075985; --aqua: #2dd4bf; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f0f9ff; -webkit-tap-highlight-color: transparent; padding-bottom: env(safe-area-inset-bottom); }
-        .ocean-gradient { background: linear-gradient(135deg, #075985 0%, #0c4a6e 100%); }
-        .glass-card { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); border: 1px solid #bae6fd; }
-        .photo-card { background: #ffffff; border: 1px solid #e0f2fe; border-radius: 20px; padding: 15px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
-        .photo-upload-zone { width: 100%; height: 220px; border: 2px dashed #7dd3fc; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #f8fafc; cursor: pointer; }
-        .photo-upload-zone img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 10; }
-        .timestamp-badge { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%); color: white; font-size: 9px; padding: 20px 12px 8px 12px; z-index: 20; line-height: 1.3; pointer-events: none; }
-        .clear-btn { position: absolute; top: 10px; right: 10px; z-index: 30; background: rgba(239, 68, 68, 0.9); color: white; padding: 6px 12px; border-radius: 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-        #success-overlay, #admin-overlay, #loading-overlay { display: none; position: fixed; inset: 0; background: white; z-index: 1000; flex-direction: column; align-items: center; justify-content: center; overflow-y: auto; }
-        #loading-overlay { background: rgba(7, 89, 133, 0.98); backdrop-filter: blur(10px); color: white; }
-        .spinner { width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.2); border-radius: 50%; border-top-color: var(--aqua); animation: spin 1s linear infinite; margin-bottom: 20px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .checkmark { width: 80px; height: 80px; border-radius: 50%; stroke: #14b8a6; stroke-width: 2; box-shadow: inset 0px 0px 0px #14b8a6; animation: fill .4s ease-in-out .4s forwards; }
-        @keyframes fill { 100% { box-shadow: inset 0px 0px 0px 40px #14b8a6; } }
-        .hidden { display: none; }
+        :root { --primary: #2563eb; --success: #16a34a; --bg: #f8fafc; }
+        body { background-color: var(--bg); font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+        .page { display: none; animation: fadeIn 0.3s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        #uploadSpinner { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.4); z-index: 20000; cursor: wait; }
+        .photo-slot { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 16px; background: #fff; margin-top: 8px; }
+        .preview-box { width: 100%; height: 140px; border-radius: 12px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0; position: relative; display: flex; align-items: center; justify-content: center; }
+        .preview-box img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 20; }
+        .preview-box i { position: relative; z-index: 5; font-size: 2rem; color: #cbd5e1; }
+        .audit-section { background: white; padding: 16px; border-radius: 24px; border: 1px solid #e2e8f0; margin-bottom: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .score-box { position: sticky; bottom: 100px; background: #2563eb; color: white; padding: 16px; border-radius: 20px; text-align: center; font-weight: 900; z-index: 100; box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4); }
+        #supervisorBtn { position: fixed; bottom: 25px; right: 25px; width: 56px; height: 56px; background: white; color: var(--primary); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 9999; cursor: pointer; border: 2px solid #e2e8f0; }
+        .menu-card { background: white; padding: 24px; border-radius: 28px; border: 1px solid #e2e8f0; text-align: center; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
+        .gallery-container { display: flex; overflow-x: auto; gap: 10px; padding: 5px 0; scroll-snap-type: x mandatory; }
+        .gallery-item { flex: 0 0 85%; scroll-snap-align: center; border-radius: 15px; overflow: hidden; border: 1px solid #eee; height: 200px; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .v-badge { font-size: 10px; font-weight: 900; color: #2563eb; letter-spacing: 2px; }
+        .btn-loader { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; width: 20px; height: 20px; animation: spin 0.8s linear infinite; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .tab-btn.active { border-bottom: 3px solid #2563eb; color: #2563eb; }
+        #bulkBar { position: fixed; bottom: 0; left: 0; right: 0; background: #2563eb; color: white; padding: 15px; z-index: 1000; border-radius: 20px 20px 0 0; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -10px 25px rgba(0,0,0,0.1); }
+        #galleryOverlay { display:none; position:fixed; inset:0; background:black; z-index:50000; flex-direction:column; }
+        #galleryContent { flex:1; display:flex; overflow-x:auto; scroll-snap-type:x mandatory; }
+        .gallery-full-img { flex:0 0 100%; scroll-snap-align:center; display:flex; align-items:center; justify-content:center; padding:20px; }
+        .gallery-full-img img { max-width:100%; max-height:80vh; object-fit:contain; border-radius:10px; }
+        .criteria-badge { font-size: 8px; font-weight: 900; padding: 2px 6px; border-radius: 6px; background: #f1f5f9; color: #64748b; text-transform: uppercase; border: 1px solid #e2e8f0; }
+        .detail-line { border-left: 2px solid #e2e8f0; padding-left: 10px; margin-left: 5px; }
+        .collapsible-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, opacity 0.3s; opacity: 0; }
+        .submission-card.open .collapsible-body { max-height: 10000px; opacity: 1; transition: max-height 0.8s ease-in, opacity 0.4s; }
+        .chevron-icon { transition: transform 0.3s ease; }
+        .submission-card.open .chevron-icon { transform: rotate(180deg); }
     </style>
 </head>
-<body>
+<body class="antialiased text-slate-900">
 
-    <div id="loading-overlay">
-        <div id="loading-spinner" class="spinner"></div>
-        <div id="error-icon" class="hidden text-5xl mb-4">⚠️</div>
-        <h2 id="loading-text" class="text-lg font-bold uppercase tracking-widest text-center px-6 text-white">Uploading Report...</h2>
-        <p id="loading-subtext" class="text-xs mt-2 opacity-70 text-white text-center px-10">Verification in progress. Do not refresh.</p>
-        <button id="retry-btn" onclick="processAllPortals()" class="hidden mt-8 px-8 py-3 bg-white text-sky-900 rounded-full font-black uppercase text-sm shadow-xl">Retry Submission</button>
+    <div id="uploadSpinner"></div>
+    <div id="successOverlay" class="hidden fixed inset-0 bg-white/95 z-[10000] flex flex-col items-center justify-center text-center">
+        <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center text-white text-4xl shadow-xl animate-bounce"><i class="fas fa-check"></i></div>
+        <h2 class="text-2xl font-black mt-6 tracking-tight uppercase px-6">Upload Successful</h2>
     </div>
 
-    <div id="success-overlay">
-        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-            <circle cx="26" cy="26" r="25" fill="none" stroke="#14b8a6" stroke-width="2"/>
-            <path fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" stroke="white" stroke-width="4"/>
-        </svg>
-        <h2 class="text-2xl font-800 text-sky-900 mt-6 uppercase tracking-widest">Success</h2>
-        <button onclick="clearAllAndReload()" class="mt-8 px-10 py-3 bg-cyan-600 text-white rounded-full font-bold shadow-lg">New Entry</button>
+    <div id="galleryOverlay">
+        <div class="p-5 flex justify-between items-center text-white">
+            <span id="galleryCounter" class="text-xs font-black">1 / 1</span>
+            <button onclick="closeGallery()" class="text-2xl"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="galleryContent" class="no-scrollbar"></div>
+        <div class="p-10 text-center text-white/50 text-[10px] font-bold uppercase tracking-widest">Swipe Left/Right to View All</div>
     </div>
 
-    <div id="admin-overlay" class="p-6">
-        <div class="w-full max-w-lg mx-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-800 text-sky-900 uppercase tracking-tighter">Supervisor Dashboard</h2>
-                <button onclick="closeAdmin()" class="bg-red-50 text-red-500 px-4 py-2 rounded-xl text-xs font-bold uppercase">Exit</button>
+    <div id="page1" class="page active min-h-screen p-6">
+        <header class="text-center mt-4 mb-10">
+            <h1 class="text-4xl font-black text-blue-600 tracking-tighter">InstaReport</h1>
+            <p class="v-badge uppercase mt-1">Enterprise Portal v2.1</p>
+        </header>
+        <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 space-y-6">
+            <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Access Role</label>
+                <select id="userRole" onchange="handleRoleChange()" class="w-full mt-1.5 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-slate-700">
+                    <option value="Staff">Staff Member</option>
+                    <option value="Area Manager">Area Manager (AM)</option>
+                </select>
             </div>
-            
-            <div class="bg-white p-5 rounded-[2rem] border border-sky-100 shadow-sm mb-6 space-y-3">
-                <div class="grid grid-cols-2 gap-2">
-                    <select id="filter-role" onchange="renderAdminLogs()" class="p-3 rounded-xl border border-sky-50 text-xs font-bold bg-slate-50">
-                        <option value="ALL">All Portals</option>
-                        <option value="DRIVER">Driver</option>
-                        <option value="OUTLET">Outlet</option>
-                    </select>
-                    <select id="filter-outlet" onchange="renderAdminLogs()" class="p-3 rounded-xl border border-sky-50 text-xs font-bold bg-slate-50"></select>
-                </div>
-                <input type="month" id="filter-date" onchange="renderAdminLogs()" class="w-full p-3 rounded-xl border border-sky-50 text-xs font-bold bg-slate-50">
-                <div class="flex gap-2 pt-2">
-                    <button onclick="downloadCSV()" class="flex-1 bg-sky-100 text-sky-700 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest">CSV Export</button>
-                    <button id="bulkPdfBtn" onclick="downloadBulk()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md">Bulk PDF</button>
-                </div>
+            <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
+                <input type="text" id="staffName" class="w-full mt-1.5 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold" placeholder="Required">
             </div>
-
-            <div id="admin-log-container" class="space-y-4 pb-20"></div>
+            <div id="amRegionContainer" class="hidden">
+                <label class="text-[10px] font-black text-blue-400 uppercase tracking-widest ml-1">AM Region</label>
+                <select id="amRegion" onchange="updateOutletList()" class="w-full mt-1.5 p-4 bg-blue-50 border border-blue-100 rounded-2xl outline-none font-black text-blue-700">
+                    <option value="">Select Region...</option>
+                    <option value="R1">R1 - AMIRUL</option><option value="R2">R2 - HAZWANI</option>
+                    <option value="R3">R3 - HARIS</option><option value="R4">R4 - RAIHAN</option>
+                    <option value="R5">R5 - ADNIN</option><option value="R6">R6 - NADHIRAH</option>
+                    <option value="R7">R7 - HASANUL</option><option value="R8">R8 - HAFSHAM</option>
+                    <option value="R9">R9 - IFFAH / RAIHAN</option>
+                </select>
+            </div>
+            <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Select Outlet</label>
+                <select id="outletName" class="w-full mt-1.5 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold"></select>
+            </div>
+            <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Reporting Date</label>
+                <input type="date" id="reportDate" class="w-full mt-1.5 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-blue-600">
+            </div>
+            <button onclick="navTo(2)" class="w-full bg-blue-600 text-white font-black py-5 rounded-3xl shadow-xl active:scale-95 transition-all">DASHBOARD <i class="fas fa-arrow-right ml-2"></i></button>
         </div>
     </div>
 
-    <header class="ocean-gradient text-white pt-12 pb-20 px-8 rounded-b-[45px] shadow-2xl relative z-0">
-        <div class="absolute top-4 right-8 text-[10px] font-bold text-sky-300 opacity-60">V2.2</div>
-        <div class="flex flex-col items-center">
-            <img src="icon-512.jpg" class="w-16 h-16 rounded-2xl shadow-lg mb-3 border-2 border-sky-400/30" alt="Logo">
-            <h1 class="text-2xl font-800 text-center tracking-tighter">OPS PORTAL</h1>
-            <p class="text-center text-sky-200 text-[10px] font-bold tracking-[0.2em] opacity-80 uppercase mt-1">Operational Reporting System</p>
+    <div id="page2" class="page min-h-screen p-6">
+        <div class="flex items-center justify-between mb-8 mt-2">
+            <button onclick="navTo(1)" class="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400"><i class="fas fa-arrow-left"></i></button>
+            <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest" id="displayRole">Portal</p>
         </div>
-    </header>
+        <div class="grid grid-cols-1 gap-5">
+            <div id="menu_outlet" onclick="openCategory('OUTLET')" class="menu-card border-l-8 border-l-blue-500 flex items-center gap-5">
+                <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 text-2xl"><i class="fas fa-store"></i></div>
+                <div class="text-left"><h3 class="font-black text-lg uppercase">Outlet</h3><p class="text-[10px] text-slate-400 font-bold uppercase">Training & Planogram</p></div>
+            </div>
+            <div id="menu_marketing" onclick="openCategory('MARKETING')" class="menu-card border-l-8 border-l-orange-500 flex items-center gap-5">
+                <div class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500 text-2xl"><i class="fas fa-bullhorn"></i></div>
+                <div class="text-left"><h3 class="font-black text-lg uppercase">Marketing</h3><p class="text-[10px] text-slate-400 font-bold uppercase">Promotions</p></div>
+            </div>
+            <div id="menu_am" onclick="openCategory('AM')" class="hidden menu-card border-l-8 border-l-blue-900 bg-blue-50 flex items-center gap-5">
+                <div class="w-14 h-14 bg-blue-900 rounded-2xl flex items-center justify-center text-white text-2xl"><i class="fas fa-user-shield"></i></div>
+                <div class="text-left"><h3 class="font-black text-lg text-blue-900 uppercase">AM Portal</h3><p class="text-[10px] text-blue-400 font-bold uppercase">Audit & Visit</p></div>
+            </div>
+        </div>
+    </div>
 
-    <main class="px-5 -mt-12 pb-20 relative z-10">
-        <section id="step-1" class="glass-card rounded-[35px] p-7 shadow-2xl">
-            <div class="space-y-6">
-                <div>
-                    <label class="text-[11px] font-800 text-sky-900 uppercase mb-3 block tracking-widest ml-1">Select Identity</label>
-                    <div class="grid grid-cols-2 gap-4">
-                        <button id="role-driver" onclick="selectRole('DRIVER')" class="py-5 border-2 border-sky-100 rounded-2xl font-bold text-sky-400 bg-white active:scale-95 transition-all">DRIVER</button>
-                        <button id="role-outlet" onclick="selectRole('OUTLET')" class="py-5 border-2 border-sky-100 rounded-2xl font-bold text-sky-400 bg-white active:scale-95 transition-all">OUTLET</button>
+    <div id="page3" class="page min-h-screen p-6">
+        <div class="flex items-center gap-4 mb-8">
+            <button onclick="navTo(2)" class="w-12 h-12 rounded-2xl bg-white border flex items-center justify-center text-slate-400"><i class="fas fa-chevron-left"></i></button>
+            <div><h2 class="text-2xl font-black uppercase" id="catTitle">Category</h2><p class="text-[10px] font-black text-slate-400 tracking-widest uppercase">Select Task</p></div>
+        </div>
+        <div id="taskList" class="space-y-4"></div>
+    </div>
+
+    <div id="page4" class="page min-h-screen p-4 pb-48">
+        <div class="flex items-center gap-4 mb-6 mt-2">
+            <button onclick="navTo(3)" class="w-10 h-10 rounded-xl bg-white border flex items-center justify-center text-slate-400 shadow-sm"><i class="fas fa-chevron-left"></i></button>
+            <h2 class="font-black text-lg uppercase truncate" id="taskTitle">Task Name</h2>
+        </div>
+        <div id="dynamicForm" class="space-y-4"></div>
+        <div id="photoSection" class="mt-6"><div id="photoGrid" class="space-y-3"></div></div>
+        <div id="auditScoreBox" class="score-box hidden uppercase">Audit Marks: <span id="currentScore">0</span> / 46</div>
+        <div class="fixed bottom-0 left-0 right-0 p-5 bg-white/90 backdrop-blur-xl border-t z-50">
+            <button onclick="submitReport()" id="submitBtn" class="w-full bg-blue-600 text-white font-black py-5 rounded-[2rem] shadow-xl flex items-center justify-center gap-3">
+                <span id="btnText">FINISH & UPLOAD</span>
+                <div id="btnLoader" class="btn-loader"></div>
+            </button>
+        </div>
+    </div>
+
+    <div id="supervisorDashboard" class="page hidden min-h-screen bg-slate-50 p-4 pb-32">
+        <nav class="bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-100 mb-6 sticky top-4 z-[100]">
+            <div class="flex justify-between items-center mb-5">
+                <button onclick="window.location.reload()" class="font-black text-[10px] text-slate-400 uppercase">Exit Portal</button>
+                <div class="flex gap-2">
+                    <i id="syncIcon" class="fas fa-sync-alt text-blue-600 mt-1"></i>
+                    <span id="totalCount" class="bg-blue-600 text-white text-[9px] font-black px-3 py-1.5 rounded-full shadow-lg">0 Reports</span>
+                </div>
+            </div>
+            <div class="flex border-b mb-4 text-[10px] font-black overflow-x-auto whitespace-nowrap gap-4 px-2 no-scrollbar">
+                <button onclick="setTab('STAFF')" class="tab-btn active px-2 py-2">STAFF</button>
+                <button onclick="setTab('MARKETING')" class="tab-btn px-2 py-2">MARKETING</button>
+                <button onclick="setTab('AM')" class="tab-btn px-2 py-2">AM PORTAL</button>
+            </div>
+            <div class="space-y-3">
+                <input type="text" id="dashSearch" onkeyup="filterFeed()" placeholder="Search Name/Outlet..." class="w-full p-4 bg-slate-50 rounded-2xl text-sm font-bold outline-none border border-slate-100">
+                <div class="grid grid-cols-4 gap-2">
+                    <button id="btn-all" onclick="setTimeFilter('all')" class="time-btn bg-blue-600 text-white p-2 rounded-lg text-[8px] font-black uppercase">ALL</button>
+                    <button id="btn-week" onclick="setTimeFilter('week')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black uppercase">Week</button>
+                    <button id="btn-month" onclick="setTimeFilter('month')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black uppercase">Month</button>
+                    <button id="btn-year" onclick="setTimeFilter('year')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black uppercase">Year</button>
+                </div>
+                <div id="subFilterContainer" class="hidden space-y-2 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-3 top-3.5 text-slate-300 text-xs"></i>
+                        <input type="text" id="periodSearch" onkeyup="searchPeriods()" placeholder="Search period..." class="w-full pl-8 p-3 bg-white rounded-xl text-xs font-bold border border-slate-100 outline-none">
                     </div>
+                    <select id="subFilterSelect" onchange="filterFeed()" class="w-full p-3 bg-white rounded-xl text-xs font-bold border border-slate-100 outline-none"></select>
                 </div>
-                <div class="space-y-4">
-                    <input type="text" id="user-name" oninput="saveDraft()" placeholder="Full Name" class="w-full p-5 rounded-2xl border border-sky-100 outline-none focus:ring-2 focus:ring-cyan-400 bg-white font-semibold text-sky-900 shadow-sm">
-                    <select id="outlet-select" onchange="saveDraft()" class="w-full p-5 rounded-2xl border border-sky-100 bg-white outline-none font-semibold text-sky-900 appearance-none shadow-sm"></select>
-                    <input type="date" id="entry-date" oninput="saveDraft()" class="w-full p-5 rounded-2xl border border-sky-100 bg-white outline-none font-semibold text-sky-900 shadow-sm">
-                </div>
-                <button onclick="openPortal()" class="w-full bg-cyan-500 text-white font-black py-5 rounded-2xl shadow-xl shadow-cyan-100 uppercase tracking-widest text-sm hover:bg-cyan-600 active:scale-95 transition-all">Access Portal</button>
             </div>
-        </section>
-
-        <section id="step-2" class="hidden space-y-6">
-            <div class="flex items-center justify-between gap-4 px-2">
-                <button onclick="goBack()" class="bg-white/90 px-6 py-3 rounded-2xl shadow-md text-sky-800 font-black text-[11px] flex items-center border border-sky-100 active:scale-90 transition-all uppercase whitespace-nowrap">
-                    <i class="fas fa-arrow-left mr-2"></i> BACK
-                </button>
-                <div class="h-[2px] flex-1 bg-sky-200 rounded-full opacity-30"></div>
-                <span id="portal-display-title" class="text-sky-900 font-800 text-[10px] uppercase tracking-widest"></span>
+        </nav>
+        <div id="feedList" class="space-y-4"></div>
+        <div id="bulkBar" class="hidden">
+            <div class="flex items-center gap-3">
+                <input type="checkbox" id="selectAll" onchange="toggleSelectAll()" class="w-5 h-5 rounded border-white">
+                <span id="selectedText" class="text-xs font-black">0 Selected</span>
             </div>
-            
-            <div id="photo-grid" class="space-y-6">
-                <script>
-                    for(let i=1; i<=12; i++) {
-                        document.write(`
-                            <div class="photo-card space-y-4" id="photo-card-${i}">
-                                <div class="flex justify-between items-center px-1">
-                                    <span class="text-[10px] font-black text-sky-300 uppercase tracking-widest">Evidence Slot ${i} ${i>1 ? '(Optional)' : ''}</span>
-                                    <i class="fas fa-camera text-sky-100"></i>
-                                </div>
-                                <div class="photo-upload-zone" id="zone-${i}" onclick="triggerCamera(${i})">
-                                    <div class="text-center" id="placeholder-${i}">
-                                        <div class="text-4xl mb-2">📸</div>
-                                        <div class="text-[10px] font-900 text-cyan-500 uppercase tracking-widest">Snap Capture</div>
-                                    </div>
-                                    <input type="file" id="cam-${i}" accept="image/*" capture="camera" class="hidden" onchange="previewPhoto(${i})">
-                                    <div id="wrap-${i}"></div>
-                                </div>
-                                <textarea id="desc-${i}" oninput="saveDraft()" class="w-full p-4 rounded-xl border border-sky-50 bg-slate-50 text-sm font-semibold text-sky-800 outline-none focus:ring-2 focus:ring-cyan-400" placeholder="Type report details here..."></textarea>
-                            </div>
-                        `);
-                    }
-                </script>
-            </div>
-            <button id="submit-btn" disabled onclick="processAllPortals()" class="w-full bg-slate-800 text-white font-black py-6 rounded-3xl shadow-2xl uppercase tracking-[0.3em] mt-8 mb-10 transition-all">Submit Report</button>
-        </section>
-    </main>
-
-    <div class="fixed bottom-4 right-4 z-[50]">
-        <button onclick="promptAdmin()" class="bg-white/80 backdrop-blur p-3 rounded-full text-[9px] font-black text-sky-900 shadow-lg uppercase border border-sky-100"><i class="fas fa-user-shield mr-1"></i> Admin</button>
+            <button onclick="downloadBulk(this)" class="bg-white text-blue-600 px-4 py-2 rounded-xl font-black text-[10px]">COMBINED PDF</button>
+        </div>
     </div>
+
+    <canvas id="compressCanvas" class="hidden"></canvas>
+    <div id="supervisorBtn"><i class="fas fa-lock"></i></div>
 
     <script>
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwy58cuAW4o6ZMuvH98TWoBwnSFfxppFG-eg6kbZvzM1I9fNYHlejK6WVFj79fZwY1r5w/exec';
-        const outlets = ["AJ", "B6", "BB", "BJR", "BP", "CDR", "CK", "DG", "DGD", "GB", "GBD", "GM", "HL", "HQ", "HQCT", "JL", "JLD", "JTH", "KB", "KBKK", "KBKS", "KBTJ", "KKR", "KL", "KMD", "KMN", "KMSK", "KS", "MC", "MLR", "MR", "PC", "PK", "PM", "PP", "PPK", "PSPD", "PT", "RJ", "SLS", "SMR", "ST", "TM", "TMD", "TMT", "TPOH", "TPT", "WM"];
-        let currentRole = "";
-
-        const sel = document.getElementById('outlet-select');
-        const adminSel = document.getElementById('filter-outlet');
-        sel.innerHTML = outlets.map(o => `<option value="${o}">${o}</option>`).join('');
-        adminSel.innerHTML = `<option value="ALL">All Outlets</option>` + outlets.map(o => `<option value="${o}">${o}</option>`).join('');
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzgsyV3uymPOyKXx8KdwAe_TvNuMozuW5jIqzUX1YwHYf1Qn3I3_vu-FtvJUYPtm-c/exec";
+        const AM_PASS = "AM2026", SUPER_PASS = "8899", MASTER_PIN = SUPER_PASS;
         
-        document.getElementById('entry-date').valueAsDate = new Date();
-        document.getElementById('filter-date').value = new Date().toISOString().slice(0, 7);
+        let isAmAuthenticated = false, currentCat = "", currentTask = "", timeFilter = "all", currentTab = "STAFF", allSubmissions = [], allPeriodOptions = [];
 
-        // Standard draft and camera logic...
-        window.onload = () => {
-            const draft = JSON.parse(localStorage.getItem('ops_portal_draft'));
-            if(draft) {
-                document.getElementById('user-name').value = draft.user || "";
-                document.getElementById('outlet-select').value = draft.outlet || "AJ";
-                document.getElementById('entry-date').value = draft.date || new Date().toISOString().split('T')[0];
-                if(draft.role) selectRole(draft.role);
-                for(let i=1; i<=12; i++) {
-                    const savedDesc = draft.descriptions?.[i-1];
-                    if(savedDesc) document.getElementById(`desc-${i}`).value = savedDesc;
-                    const savedImg = localStorage.getItem(`photo_data_${i}`);
-                    if(savedImg) displayStoredPhoto(i, savedImg, draft.photo_meta?.[i-1]);
-                }
-                validateSubmit();
-            }
+        const regions = {
+            "R1 - AMIRUL": ["DG", "DGD", "KMD", "KMN", "KMSK", "MR"],
+            "R2 - HAZWANI": ["AJ", "BJR", "BP", "HQCT", "KB", "PK", "WM"],
+            "R3 - HARIS": ["B6", "BB", "CDR", "HL", "BG", "KL"],
+            "R4 - RAIHAN": ["GB", "GBD", "JTH", "RJ", "ST", "TPOH"],
+            "R5 - ADNIN": ["JL", "JLD", "PP", "PSPD", "SMR"],
+            "R6 - NADHIRAH": ["KS", "MC", "MLR", "TM", "TMD", "TMT"],
+            "R7 - HASANUL": ["KBKK", "KBKS", "KBTJ", "PC", "PT"],
+            "R8 - HAFSHAM": ["PM", "SLS", "TPT", "KKR", "PPK"],
+            "R9 - IFFAH / RAIHAN": ["GM", "CK"]
         };
 
-        function selectRole(role) {
-            currentRole = role;
-            const isDriver = role === 'DRIVER';
-            document.getElementById('role-driver').className = isDriver ? 'py-5 border-2 border-cyan-500 rounded-2xl font-black text-cyan-600 bg-cyan-50 shadow-inner' : 'py-5 border-2 border-sky-100 rounded-2xl font-bold text-sky-400 bg-white';
-            document.getElementById('role-outlet').className = !isDriver ? 'py-5 border-2 border-cyan-500 rounded-2xl font-black text-cyan-600 bg-cyan-50 shadow-inner' : 'py-5 border-2 border-sky-100 rounded-2xl font-bold text-sky-400 bg-white';
-            const ph = currentRole === 'DRIVER' ? "Route/Deliveries/Returns Report" : "Daily Ops/Cash/Cleanliness Report";
-            for(let i=1; i<=12; i++) document.getElementById(`desc-${i}`).placeholder = ph;
-            saveDraft();
+        const allOutlets = ["AJ", "B6", "BB", "BJR", "BP", "CDR", "CK", "DG", "DGD", "GB", "GBD", "GM", "HL", "HQ", "HQCT", "JL", "JLD", "JTH", "KB", "KBKK", "KBKS", "KBTJ", "KKR", "KL", "KMD", "KMN", "KMSK", "KS", "MC", "MLR", "MR", "PC", "PK", "PM", "PP", "PPK", "PSPD", "PT", "RJ", "RP", "SLS", "SMR", "ST", "TM", "TMD", "TMT", "TPOH", "TPT", "WM"];
+        const productsList = ["Mom & Baby", "Health Supplement", "Food Supplement", "OTC", "Personal Care", "Rehab", "Dressing", "Back Counter"];
+        const planogramTasks = ["House Brand Products", "Focused Products 1", "Focused Products 2 & 3", "End Cap", "Store Layout", "Housekeeping", "Clear Price Tag", "Shelf Tags", "Pharmacist Tags", "Store Display", "Welcoming Board", "Updated Promo"];
+
+        window.onload = () => {
+            document.getElementById('reportDate').valueAsDate = new Date();
+            updateOutletList();
+        };
+
+        function handleRoleChange() {
+            const role = document.getElementById('userRole').value;
+            document.getElementById('amRegionContainer').classList.toggle('hidden', role !== "Area Manager");
+            updateOutletList();
         }
 
-        function saveDraft() {
-            const descs = [];
-            for(let i=1; i<=12; i++) descs.push(document.getElementById(`desc-${i}`).value);
-            const draft = { user: document.getElementById('user-name').value, role: currentRole, outlet: document.getElementById('outlet-select').value, date: document.getElementById('entry-date').value, descriptions: descs, photo_meta: [] };
-            for(let i=1; i<=12; i++) {
-                const badge = document.getElementById(`meta-${i}`);
-                draft.photo_meta.push(badge ? badge.innerText : null);
+        function updateOutletList() {
+            const role = document.getElementById('userRole').value;
+            const reg = document.getElementById('amRegion').value;
+            const select = document.getElementById('outletName');
+            select.innerHTML = "";
+            let list = allOutlets;
+            if(role === "Area Manager" && reg) {
+                const key = Object.keys(regions).find(k => k.startsWith(reg));
+                list = regions[key];
             }
-            localStorage.setItem('ops_portal_draft', JSON.stringify(draft));
+            list.forEach(o => select.innerHTML += `<option value="${o}">${o}</option>`);
         }
 
-        function triggerCamera(id) { if (!localStorage.getItem(`photo_data_${id}`)) document.getElementById(`cam-${id}`).click(); }
+        function navTo(num) {
+            if(num === 2) {
+                const role = document.getElementById('userRole').value;
+                const name = document.getElementById('staffName').value;
+                const region = document.getElementById('amRegion').value;
+                if(!name) return alert("Please enter your name.");
+                if(role === "Area Manager" && !region) return alert("Area Managers must select an AM Region to proceed.");
+                
+                const isAM = role === "Area Manager";
+                document.getElementById('menu_outlet').classList.toggle('hidden', isAM);
+                document.getElementById('menu_marketing').classList.toggle('hidden', isAM);
+                document.getElementById('menu_am').classList.toggle('hidden', !isAM);
+                document.getElementById('displayRole').innerText = isAM ? "AM Portal" : "Staff Portal";
+            }
+            document.getElementById('supervisorBtn').style.display = (num === 1) ? "flex" : "none";
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const targetPage = document.getElementById('page' + num);
+            if(targetPage) targetPage.classList.add('active');
+            window.scrollTo(0,0);
+        }
 
-        function previewPhoto(id) {
-            const file = document.getElementById(`cam-${id}`).files[0];
-            if(!file) return;
+        function openCategory(cat) {
+            if(cat === 'AM' && !isAmAuthenticated) {
+                if(prompt("Security: Enter AM PIN") === AM_PASS) isAmAuthenticated = true;
+                else return;
+            }
+            currentCat = cat;
+            document.getElementById('catTitle').innerText = cat;
+            navTo(3);
+            const list = document.getElementById('taskList');
+            list.innerHTML = "";
+            const tasks = {
+                'OUTLET': ['TRAINING', 'ALL PRODUCTS', 'PLANOGRAM'],
+                'MARKETING': ['CLEARANCE', 'PWP', 'DISPLAY (INFORMED BY MARKETING)', 'COLLABORATION'],
+                'AM': ['VISIT EVIDENCE', 'AM TRAINING', 'AUDIT FORM', 'KPI DISCUSSION']
+            };
+            tasks[cat].forEach(t => {
+                list.innerHTML += `<button onclick="setupTask('${t}')" class="w-full bg-white p-6 rounded-[2rem] border text-left font-black flex justify-between items-center shadow-sm uppercase">${t} <i class="fas fa-chevron-right text-slate-200"></i></button>`;
+            });
+        }
+
+        function setupTask(task) {
+            currentTask = task;
+            document.getElementById('taskTitle').innerText = task;
+            const form = document.getElementById('dynamicForm');
+            form.innerHTML = "";
+            document.getElementById('auditScoreBox').classList.add('hidden');
+            navTo(4);
+            if(task === 'TRAINING' || task === 'VISIT EVIDENCE' || task === 'AM TRAINING') {
+                form.innerHTML = `<input type="text" id="taskSub" class="w-full p-4 rounded-2xl border font-bold" placeholder="Topic / Title"><textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="Notes..."></textarea>`;
+                initPhotos(4);
+            } else if(task === 'PLANOGRAM' || task === 'ALL PRODUCTS') {
+                const opts = task === 'PLANOGRAM' ? planogramTasks : productsList;
+                let s = `<select id="subTask" class="w-full p-4 rounded-2xl border font-bold bg-slate-50 appearance-none">`;
+                opts.forEach(o => s += `<option value="${o}">${o}</option>`);
+                form.innerHTML = s + `</select><textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="Remarks..."></textarea>`;
+                initPhotos(8);
+            } else if(task === 'COLLABORATION' || task === 'DISPLAY (INFORMED BY MARKETING)' || task === 'CLEARANCE' || task === 'PWP') {
+                form.innerHTML = `<input type="text" id="taskSub" class="w-full p-4 rounded-2xl border font-bold" placeholder="Subject / Brand"><textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="Details..."></textarea>`;
+                initPhotos(8);
+            } else if(task === 'AUDIT FORM') {
+                document.getElementById('auditScoreBox').classList.remove('hidden');
+                buildAuditForm(form);
+            } else if(task === 'KPI DISCUSSION') {
+                form.innerHTML = `<div class="space-y-4">
+                    <div class="bg-white p-5 rounded-3xl border"><label class="text-[9px] font-black text-slate-400 uppercase">PROGRESSION</label><textarea id="kpi1" class="w-full mt-2 h-24 outline-none font-bold text-sm"></textarea></div>
+                    <div class="bg-white p-5 rounded-3xl border"><label class="text-[9px] font-black text-slate-400 uppercase">LIMITATIONS</label><textarea id="kpi2" class="w-full mt-2 h-24 outline-none font-bold text-sm"></textarea></div>
+                    <div class="bg-white p-5 rounded-3xl border"><label class="text-[9px] font-black text-slate-400 uppercase">ACTION PLAN</label><textarea id="kpi3" class="w-full mt-2 h-24 outline-none font-bold text-sm"></textarea></div>
+                </div>`;
+                initPhotos(0);
+            } else {
+                form.innerHTML = `<input type="text" id="taskSub" class="w-full p-4 rounded-2xl border font-bold bg-slate-50" placeholder="Topic Title"><textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="Notes..."></textarea>`;
+                initPhotos(8);
+            }
+        }
+
+        function buildAuditForm(container) {
+            const auditData = [
+                {title: "Visual Merchandising", items: [{n: "Planogram based on Category", snap: true}, {n: "House Brand Products", snap: false}, {n: "FP1", snap: false}, {n: "FP2 & FP3", snap: false}, {n: "End cap", snap: false}, {n: "Store layout - LTR Logic", snap: true}, {n: "Clean Shelves", snap: true}, {n: "Price tag & colours", snap: true}, {n: "Clear & Accurate Price Tag", snap: false}, {n: "Utilise Shelf Tags", snap: false}, {n: "Pharmacist Recommendation tags", snap: false}, {n: "Display Item", snap: true}, {n: "Marketing Compliance", header: true}, {n: "Item clearance & PWP", snap: false}, {n: "Welcoming Board Display & Promo", snap: false}, {n: "Repost From HQ", snap: false}, {n: "POSM", snap: false}]},
+                {title: "Staff Knowledge & Competency", items: [{n: "Sales Target", snap: false}, {n: "Focused Items", header: true}, {n: "House Brand", snap: false}, {n: "Focused Items 1", snap: false}, {n: "Focused Items 2 & 3", snap: false}, {n: "SOP", snap: false}, {n: "Product Knowledge", header: true}, {n: "Brief Unique selling points", snap: false}, {n: "Spontaneous test by AM", snap: false}]},
+                {title: "Ambience & cleanliness", items: [{n: "Music", snap: false}, {n: "Scent", snap: false}, {n: "Consultation area", snap: false}, {n: "Lighting & Air Cond", snap: false}, {n: "Storefront & Signage", snap: false}, {n: "Floor, wall and ceiling", snap: false}]},
+                {title: "Customer Experience", items: [{n: "Warm greeting", snap: false}, {n: "Proactive assistance", snap: false}, {n: "Available Pharmacist", snap: false}, {n: "Add-on recommendation", snap: false}, {n: "Thanks & return invitation", snap: false}, {n: "Efficient customer flow & queue", snap: false}, {n: "Good Customer Impression", snap: false}]},
+                {title: "Operational Compliance", items: [{n: "Poison logbook", snap: true}, {n: "License valid & displayed", snap: true}, {n: "No expired products", snap: true}, {n: "Temperature logs", snap: true}, {n: "Storage FEFO", snap: true}, {n: "No personal item in area", snap: true}]}
+            ];
+            let photoIdx = 0;
+            const photoGrid = document.getElementById('photoGrid');
+            container.innerHTML = ""; photoGrid.innerHTML = ""; 
+            auditData.forEach(sec => {
+                let h = `<div class="audit-section"><h4 class="text-blue-600 font-black text-[10px] mb-4 border-b pb-2 uppercase tracking-widest">${sec.title}</h4>`;
+                sec.items.forEach(item => {
+                    if(item.header) h += `<div class="mt-4 mb-2"><span class="text-[10px] font-black text-slate-400 uppercase">${item.n}</span></div>`;
+                    else {
+                        h += `<div class="py-3 border-b border-slate-50 last:border-0"><div class="flex justify-between items-center"><span class="text-xs font-black text-slate-600 pr-4">${item.n}</span><input type="checkbox" class="audit-check" onchange="calcAudit()"></div>`;
+                        if(item.snap) {
+                            h += `<div class="photo-slot"><div class="preview-box"><i class="fas fa-camera text-slate-300"></i><img id="prev_${photoIdx}" class="hidden"></div><button onclick="document.getElementById('cam_${photoIdx}').click()" class="bg-blue-50 text-blue-600 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest">Snap Evidence</button><input type="file" id="cam_${photoIdx}" class="hidden" accept="image/*" capture="environment" onchange="handleImg(${photoIdx})"><input type="hidden" id="label_${photoIdx}" value="${item.n}"></div>`;
+                            photoIdx++;
+                        }
+                        h += `</div>`;
+                    }
+                });
+                container.innerHTML += h + `</div>`;
+            });
+            const discItems = ["DISCUSSION WITH PIC", "Staff Challenges", "Ground feedback", "Event Plan & Update"];
+            let dHtml = `<div class="audit-section"><h4 class="text-blue-800 font-black text-[10px] mb-4 border-b pb-2 uppercase tracking-widest">Discussion</h4>`;
+            discItems.forEach((di, idx) => {
+                dHtml += `<div class="mb-4"><div class="flex justify-between items-center mb-2"><label class="text-[10px] font-black text-slate-500 uppercase">${di}</label><input type="checkbox" class="audit-check" onchange="calcAudit()"></div><textarea id="disc_${idx}" class="w-full p-4 rounded-2xl bg-slate-50 border-none font-bold text-sm h-24" placeholder="Type here..."></textarea></div>`;
+            });
+            container.innerHTML += dHtml + `</div>`;
+        }
+
+        function initPhotos(count) {
+            const grid = document.getElementById('photoGrid');
+            grid.innerHTML = "";
+            for(let i=0; i<count; i++) {
+                grid.innerHTML += `<div class="photo-slot"><div class="preview-box"><i class="fas fa-camera text-slate-300"></i><img id="prev_${i}" class="hidden"></div><input type="text" id="label_${i}" class="p-3 text-xs font-black border-b border-dashed outline-none" placeholder="Description"><button onclick="document.getElementById('cam_${i}').click()" class="bg-slate-100 py-3 rounded-xl text-[9px] font-black uppercase">Open Camera</button><input type="file" id="cam_${i}" class="hidden" accept="image/*" capture="environment" onchange="handleImg(${i})"></div>`;
+            }
+        }
+
+        function calcAudit() { document.getElementById('currentScore').innerText = document.querySelectorAll('.audit-check:checked').length; }
+
+        function handleImg(idx) {
+            const input = document.getElementById(`cam_${idx}`);
+            const prev = document.getElementById(`prev_${idx}`);
+            if (!input || !input.files || !input.files[0]) return;
+            const file = input.files[0];
             const reader = new FileReader();
+            document.getElementById('uploadSpinner').style.display = "block";
             reader.onload = function(e) {
-                const now = new Date();
-                const meta = `${document.getElementById('user-name').value} - ${document.getElementById('outlet-select').value}\nTask: ${currentRole} Portal\n${now.toLocaleDateString('en-GB')} | ${now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
-                localStorage.setItem(`photo_data_${id}`, e.target.result);
-                displayStoredPhoto(id, e.target.result, meta);
-                saveDraft();
-                validateSubmit();
-            }
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.getElementById('compressCanvas'), ctx = canvas.getContext('2d');
+                    const MAX_WIDTH = 1200;
+                    const scale = MAX_WIDTH / img.width;
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = img.height * scale;
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = "rgba(0,0,0,0.65)"; 
+                    ctx.fillRect(0, canvas.height - 80, canvas.width, 80);
+                    ctx.fillStyle = "white"; 
+                    ctx.font = "bold 28px Arial, sans-serif";
+                    const outlet = document.getElementById('outletName').value;
+                    const name = document.getElementById('staffName').value.toUpperCase();
+                    const dateStr = new Date().toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' });
+                    const stamp = `${outlet} | ${name} | ${dateStr} | STAMPED`;
+                    ctx.fillText(stamp, 30, canvas.height - 30);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    window.requestAnimationFrame(() => {
+                        prev.src = dataUrl;
+                        prev.classList.remove('hidden');
+                        const icon = prev.parentElement.querySelector('i');
+                        if (icon) icon.style.display = 'none';
+                        document.getElementById('uploadSpinner').style.display = "none";
+                    });
+                };
+                img.src = e.target.result;
+            };
             reader.readAsDataURL(file);
         }
 
-        function displayStoredPhoto(id, base64, meta) {
-            const wrap = document.getElementById(`wrap-${id}`);
-            const placeholder = document.getElementById(`placeholder-${id}`);
-            if(placeholder) placeholder.classList.add('hidden');
-            wrap.innerHTML = `<button class="clear-btn" onclick="clearPhoto(${id}); event.stopPropagation();">Clear</button><img src="${base64}"><div class="timestamp-badge" id="meta-${id}">${meta.replace(/\n/g, '<br>')}</div>`;
-        }
-
-        function clearPhoto(id) {
-            document.getElementById(`cam-${id}`).value = "";
-            localStorage.removeItem(`photo_data_${id}`);
-            document.getElementById(`wrap-${id}`).innerHTML = "";
-            document.getElementById(`placeholder-${id}`).classList.remove('hidden');
-            saveDraft();
-            validateSubmit();
-        }
-
-        function validateSubmit() {
-            let count = 0;
-            for(let i=1; i<=12; i++) if(localStorage.getItem(`photo_data_${i}`)) count++;
-            const btn = document.getElementById('submit-btn');
-            btn.disabled = count < 1;
-            if(count >= 1) btn.classList.replace('bg-slate-800', 'bg-cyan-600');
-            else btn.classList.replace('bg-cyan-600', 'bg-slate-800');
-        }
-
-        function openPortal() { 
-            if(!document.getElementById('user-name').value || !currentRole) return alert("Please Fill Info First.");
-            document.getElementById('step-1').style.display = 'none'; 
-            document.getElementById('step-2').classList.remove('hidden'); 
-            document.getElementById('portal-display-title').innerText = currentRole + " MODE"; 
-        }
-
-        function goBack() { 
-            document.getElementById('step-2').classList.add('hidden'); 
-            document.getElementById('step-1').style.display = 'block'; 
-        }
-
-        function clearAllAndReload() { localStorage.removeItem('ops_portal_draft'); for(let i=1; i<=12; i++) localStorage.removeItem(`photo_data_${i}`); location.reload(); }
-        function showSuccess() { document.getElementById('success-overlay').style.display = 'flex'; }
-
-        async function compressImage(base64) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.src = base64;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    let width = img.width, height = img.height, max = 800; 
-                    if (width > height && width > max) { height *= max / width; width = max; }
-                    else if (height > max) { width *= max / height; height = max; }
-                    canvas.width = width; canvas.height = height;
-                    ctx.drawImage(img, 0, 0, width, height);
-                    const now = new Date();
-                    const name = document.getElementById('user-name').value;
-                    const outlet = document.getElementById('outlet-select').value;
-                    const stampText = `${name} - ${outlet} - ${now.toLocaleString()}`;
-                    ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
-                    ctx.fillRect(0, height - 45, width, 45); 
-                    ctx.fillStyle = "white";
-                    ctx.font = "bold 15px Arial";
-                    ctx.fillText(stampText, 15, height - 15);
-                    resolve(canvas.toDataURL('image/jpeg', 0.4));
-                };
-            });
-        }
-
-        // Processing Submit
-        async function processAllPortals() {
-            const overlay = document.getElementById('loading-overlay');
-            const loadingText = document.getElementById('loading-text');
-            const spinner = document.getElementById('loading-spinner');
-            const errIcon = document.getElementById('error-icon');
+        async function submitReport() {
+            const btn = document.getElementById('submitBtn'), btnText = document.getElementById('btnText'), btnLoader = document.getElementById('btnLoader'), blocker = document.getElementById('uploadSpinner');
+            const images = [], photoNames = [];
+            const allImgElements = document.querySelectorAll('img[id^="prev_"]');
             
-            overlay.style.display = 'flex';
-            spinner.classList.remove('hidden');
-            errIcon.classList.add('hidden');
-            loadingText.innerText = "Processing Evidence...";
-
-            const activeIds = [];
-            for (let i = 1; i <= 12; i++) if (localStorage.getItem(`photo_data_${i}`)) activeIds.push(i); 
-
-            try {
-                const photoPayloadArr = [];
-                for(let i=0; i<activeIds.length; i++) {
-                    const id = activeIds[i];
-                    loadingText.innerText = `Preparing Image ${i+1}/${activeIds.length}...`;
-                    const clean = await compressImage(localStorage.getItem(`photo_data_${id}`));
-                    photoPayloadArr.push({ base64: clean, description: document.getElementById(`desc-${id}`).value || "" });
+            allImgElements.forEach((img, i) => {
+                if (img.src && img.src.startsWith('data:image') && !img.classList.contains('hidden')) {
+                    const base64Data = img.src.split(',')[1];
+                    images.push(base64Data);
+                    const lblInput = document.getElementById('label_'+i);
+                    const labelValue = lblInput ? (lblInput.value || 'Evidence') : 'Evidence';
+                    // We encode the description into the filename using | as separator for GAS
+                    photoNames.push(`${currentTask}|${labelValue}`);
                 }
+            });
 
-                loadingText.innerText = "Syncing to Database...";
-
-                const payload = { 
-                    user: document.getElementById('user-name').value,
-                    role: currentRole,
-                    outlet: document.getElementById('outlet-select').value,
-                    date: document.getElementById('entry-date').value,
-                    photos: photoPayloadArr 
+            if(currentTask === 'AUDIT FORM') {
+                if(document.querySelectorAll('.audit-check:checked').length === 0) return alert("Select at least one achievement.");
+                if(images.length < 11) return alert("Audit Form requires 11 snap evidences.");
+            } else if(currentTask !== 'KPI DISCUSSION' && images.length === 0) {
+                return alert("Please capture at least one photo.");
+            }
+            
+            blocker.style.display = "block"; btn.disabled = true; btnText.style.display = "none"; btnLoader.style.display = "block";
+            
+            // --- KPI DISCUSSION DATA FLOW FIX ---
+            let rem = "";
+            if (currentTask === 'KPI DISCUSSION') {
+                const p = document.getElementById('kpi1').value;
+                const l = document.getElementById('kpi2').value;
+                const a = document.getElementById('kpi3').value;
+                rem = `PROGRESSION: ${p} | LIMITATIONS: ${l} | ACTION PLAN: ${a}`;
+            } else if (currentTask === 'AUDIT FORM') {
+                rem = `SCORE: ${document.getElementById('currentScore').innerText}/46`;
+            } else {
+                const subName = document.getElementById('taskSub')?.value || document.getElementById('subTask')?.value || "General";
+                rem = `TASK: ${subName} | REMARKS: ${document.getElementById('remarks')?.value || 'N/A'}`;
+            }
+            
+            try {
+                const payload = {
+                    staff: document.getElementById('staffName').value,
+                    outlet: document.getElementById('outletName').value,
+                    category: currentCat,
+                    task: currentTask,
+                    remarks: rem,
+                    staffTime: document.getElementById('reportDate').value,
+                    images: images,
+                    photoNames: photoNames
                 };
-
-                const response = await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(payload),
-                    mode: 'no-cors',
-                    cache: 'no-cache',
-                    headers: { 'Content-Type': 'text/plain' }
-                });
-
-                // NO-CORS Manual Log Strategy
-                let history = JSON.parse(localStorage.getItem('ops_history')) || [];
-                const localRow = [new Date().toISOString(), payload.user, payload.outlet, payload.date, payload.role];
-                history.push(localRow);
-                localStorage.setItem('ops_history', JSON.stringify(history));
-
-                loadingText.innerText = "Finishing Submission...";
-                setTimeout(() => {
-                    overlay.style.display = 'none';
-                    showSuccess();
-                }, 3500);
-
-            } catch (e) {
-                spinner.classList.add('hidden');
-                errIcon.classList.remove('hidden');
-                loadingText.innerText = "Upload Interrupted";
+                const r = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload)});
+                const result = await r.text();
+                if(result.includes("Success")) {
+                    document.getElementById('successOverlay').classList.remove('hidden');
+                    setTimeout(() => {
+                        document.getElementById('successOverlay').classList.add('hidden');
+                        blocker.style.display = "none"; btnText.style.display = "block"; btnLoader.style.display = "none";
+                        navTo(2);
+                        btn.disabled = false;
+                    }, 2000);
+                } else throw new Error();
+            } catch(e) { 
+                blocker.style.display = "none"; btnText.style.display = "block"; btnLoader.style.display = "none"; 
+                alert("Upload Error."); 
+                btn.disabled = false; 
             }
         }
 
-        /**
-         * SUPERVISOR LOGIC PATCH
-         */
-        async function downloadIndividualPDF(rowId, role) {
-            alert("Connecting to Cloud PDF Engine...");
-            // Use standard doGet generation logic
-            const url = `${WEB_APP_URL}?action=generatePDF&role=${role}&row=${rowId}`;
-            window.open(url, '_blank');
+        document.getElementById('supervisorBtn').onclick = () => {
+            if (prompt("Enter Supervisor PIN:") === MASTER_PIN) {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById('supervisorDashboard').classList.remove('hidden');
+                document.getElementById('supervisorDashboard').classList.add('active');
+                document.getElementById('supervisorBtn').style.display = "none";
+                loadFeed();
+            }
+        };
+
+        async function loadFeed() {
+            const syncIcon = document.getElementById('syncIcon');
+            syncIcon.classList.add('fa-spin');
+            try {
+                const r = await fetch(SCRIPT_URL + "?action=read");
+                const d = await r.json();
+                allSubmissions = d.submissions || [];
+                generateSubFilterOptions();
+                filterFeed();
+            } catch (e) { alert("Load Error"); } finally { syncIcon.classList.remove('fa-spin'); }
         }
 
-        async function downloadBulk() {
-            const checked = Array.from(document.querySelectorAll('.report-checkbox:checked'));
-            if(checked.length === 0) return alert("Select reports first.");
-            alert("This will open the server combined view for the selected items.");
-            // Implementation logic for bulk URL generation can be added here
+        async function downloadIndividualPDF(rowId, tabName) {
+            const blocker = document.getElementById('uploadSpinner');
+            blocker.style.display = "block";
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=generatePDF&rowId=${rowId}&tab=${tabName}`);
+                const result = await response.json();
+                if (!result.data) throw new Error("No data received");
+                const link = document.createElement('a');
+                link.href = `data:application/pdf;base64,${result.data}`;
+                link.download = result.filename || `Report_${rowId}.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (e) { alert("PDF Error"); } finally { blocker.style.display = "none"; }
         }
 
-        function renderAdminLogs() {
-            const history = JSON.parse(localStorage.getItem('ops_history')) || [];
-            const container = document.getElementById('admin-log-container');
-            container.innerHTML = "";
-            const roleFilter = document.getElementById('filter-role').value;
-            const outletFilter = document.getElementById('filter-outlet').value;
-            const dateFilter = document.getElementById('filter-date').value;
+        async function downloadBulk(btn) {
+            const selected = Array.from(document.querySelectorAll('.report-checkbox:checked')).map(cb => cb.value);
+            if (selected.length === 0) return alert("Please select at least one report.");
+            const blocker = document.getElementById('uploadSpinner');
+            blocker.style.display = "block";
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=combinedPDF&ids=${selected.join(',')}`);
+                const result = await response.json();
+                const link = document.createElement('a');
+                link.href = `data:application/pdf;base64,${result.data}`;
+                link.download = "Combined_Audit_Reports.pdf";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (e) { alert("Bulk PDF Failed."); } finally { blocker.style.display = "none"; }
+        }
 
-            const filtered = history.filter(row => {
-                const matchesRole = roleFilter === "ALL" || (row[4] && row[4].includes(roleFilter)); 
-                const matchesOutlet = outletFilter === "ALL" || row[2] === outletFilter;
-                const matchesDate = !dateFilter || row[0].toString().startsWith(dateFilter);
-                return matchesOutlet && matchesDate;
+        function setTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.innerText === tab || (tab==='AM' && b.innerText==='AM PORTAL')));
+            generateSubFilterOptions();
+            filterFeed();
+        }
+
+        function setTimeFilter(f) {
+            timeFilter = f;
+            document.querySelectorAll('.time-btn').forEach(b => {
+                const isSelected = b.id === `btn-${f}`;
+                b.classList.toggle('bg-blue-600', isSelected);
+                b.classList.toggle('text-white', isSelected);
+                b.classList.toggle('bg-white', !isSelected);
+                b.classList.toggle('text-slate-400', !isSelected);
             });
+            document.getElementById('subFilterContainer').classList.toggle('hidden', f === 'all');
+            document.getElementById('periodSearch').value = "";
+            generateSubFilterOptions();
+            filterFeed();
+        }
 
-            if(filtered.length === 0) {
-                container.innerHTML = `<div class="text-center py-10 opacity-30 font-black uppercase text-[10px]">No Records Found</div>`;
+        function generateSubFilterOptions() {
+            const select = document.getElementById('subFilterSelect');
+            select.innerHTML = '<option value="current">All Available Periods</option>';
+            if(timeFilter === 'all') return;
+            const uniquePeriods = new Set();
+            allSubmissions.forEach(s => {
+                const d = new Date(s.staffTime);
+                if(isNaN(d.getTime())) return;
+                if(timeFilter === 'year') uniquePeriods.add(d.getFullYear().toString());
+                if(timeFilter === 'month') uniquePeriods.add(`${d.toLocaleString('default', { month: 'long' })} ${d.getFullYear()}`);
+                if(timeFilter === 'week') {
+                    const start = new Date(d.getFullYear(), 0, 1);
+                    const week = Math.ceil((((d - start) / 86400000) + start.getDay() + 1) / 7);
+                    uniquePeriods.add(`Week ${week} (${d.getFullYear()})`);
+                }
+            });
+            allPeriodOptions = Array.from(uniquePeriods).sort().reverse();
+            allPeriodOptions.forEach(p => select.innerHTML += `<option value="${p}">${p}</option>`);
+        }
+
+        function searchPeriods() {
+            const query = document.getElementById('periodSearch').value.toLowerCase();
+            const filtered = allPeriodOptions.filter(opt => opt.toLowerCase().includes(query));
+            const select = document.getElementById('subFilterSelect');
+            select.innerHTML = '<option value="current">All Available Periods</option>';
+            filtered.forEach(p => select.innerHTML += `<option value="${p}">${p}</option>`);
+        }
+
+        function filterFeed() {
+            const q = document.getElementById('dashSearch').value.toLowerCase();
+            const subVal = document.getElementById('subFilterSelect').value;
+            const filtered = allSubmissions.filter(s => {
+                const sDate = new Date(s.staffTime);
+                const targetSheet = currentTab === 'MARKETING' ? "Submissions_Marketing" : (currentTab === 'AM' ? "Submissions_AM" : "Submissions_Staff");
+                if (s.tabName !== targetSheet) return false;
+                const matchSearch = s.staff.toLowerCase().includes(q) || s.outlet.toLowerCase().includes(q) || s.task.toLowerCase().includes(q);
+                if (!matchSearch) return false;
+                if(timeFilter !== 'all' && subVal !== 'current') {
+                    if(timeFilter === 'year') return sDate.getFullYear().toString() === subVal;
+                    if(timeFilter === 'month') return `${sDate.toLocaleString('default', { month: 'long' })} ${sDate.getFullYear()}` === subVal;
+                    if(timeFilter === 'week') {
+                        const start = new Date(sDate.getFullYear(), 0, 1);
+                        const week = Math.ceil((((sDate - start) / 86400000) + start.getDay() + 1) / 7);
+                        return `Week ${week} (${sDate.getFullYear()})` === subVal;
+                    }
+                }
+                return true;
+            });
+            renderFeed(filtered);
+            document.getElementById('totalCount').innerText = filtered.length + " Reports";
+            document.getElementById('bulkBar').classList.toggle('hidden', filtered.length === 0);
+        }
+
+        // --- NEW DEEP SCAN COLLAPSIBLE RENDERER WITH NAMING FIX ---
+        function renderFeed(items) {
+            const feed = document.getElementById('feedList');
+            if (items.length === 0) {
+                feed.innerHTML = `<div class="text-center p-10 bg-white rounded-2xl border border-dashed"><p class="text-slate-400 font-medium">No reports found.</p></div>`;
                 return;
             }
+            feed.innerHTML = items.map(s => {
+                const targetTab = s.tabName || 'Submissions_Staff'; 
+                let subTaskPath = "N/A", finalRemark = "N/A";
+                
+                // Parsing Remarks for Dashboard: "TASK: OTC | REMARKS: Clean shelves"
+                if (s.remarks && s.remarks.includes("|")) {
+                    const pts = s.remarks.split("|");
+                    subTaskPath = pts[0].replace("TASK:", "").trim();
+                    finalRemark = pts[1].replace("REMARKS:", "").trim();
+                } else if (s.remarks && s.remarks.startsWith("SCORE:")) {
+                    subTaskPath = "Audit Summary";
+                    finalRemark = s.remarks;
+                } else {
+                    subTaskPath = "General";
+                    finalRemark = s.remarks || "No data";
+                }
 
-            filtered.reverse().forEach((row) => {
-                const card = document.createElement('div');
-                card.className = "bg-white p-5 rounded-[2rem] border border-sky-50 shadow-sm relative";
-                card.innerHTML = `
-                    <div class="flex justify-between items-start mb-3">
-                        <div class="flex items-center gap-3">
-                            <input type="checkbox" value="${row[0]}" class="report-checkbox w-5 h-5 rounded-lg border-sky-100">
-                            <div>
-                                <h4 class="font-black text-[12px] uppercase text-sky-900 leading-none">${row[1]}</h4>
-                                <p class="text-[9px] font-bold text-sky-300 uppercase mt-1 tracking-tighter">${row[2]} | ${row[4]}</p>
+                const processedUrls = (s.urls || []).map(u => {
+                    const urlPart = u.split("?id=")[0];
+                    const fileId = u.split("id=")[1]?.split("&")[0] || "";
+                    
+                    // NEW: EXTRACT FILENAME DESCRIPTION FROM DRIVE URL METADATA
+                    // If your GAS uses the file name correctly, we can extract the text after the '|'
+                    let label = "Evidence Photo";
+                    try {
+                        // This logic extracts the description from the custom string encoded in the photo name
+                        const nameMatch = u.match(/\|([^._]+)/);
+                        if (nameMatch) label = decodeURIComponent(nameMatch[1]);
+                    } catch(e) {}
+                    
+                    return { thumb: `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`, label: label };
+                });
+
+                const thumbList = processedUrls.map(p => p.thumb);
+                const urlListStr = JSON.stringify(thumbList).replace(/"/g, "&quot;");
+                
+                // Static list for Audit Form criteria naming fallback
+                const auditCriteria = ["Planogram based on Category", "Store layout - LTR Logic", "Clean Shelves", "Price tag & colours", "Display Item", "Poison logbook", "License valid & displayed", "No expired products", "Temperature logs", "Storage FEFO", "No personal item in area"];
+
+                return `
+                <div id="card_${s.rowId}" class="submission-card bg-white rounded-3xl border shadow-sm relative mb-4 overflow-hidden">
+                    <div class="p-5 flex justify-between items-center" onclick="toggleCard(${s.rowId})">
+                        <div class="flex-1">
+                            <h4 class="font-black text-sm uppercase">${s.staff}</h4>
+                            <p class="text-[9px] font-black text-blue-600 uppercase tracking-tighter">${s.outlet} | ${s.staffTime}</p>
+                            <div class="mt-2 flex items-center gap-2">
+                                <span class="bg-blue-600 text-white text-[8px] font-black px-2 py-0.5 rounded uppercase">${s.task}</span>
+                                <i class="fas fa-chevron-right text-slate-300 text-[8px]"></i>
+                                <span class="text-slate-700 text-[9px] font-black uppercase truncate">${subTaskPath}</span>
                             </div>
                         </div>
-                        <span class="bg-emerald-50 text-emerald-600 text-[8px] font-black px-2 py-1 rounded-lg uppercase">Synced</span>
+                        <div class="flex flex-col items-end gap-3 ml-4">
+                            <input type="checkbox" value="${s.rowId}|${targetTab}" class="report-checkbox w-5 h-5 rounded-lg border-slate-200" onchange="updateSelectedCount()">
+                            <i class="fas fa-chevron-down text-slate-300 chevron-icon"></i>
+                        </div>
                     </div>
-                    <div class="flex gap-2 border-t pt-3 border-slate-50">
-                        <button onclick="viewReportOnCloud('${row[4]}', '${row[0]}')" class="flex-1 py-2 bg-slate-50 text-slate-500 rounded-xl text-[9px] font-black uppercase">View Photos</button>
-                        <button onclick="downloadIndividualPDF(1, '${row[4]}')" class="flex-1 py-2 bg-blue-50 text-blue-600 rounded-xl text-[9px] font-black uppercase">PDF Report</button>
+
+                    <div class="collapsible-body bg-slate-50/50 border-t border-slate-50">
+                        <div class="p-5 space-y-4">
+                            <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
+                                <p class="text-[8px] font-black text-slate-300 uppercase mb-1">Overall Remark</p>
+                                <p class="text-[10px] text-slate-600 font-bold leading-relaxed">${finalRemark}</p>
+                            </div>
+
+                            <div class="space-y-4">
+                                ${processedUrls.map((p, idx) => {
+                                    // Use Audit List if it's an audit, otherwise use the encoded label
+                                    let displayLabel = (s.task === 'AUDIT FORM' && idx < auditCriteria.length) ? auditCriteria[idx] : p.label;
+                                    
+                                    return `
+                                    <div class="detail-line">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                                            <span class="text-[9px] font-black text-slate-700 uppercase tracking-tight">${displayLabel}</span>
+                                        </div>
+                                        <div class="h-48 w-full rounded-2xl overflow-hidden border border-white shadow-md bg-white">
+                                            <img src="${p.thumb}" class="w-full h-full object-cover" onclick="openGallery(${urlListStr}, ${idx})">
+                                        </div>
+                                    </div>`;
+                                }).join('')}
+                            </div>
+
+                            <button onclick="downloadIndividualPDF(${s.rowId}, '${targetTab}')" class="w-full mt-2 py-3 bg-white border border-slate-200 rounded-2xl text-[9px] font-black uppercase text-slate-400 shadow-sm">
+                                <i class="fas fa-file-pdf mr-1 text-red-400"></i> Generate Official Neat PDF
+                            </button>
+                        </div>
                     </div>
-                `;
-                container.appendChild(card);
-            });
+                </div>`;
+            }).join('');
         }
 
-        function viewReportOnCloud(role, timestamp) {
-            // Logic to find row index based on timestamp could be complex without a direct ID, 
-            // but we can redirect to the sheet or a search view.
-            alert("Searching database for record...");
-            window.open(WEB_APP_URL, '_blank');
+        function toggleCard(id) {
+            document.getElementById(`card_${id}`).classList.toggle('open');
         }
 
-        function downloadCSV() {
-            const history = JSON.parse(localStorage.getItem('ops_history')) || [];
-            if(history.length === 0) return alert("No local data found.");
-            const header = "Timestamp,User,Outlet,Date,Role\n";
-            let csv = header;
-            history.forEach(row => {
-                const sanitized = row.slice(0, 5).map(cell => `"${(cell || "").toString().replace(/"/g, '""')}"`);
-                csv += sanitized.join(",") + "\n";
-            });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = `OPS_PORTAL_LOG_${new Date().getTime()}.csv`;
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        function openGallery(urls, startIndex) {
+            const overlay = document.getElementById('galleryOverlay');
+            const content = document.getElementById('galleryContent');
+            content.innerHTML = "";
+            urls.forEach((u, i) => { content.innerHTML += `<div class="gallery-full-img"><img src="${u}"></div>`; });
+            overlay.style.display = "flex";
+            document.getElementById('galleryCounter').innerText = `${startIndex + 1} / ${urls.length}`;
+            setTimeout(() => { content.scrollLeft = content.clientWidth * startIndex; }, 50);
+            content.onscroll = () => {
+                const index = Math.round(content.scrollLeft / content.clientWidth);
+                document.getElementById('galleryCounter').innerText = `${index + 1} / ${urls.length}`;
+            };
         }
 
-        function promptAdmin() {
-            const pass = prompt("Enter Supervisor PIN:");
-            if(pass === "admin") { 
-                document.getElementById('admin-overlay').style.display = 'flex'; 
-                renderAdminLogs(); 
-            } else alert("Unauthorized.");
+        function closeGallery() { document.getElementById('galleryOverlay').style.display = "none"; }
+
+        function toggleSelectAll() {
+            const master = document.getElementById('selectAll').checked;
+            document.querySelectorAll('.report-checkbox').forEach(cb => cb.checked = master);
+            updateSelectedCount();
         }
-        function closeAdmin() { document.getElementById('admin-overlay').style.display = 'none'; }
+
+        function updateSelectedCount() {
+            const checked = document.querySelectorAll('.report-checkbox:checked').length;
+            const text = document.getElementById('selectedText');
+            if(text) text.innerText = `${checked} Selected`;
+        }
+
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
     </script>
 </body>
 </html>
