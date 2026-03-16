@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>InstaReport Pro v2.1</title>
+    <title>InstaReport Pro v2.2</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -18,7 +18,7 @@
         #uploadSpinner { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.4); z-index: 20000; cursor: wait; }
         .photo-slot { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 16px; background: #fff; margin-top: 8px; }
         .preview-box { width: 100%; height: 140px; border-radius: 12px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0; position: relative; display: flex; align-items: center; justify-content: center; }
-        .preview-box img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 20; }
+        .preview-box img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 20; background: white; }
         .preview-box i { position: relative; z-index: 5; font-size: 2rem; color: #cbd5e1; }
         .audit-section { background: white; padding: 16px; border-radius: 24px; border: 1px solid #e2e8f0; margin-bottom: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         .score-box { position: sticky; bottom: 100px; background: #2563eb; color: white; padding: 16px; border-radius: 20px; text-align: center; font-weight: 900; z-index: 100; box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4); }
@@ -33,12 +33,15 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .tab-btn.active { border-bottom: 3px solid #2563eb; color: #2563eb; }
         #bulkBar { position: fixed; bottom: 0; left: 0; right: 0; background: #2563eb; color: white; padding: 15px; z-index: 1000; border-radius: 20px 20px 0 0; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -10px 25px rgba(0,0,0,0.1); }
+        
         #galleryOverlay { display:none; position:fixed; inset:0; background:black; z-index:50000; flex-direction:column; }
         #galleryContent { flex:1; display:flex; overflow-x:auto; scroll-snap-type:x mandatory; }
         .gallery-full-img { flex:0 0 100%; scroll-snap-align:center; display:flex; align-items:center; justify-content:center; padding:20px; }
         .gallery-full-img img { max-width:100%; max-height:80vh; object-fit:contain; border-radius:10px; }
+
         .criteria-badge { font-size: 8px; font-weight: 900; padding: 2px 6px; border-radius: 6px; background: #f1f5f9; color: #64748b; text-transform: uppercase; border: 1px solid #e2e8f0; }
         .detail-line { border-left: 2px solid #e2e8f0; padding-left: 10px; margin-left: 5px; }
+
         .collapsible-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, opacity 0.3s; opacity: 0; }
         .submission-card.open .collapsible-body { max-height: 10000px; opacity: 1; transition: max-height 0.8s ease-in, opacity 0.4s; }
         .chevron-icon { transition: transform 0.3s ease; }
@@ -65,7 +68,7 @@
     <div id="page1" class="page active min-h-screen p-6">
         <header class="text-center mt-4 mb-10">
             <h1 class="text-4xl font-black text-blue-600 tracking-tighter">InstaReport</h1>
-            <p class="v-badge uppercase mt-1">Enterprise Portal v2.1</p>
+            <p class="v-badge uppercase mt-1">Enterprise Portal v2.2</p>
         </header>
         <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 space-y-6">
             <div>
@@ -407,7 +410,6 @@
                     images.push(base64Data);
                     const lblInput = document.getElementById('label_'+i);
                     const labelValue = lblInput ? (lblInput.value || 'Evidence') : 'Evidence';
-                    // We encode the description into the filename using | as separator for GAS
                     photoNames.push(`${currentTask}|${labelValue}`);
                 }
             });
@@ -421,7 +423,7 @@
             
             blocker.style.display = "block"; btn.disabled = true; btnText.style.display = "none"; btnLoader.style.display = "block";
             
-            // --- KPI DISCUSSION DATA FLOW FIX ---
+            // PACKAGING REMARKS (FIXED LOGIC)
             let rem = "";
             if (currentTask === 'KPI DISCUSSION') {
                 const p = document.getElementById('kpi1').value;
@@ -429,7 +431,9 @@
                 const a = document.getElementById('kpi3').value;
                 rem = `PROGRESSION: ${p} | LIMITATIONS: ${l} | ACTION PLAN: ${a}`;
             } else if (currentTask === 'AUDIT FORM') {
-                rem = `SCORE: ${document.getElementById('currentScore').innerText}/46`;
+                const discItems = ["DISCUSSION WITH PIC", "Staff Challenges", "Ground feedback", "Event Plan & Update"];
+                let discStr = discItems.map((di, idx) => `${di}: ${document.getElementById('disc_'+idx).value}`).join(" | ");
+                rem = `SCORE: ${document.getElementById('currentScore').innerText}/46 | ${discStr}`;
             } else {
                 const subName = document.getElementById('taskSub')?.value || document.getElementById('subTask')?.value || "General";
                 rem = `TASK: ${subName} | REMARKS: ${document.getElementById('remarks')?.value || 'N/A'}`;
@@ -594,7 +598,7 @@
             document.getElementById('bulkBar').classList.toggle('hidden', filtered.length === 0);
         }
 
-        // --- NEW DEEP SCAN COLLAPSIBLE RENDERER WITH NAMING FIX ---
+        // --- ENHANCED DEEP SCAN COLLAPSIBLE RENDERER ---
         function renderFeed(items) {
             const feed = document.getElementById('feedList');
             if (items.length === 0) {
@@ -605,7 +609,6 @@
                 const targetTab = s.tabName || 'Submissions_Staff'; 
                 let subTaskPath = "N/A", finalRemark = "N/A";
                 
-                // Parsing Remarks for Dashboard: "TASK: OTC | REMARKS: Clean shelves"
                 if (s.remarks && s.remarks.includes("|")) {
                     const pts = s.remarks.split("|");
                     subTaskPath = pts[0].replace("TASK:", "").trim();
@@ -613,31 +616,20 @@
                 } else if (s.remarks && s.remarks.startsWith("SCORE:")) {
                     subTaskPath = "Audit Summary";
                     finalRemark = s.remarks;
-                } else {
-                    subTaskPath = "General";
-                    finalRemark = s.remarks || "No data";
                 }
 
                 const processedUrls = (s.urls || []).map(u => {
-                    const urlPart = u.split("?id=")[0];
                     const fileId = u.split("id=")[1]?.split("&")[0] || "";
-                    
-                    // NEW: EXTRACT FILENAME DESCRIPTION FROM DRIVE URL METADATA
-                    // If your GAS uses the file name correctly, we can extract the text after the '|'
                     let label = "Evidence Photo";
                     try {
-                        // This logic extracts the description from the custom string encoded in the photo name
-                        const nameMatch = u.match(/\|([^._]+)/);
+                        const nameMatch = u.match(/\|([^._?]+)/);
                         if (nameMatch) label = decodeURIComponent(nameMatch[1]);
                     } catch(e) {}
-                    
                     return { thumb: `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`, label: label };
                 });
 
                 const thumbList = processedUrls.map(p => p.thumb);
                 const urlListStr = JSON.stringify(thumbList).replace(/"/g, "&quot;");
-                
-                // Static list for Audit Form criteria naming fallback
                 const auditCriteria = ["Planogram based on Category", "Store layout - LTR Logic", "Clean Shelves", "Price tag & colours", "Display Item", "Poison logbook", "License valid & displayed", "No expired products", "Temperature logs", "Storage FEFO", "No personal item in area"];
 
                 return `
@@ -662,14 +654,12 @@
                         <div class="p-5 space-y-4">
                             <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
                                 <p class="text-[8px] font-black text-slate-300 uppercase mb-1">Overall Remark</p>
-                                <p class="text-[10px] text-slate-600 font-bold leading-relaxed">${finalRemark}</p>
+                                <p class="text-[10px] text-slate-600 font-bold leading-relaxed" style="white-space:pre-wrap;">${finalRemark}</p>
                             </div>
 
                             <div class="space-y-4">
                                 ${processedUrls.map((p, idx) => {
-                                    // Use Audit List if it's an audit, otherwise use the encoded label
                                     let displayLabel = (s.task === 'AUDIT FORM' && idx < auditCriteria.length) ? auditCriteria[idx] : p.label;
-                                    
                                     return `
                                     <div class="detail-line">
                                         <div class="flex items-center gap-2 mb-2">
