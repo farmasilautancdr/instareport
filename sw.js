@@ -1,7 +1,7 @@
-const CACHE_NAME = 'instareport-v3-2';
+const CACHE_NAME = 'instareport-v3-4';
 
 // Static app-shell assets only. NOTE: cdn.tailwindcss.com removed — index.html
-// v3.2+ embeds a compiled static CSS bundle directly, no external Tailwind
+// v3.4+ embeds a compiled static CSS bundle directly, no external Tailwind
 // script is loaded anymore, so caching it here would just be dead weight
 // (and previously could have blocked install entirely if that CDN was ever
 // briefly unreachable, since cache.addAll() fails all-or-nothing).
@@ -20,7 +20,7 @@ const APP_SHELL = [
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      console.log('Service Worker: Caching app shell (v3.2)');
+      console.log('Service Worker: Caching app shell (v3.4)');
       return Promise.all(
         APP_SHELL.map(url =>
           cache.add(url).catch(err => console.warn('Service Worker: failed to cache', url, err))
@@ -48,7 +48,7 @@ self.addEventListener('activate', (event) => {
 
 // Requests to the Apps Script backend (SCRIPT_URL in index.html) — this is
 // live, constantly-changing data: submissions, date-range searches, PDFs.
-// FIX (v3.2): these must always go to the network. Previously everything
+// FIX (v3.4): these must always go to the network. Previously everything
 // was cache-first, which meant the supervisor dashboard could keep showing
 // stale submission data indefinitely once a response got cached. If the
 // network request fails, let it fail naturally so index.html's own
