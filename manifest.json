@@ -1,11 +1,11 @@
 {
-  "name": "InstaReport Pro v3.2",
+  "name": "InstaReport v3.4",
   "short_name": "InstaReport",
   "description": "Enterprise Submission Portal",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f8fafc",
-  "theme_color": "#2563eb",
+  "background_color": "#F5F4F0",
+  "theme_color": "#0B6870",
   "icons": [
     {
       "src": "icon-192.png",
