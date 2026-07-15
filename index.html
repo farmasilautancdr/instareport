@@ -3,30 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>InstaReport Pro v3.2</title>
+    <title>InstaReport — Internal Report Manager v3.4</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2563eb">
+    <meta name="theme-color" content="#0B6870">
     <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
     <style id="tw-static">/* Compiled static Tailwind CSS (v3.4.19) — only classes actually used in this file. No external CDN dependency, no in-browser JIT compiling. */
-*,:after,:before{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/*! tailwindcss v3.4.19 | MIT License | https://tailwindcss.com*/*,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}:after,:before{--tw-content:""}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0}fieldset,legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width:640px){.container{max-width:640px}}@media (min-width:768px){.container{max-width:768px}}@media (min-width:1024px){.container{max-width:1024px}}@media (min-width:1280px){.container{max-width:1280px}}@media (min-width:1536px){.container{max-width:1536px}}.static{position:static}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.inset-0{inset:0}.bottom-0{bottom:0}.left-0{left:0}.left-3{left:.75rem}.right-0{right:0}.top-3{top:.75rem}.top-3\.5{top:.875rem}.top-4{top:1rem}.z-50{z-index:50}.z-\[10000\]{z-index:10000}.z-\[100\]{z-index:100}.mb-1{margin-bottom:.25rem}.mb-10{margin-bottom:2.5rem}.mb-2{margin-bottom:.5rem}.mb-4{margin-bottom:1rem}.mb-5{margin-bottom:1.25rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.ml-1{margin-left:.25rem}.ml-2{margin-left:.5rem}.ml-4{margin-left:1rem}.mr-1{margin-right:.25rem}.mt-1{margin-top:.25rem}.mt-1\.5{margin-top:.375rem}.mt-2{margin-top:.5rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.block{display:block}.flex{display:flex}.table{display:table}.grid{display:grid}.hidden{display:none}.h-1{height:.25rem}.h-1\.5{height:.375rem}.h-10{height:2.5rem}.h-12{height:3rem}.h-14{height:3.5rem}.h-20{height:5rem}.h-24{height:6rem}.h-28{height:7rem}.h-48{height:12rem}.h-5{height:1.25rem}.h-full{height:100%}.min-h-screen{min-height:100vh}.w-1{width:.25rem}.w-1\.5{width:.375rem}.w-10{width:2.5rem}.w-12{width:3rem}.w-14{width:3.5rem}.w-20{width:5rem}.w-5{width:1.25rem}.w-full{width:100%}.flex-1{flex:1 1 0%}.transform{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes bounce{0%,to{transform:translateY(-25%);animation-timing-function:cubic-bezier(.8,0,1,1)}50%{transform:none;animation-timing-function:cubic-bezier(0,0,.2,1)}}.animate-bounce{animation:bounce 1s infinite}.appearance-none{-webkit-appearance:none;-moz-appearance:none;appearance:none}.grid-cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}.grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}.flex-col{flex-direction:column}.items-end{align-items:flex-end}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-2{gap:.5rem}.gap-3{gap:.75rem}.gap-4{gap:1rem}.gap-5{gap:1.25rem}.space-y-2>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(.5rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.5rem*var(--tw-space-y-reverse))}.space-y-3>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(.75rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.75rem*var(--tw-space-y-reverse))}.space-y-4>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem*var(--tw-space-y-reverse))}.space-y-6>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem*var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.truncate{overflow:hidden;text-overflow:ellipsis}.truncate,.whitespace-nowrap{white-space:nowrap}.rounded{border-radius:.25rem}.rounded-2xl{border-radius:1rem}.rounded-3xl{border-radius:1.5rem}.rounded-\[2\.5rem\]{border-radius:2.5rem}.rounded-\[2rem\]{border-radius:2rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:.5rem}.rounded-xl{border-radius:.75rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-l-8{border-left-width:8px}.border-t{border-top-width:1px}.border-dashed{border-style:dashed}.border-none{border-style:none}.border-blue-100{--tw-border-opacity:1;border-color:rgb(219 234 254/var(--tw-border-opacity,1))}.border-slate-100{--tw-border-opacity:1;border-color:rgb(241 245 249/var(--tw-border-opacity,1))}.border-slate-200{--tw-border-opacity:1;border-color:rgb(226 232 240/var(--tw-border-opacity,1))}.border-slate-50{--tw-border-opacity:1;border-color:rgb(248 250 252/var(--tw-border-opacity,1))}.border-white{--tw-border-opacity:1;border-color:rgb(255 255 255/var(--tw-border-opacity,1))}.border-l-blue-500{--tw-border-opacity:1;border-left-color:rgb(59 130 246/var(--tw-border-opacity,1))}.border-l-blue-900{--tw-border-opacity:1;border-left-color:rgb(30 58 138/var(--tw-border-opacity,1))}.border-l-orange-500{--tw-border-opacity:1;border-left-color:rgb(249 115 22/var(--tw-border-opacity,1))}.bg-blue-50{--tw-bg-opacity:1;background-color:rgb(239 246 255/var(--tw-bg-opacity,1))}.bg-blue-500{--tw-bg-opacity:1;background-color:rgb(59 130 246/var(--tw-bg-opacity,1))}.bg-blue-600{--tw-bg-opacity:1;background-color:rgb(37 99 235/var(--tw-bg-opacity,1))}.bg-blue-900{--tw-bg-opacity:1;background-color:rgb(30 58 138/var(--tw-bg-opacity,1))}.bg-green-500{--tw-bg-opacity:1;background-color:rgb(34 197 94/var(--tw-bg-opacity,1))}.bg-orange-50{--tw-bg-opacity:1;background-color:rgb(255 247 237/var(--tw-bg-opacity,1))}.bg-slate-100{--tw-bg-opacity:1;background-color:rgb(241 245 249/var(--tw-bg-opacity,1))}.bg-slate-50{--tw-bg-opacity:1;background-color:rgb(248 250 252/var(--tw-bg-opacity,1))}.bg-slate-50\/50{background-color:rgba(248,250,252,.5)}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255/var(--tw-bg-opacity,1))}.bg-white\/90{background-color:hsla(0,0%,100%,.9)}.bg-white\/95{background-color:hsla(0,0%,100%,.95)}.object-cover{-o-object-fit:cover;object-fit:cover}.p-10{padding:2.5rem}.p-2{padding:.5rem}.p-3{padding:.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.px-2{padding-left:.5rem;padding-right:.5rem}.px-3{padding-left:.75rem;padding-right:.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-0{padding-top:0;padding-bottom:0}.py-0\.5{padding-top:.125rem;padding-bottom:.125rem}.py-1{padding-top:.25rem;padding-bottom:.25rem}.py-1\.5{padding-top:.375rem;padding-bottom:.375rem}.py-2{padding-top:.5rem;padding-bottom:.5rem}.py-3{padding-top:.75rem;padding-bottom:.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-5{padding-top:1.25rem;padding-bottom:1.25rem}.pb-2{padding-bottom:.5rem}.pb-32{padding-bottom:8rem}.pb-48{padding-bottom:12rem}.pl-8{padding-left:2rem}.pr-4{padding-right:1rem}.text-left{text-align:left}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-\[10px\]{font-size:10px}.text-\[8px\]{font-size:8px}.text-\[9px\]{font-size:9px}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:.875rem;line-height:1.25rem}.text-xs{font-size:.75rem;line-height:1rem}.font-black{font-weight:900}.font-bold{font-weight:700}.font-medium{font-weight:500}.uppercase{text-transform:uppercase}.normal-case{text-transform:none}.leading-relaxed{line-height:1.625}.tracking-tight{letter-spacing:-.025em}.tracking-tighter{letter-spacing:-.05em}.tracking-widest{letter-spacing:.1em}.text-blue-400{--tw-text-opacity:1;color:rgb(96 165 250/var(--tw-text-opacity,1))}.text-blue-500{--tw-text-opacity:1;color:rgb(59 130 246/var(--tw-text-opacity,1))}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235/var(--tw-text-opacity,1))}.text-blue-700{--tw-text-opacity:1;color:rgb(29 78 216/var(--tw-text-opacity,1))}.text-blue-800{--tw-text-opacity:1;color:rgb(30 64 175/var(--tw-text-opacity,1))}.text-blue-900{--tw-text-opacity:1;color:rgb(30 58 138/var(--tw-text-opacity,1))}.text-orange-500{--tw-text-opacity:1;color:rgb(249 115 22/var(--tw-text-opacity,1))}.text-red-400{--tw-text-opacity:1;color:rgb(248 113 113/var(--tw-text-opacity,1))}.text-red-500{--tw-text-opacity:1;color:rgb(239 68 68/var(--tw-text-opacity,1))}.text-slate-200{--tw-text-opacity:1;color:rgb(226 232 240/var(--tw-text-opacity,1))}.text-slate-300{--tw-text-opacity:1;color:rgb(203 213 225/var(--tw-text-opacity,1))}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184/var(--tw-text-opacity,1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139/var(--tw-text-opacity,1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105/var(--tw-text-opacity,1))}.text-slate-700{--tw-text-opacity:1;color:rgb(51 65 85/var(--tw-text-opacity,1))}.text-slate-900{--tw-text-opacity:1;color:rgb(15 23 42/var(--tw-text-opacity,1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255/var(--tw-text-opacity,1))}.text-white\/50{color:hsla(0,0%,100%,.5)}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.shadow-lg{--tw-shadow:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color),0 4px 6px -4px var(--tw-shadow-color)}.shadow-lg,.shadow-md{box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color),0 2px 4px -2px var(--tw-shadow-color)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgba(0,0,0,.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color)}.shadow-sm,.shadow-xl{box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgba(0,0,0,.1),0 8px 10px -6px rgba(0,0,0,.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color),0 8px 10px -6px var(--tw-shadow-color)}.outline-none{outline:2px solid transparent;outline-offset:2px}.filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.backdrop-blur-xl{--tw-backdrop-blur:blur(24px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,-webkit-backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter,-webkit-backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.last\:border-0:last-child{border-width:0}.active\:scale-95:active{--tw-scale-x:.95;--tw-scale-y:.95;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}
+*,:after,:before{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/*! tailwindcss v3.4.19 | MIT License | https://tailwindcss.com*/*,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}:after,:before{--tw-content:""}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:IBM Plex Sans,sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:IBM Plex Mono,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0}fieldset,legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width:640px){.container{max-width:640px}}@media (min-width:768px){.container{max-width:768px}}@media (min-width:1024px){.container{max-width:1024px}}@media (min-width:1280px){.container{max-width:1280px}}@media (min-width:1536px){.container{max-width:1536px}}.static{position:static}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.inset-0{inset:0}.bottom-0{bottom:0}.left-0{left:0}.left-3{left:.75rem}.right-0{right:0}.right-5{right:1.25rem}.top-3\.5{top:.875rem}.top-4{top:1rem}.top-5{top:1.25rem}.z-50{z-index:50}.z-\[10000\]{z-index:10000}.z-\[100\]{z-index:100}.-mx-6{margin-left:-1.5rem;margin-right:-1.5rem}.mb-1{margin-bottom:.25rem}.mb-2{margin-bottom:.5rem}.mb-4{margin-bottom:1rem}.mb-5{margin-bottom:1.25rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.ml-1{margin-left:.25rem}.ml-2{margin-left:.5rem}.ml-4{margin-left:1rem}.mr-1{margin-right:.25rem}.mt-1{margin-top:.25rem}.mt-1\.5{margin-top:.375rem}.mt-2{margin-top:.5rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.block{display:block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-1\.5{height:.375rem}.h-10{height:2.5rem}.h-12{height:3rem}.h-14{height:3.5rem}.h-20{height:5rem}.h-24{height:6rem}.h-28{height:7rem}.h-48{height:12rem}.h-5{height:1.25rem}.h-8{height:2rem}.h-9{height:2.25rem}.h-full{height:100%}.min-h-screen{min-height:100vh}.w-1\.5{width:.375rem}.w-10{width:2.5rem}.w-12{width:3rem}.w-14{width:3.5rem}.w-20{width:5rem}.w-5{width:1.25rem}.w-8{width:2rem}.w-9{width:2.25rem}.w-full{width:100%}.flex-1{flex:1 1 0%}.transform{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes bounce{0%,to{transform:translateY(-25%);animation-timing-function:cubic-bezier(.8,0,1,1)}50%{transform:none;animation-timing-function:cubic-bezier(0,0,.2,1)}}.animate-bounce{animation:bounce 1s infinite}.appearance-none{-webkit-appearance:none;-moz-appearance:none;appearance:none}.grid-cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}.grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}.flex-col{flex-direction:column}.items-end{align-items:flex-end}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-2{gap:.5rem}.gap-3{gap:.75rem}.gap-4{gap:1rem}.gap-5{gap:1.25rem}.space-y-2>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(.5rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.5rem*var(--tw-space-y-reverse))}.space-y-3>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(.75rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.75rem*var(--tw-space-y-reverse))}.space-y-4>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem*var(--tw-space-y-reverse))}.space-y-6>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem*var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.truncate{overflow:hidden;text-overflow:ellipsis}.truncate,.whitespace-nowrap{white-space:nowrap}.rounded{border-radius:.25rem}.rounded-2xl{border-radius:1rem}.rounded-3xl{border-radius:1.5rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:.5rem}.rounded-xl{border-radius:.75rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-l-8{border-left-width:8px}.border-t{border-top-width:1px}.border-dashed{border-style:dashed}.border-none{border-style:none}.border-brand-100{--tw-border-opacity:1;border-color:rgb(var(--c-brand-100)/var(--tw-border-opacity,1))}.border-slate-100{--tw-border-opacity:1;border-color:rgb(var(--c-slate-100)/var(--tw-border-opacity,1))}.border-slate-200{--tw-border-opacity:1;border-color:rgb(var(--c-slate-200)/var(--tw-border-opacity,1))}.border-slate-50{--tw-border-opacity:1;border-color:rgb(var(--c-slate-50)/var(--tw-border-opacity,1))}.border-white{--tw-border-opacity:1;border-color:rgb(var(--c-white)/var(--tw-border-opacity,1))}.border-l-accent-500{--tw-border-opacity:1;border-left-color:rgb(var(--c-accent-500)/var(--tw-border-opacity,1))}.border-l-brand-500{--tw-border-opacity:1;border-left-color:rgb(var(--c-brand-500)/var(--tw-border-opacity,1))}.border-l-brand-900{--tw-border-opacity:1;border-left-color:rgb(var(--c-brand-900)/var(--tw-border-opacity,1))}.bg-accent-50{--tw-bg-opacity:1;background-color:rgb(var(--c-accent-50)/var(--tw-bg-opacity,1))}.bg-accent-500{--tw-bg-opacity:1;background-color:rgb(var(--c-accent-500)/var(--tw-bg-opacity,1))}.bg-brand-50{--tw-bg-opacity:1;background-color:rgb(var(--c-brand-50)/var(--tw-bg-opacity,1))}.bg-brand-500{--tw-bg-opacity:1;background-color:rgb(var(--c-brand-500)/var(--tw-bg-opacity,1))}.bg-brand-600{--tw-bg-opacity:1;background-color:rgb(var(--c-brand-600)/var(--tw-bg-opacity,1))}.bg-brand-900{--tw-bg-opacity:1;background-color:rgb(var(--c-brand-900)/var(--tw-bg-opacity,1))}.bg-slate-100{--tw-bg-opacity:1;background-color:rgb(var(--c-slate-100)/var(--tw-bg-opacity,1))}.bg-slate-50{--tw-bg-opacity:1;background-color:rgb(var(--c-slate-50)/var(--tw-bg-opacity,1))}.bg-slate-50\/50{background-color:rgb(var(--c-slate-50)/.5)}.bg-success-500{--tw-bg-opacity:1;background-color:rgb(var(--c-success-500)/var(--tw-bg-opacity,1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(var(--c-white)/var(--tw-bg-opacity,1))}.bg-white\/15{background-color:rgb(var(--c-white)/.15)}.bg-white\/90{background-color:rgb(var(--c-white)/.9)}.bg-white\/95{background-color:rgb(var(--c-white)/.95)}.object-cover{-o-object-fit:cover;object-fit:cover}.p-10{padding:2.5rem}.p-2{padding:.5rem}.p-3{padding:.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.px-2{padding-left:.5rem;padding-right:.5rem}.px-3{padding-left:.75rem;padding-right:.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-0\.5{padding-top:.125rem;padding-bottom:.125rem}.py-1\.5{padding-top:.375rem;padding-bottom:.375rem}.py-2{padding-top:.5rem;padding-bottom:.5rem}.py-3{padding-top:.75rem;padding-bottom:.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-5{padding-top:1.25rem;padding-bottom:1.25rem}.pb-2{padding-bottom:.5rem}.pb-32{padding-bottom:8rem}.pb-48{padding-bottom:12rem}.pb-7{padding-bottom:1.75rem}.pl-8{padding-left:2rem}.pr-4{padding-right:1rem}.pt-8{padding-top:2rem}.text-left{text-align:left}.text-center{text-align:center}.font-display{font-family:Space Grotesk,sans-serif}.font-mono{font-family:IBM Plex Mono,monospace}.text-2xl{font-size:1.5rem;line-height:2rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-\[10px\]{font-size:10px}.text-\[8px\]{font-size:8px}.text-\[9px\]{font-size:9px}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:.875rem;line-height:1.25rem}.text-xs{font-size:.75rem;line-height:1rem}.font-black{font-weight:900}.font-bold{font-weight:700}.font-medium{font-weight:500}.uppercase{text-transform:uppercase}.normal-case{text-transform:none}.leading-relaxed{line-height:1.625}.tracking-\[0\.2em\]{letter-spacing:.2em}.tracking-tight{letter-spacing:-.025em}.tracking-tighter{letter-spacing:-.05em}.tracking-widest{letter-spacing:.1em}.text-accent-500{--tw-text-opacity:1;color:rgb(var(--c-accent-500)/var(--tw-text-opacity,1))}.text-brand-100{--tw-text-opacity:1;color:rgb(var(--c-brand-100)/var(--tw-text-opacity,1))}.text-brand-400{--tw-text-opacity:1;color:rgb(var(--c-brand-400)/var(--tw-text-opacity,1))}.text-brand-500{--tw-text-opacity:1;color:rgb(var(--c-brand-500)/var(--tw-text-opacity,1))}.text-brand-600{--tw-text-opacity:1;color:rgb(var(--c-brand-600)/var(--tw-text-opacity,1))}.text-brand-700{--tw-text-opacity:1;color:rgb(var(--c-brand-700)/var(--tw-text-opacity,1))}.text-brand-800{--tw-text-opacity:1;color:rgb(var(--c-brand-800)/var(--tw-text-opacity,1))}.text-brand-900{--tw-text-opacity:1;color:rgb(var(--c-brand-900)/var(--tw-text-opacity,1))}.text-red-400{--tw-text-opacity:1;color:rgb(248 113 113/var(--tw-text-opacity,1))}.text-red-500{--tw-text-opacity:1;color:rgb(239 68 68/var(--tw-text-opacity,1))}.text-slate-200{--tw-text-opacity:1;color:rgb(var(--c-slate-200)/var(--tw-text-opacity,1))}.text-slate-300{--tw-text-opacity:1;color:rgb(var(--c-slate-300)/var(--tw-text-opacity,1))}.text-slate-400{--tw-text-opacity:1;color:rgb(var(--c-slate-400)/var(--tw-text-opacity,1))}.text-slate-500{--tw-text-opacity:1;color:rgb(var(--c-slate-500)/var(--tw-text-opacity,1))}.text-slate-600{--tw-text-opacity:1;color:rgb(var(--c-slate-600)/var(--tw-text-opacity,1))}.text-slate-700{--tw-text-opacity:1;color:rgb(var(--c-slate-700)/var(--tw-text-opacity,1))}.text-slate-900{--tw-text-opacity:1;color:rgb(var(--c-slate-900)/var(--tw-text-opacity,1))}.text-white{--tw-text-opacity:1;color:rgb(var(--c-white)/var(--tw-text-opacity,1))}.text-white\/50{color:rgb(var(--c-white)/.5)}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.shadow-lg{--tw-shadow:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color),0 4px 6px -4px var(--tw-shadow-color)}.shadow-lg,.shadow-md{box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color),0 2px 4px -2px var(--tw-shadow-color)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgba(0,0,0,.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color)}.shadow-sm,.shadow-xl{box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgba(0,0,0,.1),0 8px 10px -6px rgba(0,0,0,.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color),0 8px 10px -6px var(--tw-shadow-color)}.outline-none{outline:2px solid transparent;outline-offset:2px}.filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.backdrop-blur-xl{--tw-backdrop-blur:blur(24px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,-webkit-backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter,-webkit-backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.last\:border-0:last-child{border-width:0}.active\:scale-95:active{--tw-scale-x:.95;--tw-scale-y:.95;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}
     </style>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { --primary: #2563eb; --success: #16a34a; --bg: #f8fafc; }
+        /* ============================================================
+           InstaReport v3.4 — Design tokens
+           A field-audit tool built around inspection tags, evidence
+           photos and scored checklists. The palette is petrol teal
+           (compliance/clinical) + mustard gold (retail shelf-tag,
+           attention colour), on a warm paper ground — deliberately not
+           the cream+terracotta or near-black+neon-accent looks that
+           read as generic "AI-generated" defaults.
+           ============================================================ */
+        :root {
+            --c-white: 255 255 255;
+            --c-paper: 245 244 240;
+            --c-slate-50: 244 243 239;
+            --c-slate-100: 232 231 224;
+            --c-slate-200: 215 214 203;
+            --c-slate-300: 185 184 170;
+            --c-slate-400: 147 146 126;
+            --c-slate-500: 116 115 95;
+            --c-slate-600: 87 86 74;
+            --c-slate-700: 61 60 51;
+            --c-slate-900: 28 27 22;
+            --c-brand-50: 233 244 243;
+            --c-brand-100: 203 230 228;
+            --c-brand-400: 62 156 146;
+            --c-brand-500: 14 124 134;
+            --c-brand-600: 11 104 112;
+            --c-brand-700: 9 87 96;
+            --c-brand-800: 10 69 75;
+            --c-brand-900: 11 56 61;
+            --c-accent-50: 253 243 225;
+            --c-accent-500: 232 163 61;
+            --c-accent-600: 204 138 40;
+            --c-success-500: 76 154 74;
+        }
+        [data-theme="dark"] {
+            --c-white: 23 48 47;
+            --c-paper: 13 33 31;
+            --c-slate-50: 26 51 47;
+            --c-slate-100: 34 64 58;
+            --c-slate-200: 46 80 73;
+            --c-slate-300: 67 104 97;
+            --c-slate-400: 108 140 132;
+            --c-slate-500: 143 169 161;
+            --c-slate-600: 173 196 188;
+            --c-slate-700: 200 218 211;
+            --c-slate-900: 241 245 242;
+            --c-brand-50: 18 59 61;
+            --c-brand-100: 22 74 76;
+            --c-brand-400: 87 194 182;
+            --c-brand-500: 53 171 160;
+            --c-brand-600: 44 151 140;
+            --c-brand-700: 72 189 175;
+            --c-brand-800: 111 208 194;
+            --c-brand-900: 153 224 213;
+            --c-accent-50: 58 44 19;
+            --c-accent-500: 240 177 86;
+            --c-accent-600: 245 193 112;
+            --c-success-500: 107 193 104;
+        }
+
         * { -webkit-tap-highlight-color: transparent; }
         html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
-        body { background-color: var(--bg); font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); overscroll-behavior-y: contain; }
+        html, body { background-color: rgb(var(--c-paper)); }
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            color: rgb(var(--c-slate-700));
+            -webkit-tap-highlight-color: transparent;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            overscroll-behavior-y: contain;
+            transition: background-color 0.25s ease, color 0.25s ease;
+        }
+        h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; }
 
         /* --- Mobile input fixes (prevents iOS auto-zoom-on-focus, normalizes Android/iOS form controls) --- */
         input, select, textarea, button {
             font-size: 16px;
             touch-action: manipulation;
+            font-family: 'IBM Plex Sans', sans-serif;
         }
         select {
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230B6870' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 16px center;
             background-size: 16px;
@@ -38,32 +110,59 @@
         .page { display: none; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        #uploadSpinner { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.4); z-index: 20000; cursor: wait; }
-        .photo-slot { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 16px; background: #fff; margin-top: 8px; }
-        .preview-box { width: 100%; height: 140px; border-radius: 12px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0; position: relative; display: flex; align-items: center; justify-content: center; }
-        .preview-box img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 20; background: white; }
-        .preview-box i { position: relative; z-index: 5; font-size: 2rem; color: #cbd5e1; }
-        .audit-section { background: white; padding: 16px; border-radius: 24px; border: 1px solid #e2e8f0; margin-bottom: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .score-box { position: sticky; bottom: 100px; background: #2563eb; color: white; padding: 16px; border-radius: 20px; text-align: center; font-weight: 900; z-index: 100; box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4); }
-        #supervisorBtn { position: fixed; bottom: 25px; right: 25px; width: 56px; height: 56px; background: white; color: var(--primary); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 9999; cursor: pointer; border: 2px solid #e2e8f0; }
-        .menu-card { background: white; padding: 24px; border-radius: 28px; border: 1px solid #e2e8f0; text-align: center; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
+        #uploadSpinner { display: none; position: fixed; inset: 0; background: rgba(13,33,31,0.35); z-index: 20000; cursor: wait; }
+        .photo-slot { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid rgb(var(--c-slate-200)); border-radius: 16px; background: rgb(var(--c-white)); margin-top: 8px; }
+        .preview-box { width: 100%; height: 140px; border-radius: 12px; overflow: hidden; background: rgb(var(--c-slate-50)); border: 1px solid rgb(var(--c-slate-200)); position: relative; display: flex; align-items: center; justify-content: center; }
+        .preview-box img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 20; background: rgb(var(--c-white)); }
+        .preview-box i { position: relative; z-index: 5; font-size: 2rem; color: rgb(var(--c-slate-300)); }
+        .audit-section { background: rgb(var(--c-white)); padding: 16px; border-radius: 20px; border: 1px solid rgb(var(--c-slate-200)); margin-bottom: 16px; box-shadow: 0 4px 6px -1px rgba(11,56,61,0.05); }
+
+        /* Signature element: the "inspection tag" — a die-cut notch with a
+           punched grommet hole, echoing the retail shelf-tags and audit
+           labels this app actually produces. Used sparingly: the header
+           and the live audit score readout only. */
+        .tag-shape {
+            position: relative;
+            clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 0 100%);
+        }
+        .tag-shape::after {
+            content: '';
+            position: absolute;
+            top: 10px; right: 10px;
+            width: 9px; height: 9px;
+            border-radius: 50%;
+            background: rgb(var(--c-paper));
+        }
+
+        .score-box {
+            position: sticky; bottom: 100px;
+            background: rgb(var(--c-brand-600)); color: rgb(var(--c-white));
+            padding: 16px 20px; text-align: center; font-weight: 700;
+            z-index: 100; box-shadow: 0 15px 30px rgba(11,56,61,0.35);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        #supervisorBtn { position: fixed; bottom: 25px; right: 25px; width: 56px; height: 56px; background: rgb(var(--c-white)); color: rgb(var(--c-brand-600)); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 10px 25px rgba(11,56,61,0.18); z-index: 9999; cursor: pointer; border: 2px solid rgb(var(--c-slate-200)); }
+        .menu-card { background: rgb(var(--c-white)); padding: 24px; border-radius: 22px; border: 1px solid rgb(var(--c-slate-200)); text-align: center; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
         .gallery-container { display: flex; overflow-x: auto; gap: 10px; padding: 5px 0; scroll-snap-type: x mandatory; }
-        .gallery-item { flex: 0 0 85%; scroll-snap-align: center; border-radius: 15px; overflow: hidden; border: 1px solid #eee; height: 200px; }
+        .gallery-item { flex: 0 0 85%; scroll-snap-align: center; border-radius: 15px; overflow: hidden; border: 1px solid rgb(var(--c-slate-200)); height: 200px; }
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .v-badge { font-size: 10px; font-weight: 900; color: #2563eb; letter-spacing: 2px; }
+        .v-badge { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: rgb(var(--c-brand-500)); letter-spacing: 2px; }
         .btn-loader { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; width: 20px; height: 20px; animation: spin 0.8s linear infinite; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .tab-btn.active { border-bottom: 3px solid #2563eb; color: #2563eb; }
-        #bulkBar { position: fixed; bottom: 0; left: 0; right: 0; background: #2563eb; color: white; padding: 15px; padding-bottom: calc(15px + env(safe-area-inset-bottom)); z-index: 1000; border-radius: 20px 20px 0 0; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -10px 25px rgba(0,0,0,0.1); }
+        .tab-btn { color: rgb(var(--c-slate-400)); }
+        .tab-btn.active { border-bottom: 3px solid rgb(var(--c-brand-600)); color: rgb(var(--c-brand-600)); }
+        .time-btn { background: rgb(var(--c-white)); border: 1px solid rgb(var(--c-slate-200)); color: rgb(var(--c-slate-400)); }
+        .time-btn.active { background: rgb(var(--c-brand-600)); border-color: rgb(var(--c-brand-600)); color: rgb(var(--c-white)); }
+        #bulkBar { position: fixed; bottom: 0; left: 0; right: 0; background: rgb(var(--c-brand-700)); color: rgb(var(--c-white)); padding: 15px; padding-bottom: calc(15px + env(safe-area-inset-bottom)); z-index: 1000; border-radius: 20px 20px 0 0; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -10px 25px rgba(11,56,61,0.2); }
 
-        #galleryOverlay { display:none; position:fixed; inset:0; background:black; z-index:50000; flex-direction:column; }
+        #galleryOverlay { display:none; position:fixed; inset:0; background:rgb(var(--c-slate-900)); z-index:50000; flex-direction:column; }
         #galleryContent { flex:1; display:flex; overflow-x:auto; scroll-snap-type:x mandatory; }
         .gallery-full-img { flex:0 0 100%; scroll-snap-align:center; display:flex; align-items:center; justify-content:center; padding:20px; }
         .gallery-full-img img { max-width:100%; max-height:80vh; object-fit:contain; border-radius:10px; }
 
-        .criteria-badge { font-size: 8px; font-weight: 900; padding: 2px 6px; border-radius: 6px; background: #f1f5f9; color: #64748b; text-transform: uppercase; border: 1px solid #e2e8f0; }
-        .detail-line { border-left: 2px solid #e2e8f0; padding-left: 10px; margin-left: 5px; }
+        .criteria-badge { font-family: 'IBM Plex Mono', monospace; font-size: 8px; font-weight: 700; padding: 2px 6px; border-radius: 6px; background: rgb(var(--c-slate-100)); color: rgb(var(--c-slate-500)); text-transform: uppercase; border: 1px solid rgb(var(--c-slate-200)); }
+        .detail-line { border-left: 2px solid rgb(var(--c-slate-200)); padding-left: 10px; margin-left: 5px; }
 
         .collapsible-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, opacity 0.3s; opacity: 0; }
         .submission-card.open .collapsible-body { max-height: 10000px; opacity: 1; transition: max-height 0.8s ease-in, opacity 0.4s; }
@@ -72,13 +171,29 @@
 
         /* Fixed bottom action bar respects iPhone home-indicator safe area */
         .fixed.bottom-0.left-0.right-0.p-5 { padding-bottom: calc(1.25rem + env(safe-area-inset-bottom)); }
+
+        /* Theme toggle switch */
+        #themeToggle { transition: background 0.2s ease; }
     </style>
 </head>
 <body class="antialiased text-slate-900">
+    <script>
+        // Applied synchronously, before first paint, to avoid a flash of the
+        // wrong theme on load.
+        (function() {
+            try {
+                var saved = localStorage.getItem('instareport-theme');
+                var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (saved === 'dark' || (!saved && prefersDark)) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
 
     <div id="uploadSpinner"></div>
     <div id="successOverlay" class="hidden fixed inset-0 bg-white/95 z-[10000] flex flex-col items-center justify-center text-center">
-        <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center text-white text-4xl shadow-xl animate-bounce"><i class="fas fa-check"></i></div>
+        <div class="w-20 h-20 bg-success-500 rounded-full flex items-center justify-center text-white text-4xl shadow-xl animate-bounce"><i class="fas fa-check"></i></div>
         <h2 class="text-2xl font-black mt-6 tracking-tight uppercase px-6">Upload Successful</h2>
     </div>
 
@@ -92,11 +207,15 @@
     </div>
 
     <div id="page1" class="page active min-h-screen p-6">
-        <header class="text-center mt-4 mb-10">
-            <h1 class="text-4xl font-black text-blue-600 tracking-tighter">InstaReport</h1>
-            <p class="v-badge uppercase mt-1">Enterprise Portal v3.2</p>
+        <header class="tag-shape bg-brand-600 text-white px-6 pt-8 pb-7 -mx-6 mb-8 relative">
+            <button id="themeToggle" onclick="toggleTheme()" class="absolute top-5 right-5 w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center text-white text-sm" aria-label="Toggle dark mode">
+                <i class="fas fa-moon" id="themeIcon"></i>
+            </button>
+            <p class="font-mono text-[10px] tracking-[0.2em] text-brand-100 uppercase mb-1">Field Operations</p>
+            <h1 class="font-display text-4xl font-bold tracking-tight">InstaReport</h1>
+            <p class="font-mono text-[10px] tracking-widest uppercase text-brand-100 mt-2">Internal Report Manager <span class="text-accent-500">(v3.4)</span></p>
         </header>
-        <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 space-y-6">
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-6">
             <div>
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Access Role</label>
                 <select id="userRole" onchange="handleRoleChange()" class="w-full mt-1.5 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-slate-700">
@@ -109,8 +228,8 @@
                 <input type="text" id="staffName" class="w-full mt-1.5 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold" placeholder="Required">
             </div>
             <div id="amRegionContainer" class="hidden">
-                <label class="text-[10px] font-black text-blue-400 uppercase tracking-widest ml-1">AM Region</label>
-                <select id="amRegion" onchange="updateOutletList()" class="w-full mt-1.5 p-4 bg-blue-50 border border-blue-100 rounded-2xl outline-none font-black text-blue-700">
+                <label class="text-[10px] font-black text-brand-400 uppercase tracking-widest ml-1">AM Region</label>
+                <select id="amRegion" onchange="updateOutletList()" class="w-full mt-1.5 p-4 bg-brand-50 border border-brand-100 rounded-2xl outline-none font-black text-brand-700">
                     <option value="">Select Region...</option>
                     <option value="R1">R1 - AMIRUL</option><option value="R2">R2 - HAZWANI</option>
                     <option value="R3">R3 - HARIS</option><option value="R4">R4 - RAIHAN</option>
@@ -125,29 +244,29 @@
             </div>
             <div>
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Reporting Date</label>
-                <input type="date" id="reportDate" class="w-full mt-1.5 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-blue-600">
+                <input type="date" id="reportDate" class="w-full mt-1.5 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-brand-600">
             </div>
-            <button onclick="navTo(2)" class="w-full bg-blue-600 text-white font-black py-5 rounded-3xl shadow-xl active:scale-95 transition-all">DASHBOARD <i class="fas fa-arrow-right ml-2"></i></button>
+            <button onclick="navTo(2)" class="w-full bg-accent-500 text-brand-900 font-display font-bold py-5 rounded-2xl shadow-xl active:scale-95 transition-all">DASHBOARD <i class="fas fa-arrow-right ml-2"></i></button>
         </div>
     </div>
 
     <div id="page2" class="page min-h-screen p-6">
         <div class="flex items-center justify-between mb-8 mt-2">
             <button onclick="navTo(1)" class="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400"><i class="fas fa-arrow-left"></i></button>
-            <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest" id="displayRole">Portal</p>
+            <p class="text-[10px] font-black text-brand-500 uppercase tracking-widest" id="displayRole">Portal</p>
         </div>
         <div class="grid grid-cols-1 gap-5">
-            <div id="menu_outlet" onclick="openCategory('OUTLET')" class="menu-card border-l-8 border-l-blue-500 flex items-center gap-5">
-                <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 text-2xl"><i class="fas fa-store"></i></div>
+            <div id="menu_outlet" onclick="openCategory('OUTLET')" class="menu-card border-l-8 border-l-brand-500 flex items-center gap-5">
+                <div class="w-14 h-14 bg-brand-50 rounded-2xl flex items-center justify-center text-brand-600 text-2xl"><i class="fas fa-store"></i></div>
                 <div class="text-left"><h3 class="font-black text-lg uppercase">Outlet</h3><p class="text-[10px] text-slate-400 font-bold uppercase">Training & Planogram</p></div>
             </div>
-            <div id="menu_marketing" onclick="openCategory('MARKETING')" class="menu-card border-l-8 border-l-orange-500 flex items-center gap-5">
-                <div class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500 text-2xl"><i class="fas fa-bullhorn"></i></div>
+            <div id="menu_marketing" onclick="openCategory('MARKETING')" class="menu-card border-l-8 border-l-accent-500 flex items-center gap-5">
+                <div class="w-14 h-14 bg-accent-50 rounded-2xl flex items-center justify-center text-accent-500 text-2xl"><i class="fas fa-bullhorn"></i></div>
                 <div class="text-left"><h3 class="font-black text-lg uppercase">Marketing</h3><p class="text-[10px] text-slate-400 font-bold uppercase">Promotions</p></div>
             </div>
-            <div id="menu_am" onclick="openCategory('AM')" class="hidden menu-card border-l-8 border-l-blue-900 bg-blue-50 flex items-center gap-5">
-                <div class="w-14 h-14 bg-blue-900 rounded-2xl flex items-center justify-center text-white text-2xl"><i class="fas fa-user-shield"></i></div>
-                <div class="text-left"><h3 class="font-black text-lg text-blue-900 uppercase">AM Portal</h3><p class="text-[10px] text-blue-400 font-bold uppercase">Audit & Visit</p></div>
+            <div id="menu_am" onclick="openCategory('AM')" class="hidden menu-card border-l-8 border-l-brand-900 bg-brand-50 flex items-center gap-5">
+                <div class="w-14 h-14 bg-brand-900 rounded-2xl flex items-center justify-center text-white text-2xl"><i class="fas fa-user-shield"></i></div>
+                <div class="text-left"><h3 class="font-black text-lg text-brand-900 uppercase">AM Portal</h3><p class="text-[10px] text-brand-400 font-bold uppercase">Audit & Visit</p></div>
             </div>
         </div>
     </div>
@@ -167,9 +286,9 @@
         </div>
         <div id="dynamicForm" class="space-y-4"></div>
         <div id="photoSection" class="mt-6"><div id="photoGrid" class="space-y-3"></div></div>
-        <div id="auditScoreBox" class="score-box hidden uppercase">Audit Marks: <span id="currentScore">0</span> / 46</div>
+        <div id="auditScoreBox" class="score-box tag-shape hidden uppercase">Audit Marks: <span id="currentScore" class="font-mono">0</span> / 46</div>
         <div class="fixed bottom-0 left-0 right-0 p-5 bg-white/90 backdrop-blur-xl border-t z-50">
-            <button onclick="submitReport()" id="submitBtn" class="w-full bg-blue-600 text-white font-black py-5 rounded-[2rem] shadow-xl flex items-center justify-center gap-3">
+            <button onclick="submitReport()" id="submitBtn" class="w-full bg-brand-600 text-white font-black py-5 rounded-2xl shadow-xl flex items-center justify-center gap-3">
                 <span id="btnText">FINISH & UPLOAD</span>
                 <div id="btnLoader" class="btn-loader"></div>
             </button>
@@ -177,12 +296,13 @@
     </div>
 
     <div id="supervisorDashboard" class="page hidden min-h-screen bg-slate-50 p-4 pb-32">
-        <nav class="bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-100 mb-6 sticky top-4 z-[100]">
+        <nav class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 mb-6 sticky top-4 z-[100]">
             <div class="flex justify-between items-center mb-5">
                 <button onclick="window.location.reload()" class="font-black text-[10px] text-slate-400 uppercase">Exit Portal</button>
-                <div class="flex gap-2">
-                    <i id="syncIcon" class="fas fa-sync-alt text-blue-600 mt-1"></i>
-                    <span id="totalCount" class="bg-blue-600 text-white text-[9px] font-black px-3 py-1.5 rounded-full shadow-lg">0 Reports</span>
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleTheme()" class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 text-xs" aria-label="Toggle dark mode"><i class="fas fa-moon" id="themeIconDash"></i></button>
+                    <i id="syncIcon" class="fas fa-sync-alt text-brand-600 mt-1"></i>
+                    <span id="totalCount" class="bg-brand-600 text-white text-[9px] font-black px-3 py-1.5 rounded-full shadow-lg">0 Reports</span>
                 </div>
             </div>
             <div class="flex border-b mb-4 text-[10px] font-black overflow-x-auto whitespace-nowrap gap-4 px-2 no-scrollbar">
@@ -193,10 +313,10 @@
             <div class="space-y-3">
                 <input type="text" id="dashSearch" onkeyup="filterFeed()" placeholder="Search Name/Outlet..." class="w-full p-4 bg-slate-50 rounded-2xl text-sm font-bold outline-none border border-slate-100">
                 <div class="grid grid-cols-4 gap-2">
-                    <button id="btn-all" onclick="setTimeFilter('all')" class="time-btn bg-blue-600 text-white p-2 rounded-lg text-[8px] font-black uppercase">ALL</button>
-                    <button id="btn-week" onclick="setTimeFilter('week')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black uppercase">Week</button>
-                    <button id="btn-month" onclick="setTimeFilter('month')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black uppercase">Month</button>
-                    <button id="btn-year" onclick="setTimeFilter('year')" class="time-btn bg-white border text-slate-400 p-2 rounded-lg text-[8px] font-black uppercase">Year</button>
+                    <button id="btn-all" onclick="setTimeFilter('all')" class="time-btn active border p-2 rounded-lg text-[8px] font-black uppercase">ALL</button>
+                    <button id="btn-week" onclick="setTimeFilter('week')" class="time-btn border p-2 rounded-lg text-[8px] font-black uppercase">Week</button>
+                    <button id="btn-month" onclick="setTimeFilter('month')" class="time-btn border p-2 rounded-lg text-[8px] font-black uppercase">Month</button>
+                    <button id="btn-year" onclick="setTimeFilter('year')" class="time-btn border p-2 rounded-lg text-[8px] font-black uppercase">Year</button>
                 </div>
                 <div id="subFilterContainer" class="hidden space-y-2 bg-slate-50 p-3 rounded-2xl border border-slate-100">
                     <div class="relative">
@@ -212,7 +332,7 @@
                         <input type="date" id="rangeEnd" class="p-3 bg-white rounded-xl text-xs font-bold border border-slate-100 outline-none">
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="searchDateRange()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl text-[9px] font-black uppercase">Search Date Range</button>
+                        <button onclick="searchDateRange()" class="flex-1 bg-brand-600 text-white py-3 rounded-xl text-[9px] font-black uppercase">Search Date Range</button>
                         <button id="clearRangeBtn" onclick="clearDateRangeSearch()" class="hidden bg-white border border-slate-200 text-slate-500 px-4 py-3 rounded-xl text-[9px] font-black uppercase">Clear</button>
                     </div>
                 </div>
@@ -220,7 +340,7 @@
         </nav>
         <div id="feedStatus" class="hidden text-center text-[10px] font-black uppercase tracking-widest text-slate-400 py-3"></div>
         <div id="feedList" class="space-y-4"></div>
-        <button id="loadMoreBtn" onclick="loadMore()" class="hidden w-full mt-4 py-4 bg-white border border-slate-200 rounded-2xl text-[10px] font-black uppercase text-blue-600 shadow-sm">
+        <button id="loadMoreBtn" onclick="loadMore()" class="hidden w-full mt-4 py-4 bg-white border border-slate-200 rounded-2xl text-[10px] font-black uppercase text-brand-600 shadow-sm">
             Load More (currently showing last <span id="loadMoreCount">200</span> per portal)
         </button>
         <div id="bulkBar" class="hidden">
@@ -228,7 +348,7 @@
                 <input type="checkbox" id="selectAll" onchange="toggleSelectAll()" class="w-5 h-5 rounded border-white">
                 <span id="selectedText" class="text-xs font-black">0 Selected</span>
             </div>
-            <button onclick="downloadBulk(this)" class="bg-white text-blue-600 px-4 py-2 rounded-xl font-black text-[10px]">COMBINED PDF</button>
+            <button onclick="downloadBulk(this)" class="bg-white text-brand-600 px-4 py-2 rounded-xl font-black text-[10px]">COMBINED PDF</button>
         </div>
     </div>
 
@@ -264,7 +384,31 @@
         window.onload = () => {
             document.getElementById('reportDate').valueAsDate = new Date();
             updateOutletList();
+            syncThemeIcon();
         };
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            if (isDark) {
+                html.removeAttribute('data-theme');
+                try { localStorage.setItem('instareport-theme', 'light'); } catch(e) {}
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                try { localStorage.setItem('instareport-theme', 'dark'); } catch(e) {}
+            }
+            syncThemeIcon();
+        }
+
+        function syncThemeIcon() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            ['themeIcon', 'themeIconDash'].forEach(id => {
+                const icon = document.getElementById(id);
+                if (!icon) return;
+                icon.classList.toggle('fa-moon', !isDark);
+                icon.classList.toggle('fa-sun', isDark);
+            });
+        }
 
         function handleRoleChange() {
             const role = document.getElementById('userRole').value;
@@ -322,7 +466,7 @@
                 'AM': ['VISIT EVIDENCE', 'AM TRAINING', 'AUDIT FORM', 'KPI DISCUSSION']
             };
             tasks[cat].forEach(t => {
-                list.innerHTML += `<button onclick="setupTask('${t}')" class="w-full bg-white p-6 rounded-[2rem] border text-left font-black flex justify-between items-center shadow-sm uppercase">${t} <i class="fas fa-chevron-right text-slate-200"></i></button>`;
+                list.innerHTML += `<button onclick="setupTask('${t}')" class="w-full bg-white p-6 rounded-2xl border border-slate-200 text-left font-black flex justify-between items-center shadow-sm uppercase">${t} <i class="fas fa-chevron-right text-slate-200"></i></button>`;
             });
         }
 
@@ -373,13 +517,13 @@
             const photoGrid = document.getElementById('photoGrid');
             container.innerHTML = ""; photoGrid.innerHTML = "";
             auditData.forEach(sec => {
-                let h = `<div class="audit-section"><h4 class="text-blue-600 font-black text-[10px] mb-4 border-b pb-2 uppercase tracking-widest">${sec.title}</h4>`;
+                let h = `<div class="audit-section"><h4 class="text-brand-600 font-black text-[10px] mb-4 border-b pb-2 uppercase tracking-widest">${sec.title}</h4>`;
                 sec.items.forEach(item => {
                     if(item.header) h += `<div class="mt-4 mb-2"><span class="text-[10px] font-black text-slate-400 uppercase">${item.n}</span></div>`;
                     else {
                         h += `<div class="py-3 border-b border-slate-50 last:border-0"><div class="flex justify-between items-center"><span class="text-xs font-black text-slate-600 pr-4">${item.n}</span><input type="checkbox" class="audit-check" onchange="calcAudit()"></div>`;
                         if(item.snap) {
-                            h += `<div class="photo-slot"><div class="preview-box"><i class="fas fa-camera text-slate-300"></i><img id="prev_${photoIdx}" class="hidden"></div><button onclick="document.getElementById('cam_${photoIdx}').click()" class="bg-blue-50 text-blue-600 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest">Snap Evidence</button><input type="file" id="cam_${photoIdx}" class="hidden" accept="image/*" capture="environment" onchange="handleImg(${photoIdx})"><input type="hidden" id="label_${photoIdx}" value="${item.n}"></div>`;
+                            h += `<div class="photo-slot"><div class="preview-box"><i class="fas fa-camera text-slate-300"></i><img id="prev_${photoIdx}" class="hidden"></div><button onclick="document.getElementById('cam_${photoIdx}').click()" class="bg-brand-50 text-brand-600 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest">Snap Evidence</button><input type="file" id="cam_${photoIdx}" class="hidden" accept="image/*" capture="environment" onchange="handleImg(${photoIdx})"><input type="hidden" id="label_${photoIdx}" value="${item.n}"></div>`;
                             photoIdx++;
                         }
                         h += `</div>`;
@@ -388,7 +532,7 @@
                 container.innerHTML += h + `</div>`;
             });
             const discItems = ["DISCUSSION WITH PIC", "Staff Challenges", "Ground feedback", "Event Plan & Update"];
-            let dHtml = `<div class="audit-section"><h4 class="text-blue-800 font-black text-[10px] mb-4 border-b pb-2 uppercase tracking-widest">Discussion</h4>`;
+            let dHtml = `<div class="audit-section"><h4 class="text-brand-800 font-black text-[10px] mb-4 border-b pb-2 uppercase tracking-widest">Discussion</h4>`;
             discItems.forEach((di, idx) => {
                 dHtml += `<div class="mb-4"><div class="flex justify-between items-center mb-2"><label class="text-[10px] font-black text-slate-500 uppercase">${di}</label><input type="checkbox" class="audit-check" onchange="calcAudit()"></div><textarea id="disc_${idx}" class="w-full p-4 rounded-2xl bg-slate-50 border-none font-bold text-sm h-24" placeholder="Type here..."></textarea></div>`;
             });
@@ -638,11 +782,7 @@
         function setTimeFilter(f) {
             timeFilter = f;
             document.querySelectorAll('.time-btn').forEach(b => {
-                const isSelected = b.id === `btn-${f}`;
-                b.classList.toggle('bg-blue-600', isSelected);
-                b.classList.toggle('text-white', isSelected);
-                b.classList.toggle('bg-white', !isSelected);
-                b.classList.toggle('text-slate-400', !isSelected);
+                b.classList.toggle('active', b.id === `btn-${f}`);
             });
             document.getElementById('subFilterContainer').classList.toggle('hidden', f === 'all');
             document.getElementById('periodSearch').value = "";
@@ -687,7 +827,10 @@
             const filtered = source.filter(s => {
                 const sDate = new Date(s.staffTime);
                 if (s.tabName !== liveSheet && s.tabName !== archiveSheet) return false;
-                const matchSearch = s.staff.toLowerCase().includes(q) || s.outlet.toLowerCase().includes(q) || s.task.toLowerCase().includes(q);
+                // Coerce to String first — some sheet cells (especially older/archived rows)
+                // can hold a number, blank, or other non-string type, which used to crash
+                // .toLowerCase() outright and break the whole search.
+                const matchSearch = String(s.staff || '').toLowerCase().includes(q) || String(s.outlet || '').toLowerCase().includes(q) || String(s.task || '').toLowerCase().includes(q);
                 if (!matchSearch) return false;
                 if (!isDateRangeMode && timeFilter !== 'all' && subVal !== 'current') {
                     if(timeFilter === 'year') return sDate.getFullYear().toString() === subVal;
@@ -795,11 +938,18 @@
                         const nameMatch = u.match(/\|([^._?]+)/);
                         if (nameMatch) label = decodeURIComponent(nameMatch[1]);
                     } catch(e) {}
-                    return { thumb: `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`, label: label };
+                    return {
+                        thumb: `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`,
+                        // Alternate Drive image endpoint used as a retry if the primary
+                        // thumbnail service fails/throttles (common when many images
+                        // load at once, which is why "some" photos go blank rather than all).
+                        fallback: `https://lh3.googleusercontent.com/d/${fileId}=w1000`,
+                        label: label
+                    };
                 });
 
                 const isArchived = (s.tabName || "").indexOf("Archive_") === 0;
-                const thumbList = processedUrls.map(p => p.thumb);
+                const thumbList = processedUrls.map(p => ({ src: p.thumb, fallback: p.fallback }));
                 const urlListStr = JSON.stringify(thumbList).replace(/"/g, "&quot;");
                 const auditCriteria = ["Planogram based on Category", "Store layout - LTR Logic", "Clean Shelves", "Price tag & colours", "Display Item", "Poison logbook", "License valid & displayed", "No expired products", "Temperature logs", "Storage FEFO", "No personal item in area"];
 
@@ -808,9 +958,9 @@
                     <div class="p-5 flex justify-between items-center" onclick="toggleCard(${s.rowId})">
                         <div class="flex-1">
                             <h4 class="font-black text-sm uppercase">${s.staff}</h4>
-                            <p class="text-[9px] font-black text-blue-600 uppercase tracking-tighter">${s.outlet} | ${s.staffTime}${isArchived ? ' <span class="text-orange-500">&bull; ARCHIVED</span>' : ''}</p>
+                            <p class="text-[9px] font-black text-brand-600 uppercase tracking-tighter">${s.outlet} | ${s.staffTime}${isArchived ? ' <span class="text-accent-500">&bull; ARCHIVED</span>' : ''}</p>
                             <div class="mt-2 flex items-center gap-2">
-                                <span class="bg-blue-600 text-white text-[8px] font-black px-2 py-0.5 rounded uppercase">${s.task}</span>
+                                <span class="bg-brand-600 text-white text-[8px] font-black px-2 py-0.5 rounded uppercase">${s.task}</span>
                                 <i class="fas fa-chevron-right text-slate-300 text-[8px]"></i>
                                 <span class="text-slate-700 text-[9px] font-black uppercase truncate">${subTaskPath}</span>
                             </div>
@@ -834,11 +984,11 @@
                                     return `
                                     <div class="detail-line">
                                         <div class="flex items-center gap-2 mb-2">
-                                            <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                                            <div class="w-1.5 h-1.5 rounded-full bg-brand-500"></div>
                                             <span class="text-[9px] font-black text-slate-700 uppercase tracking-tight">${displayLabel}</span>
                                         </div>
                                         <div class="h-48 w-full rounded-2xl overflow-hidden border border-white shadow-md bg-white">
-                                            <img src="${p.thumb}" class="w-full h-full object-cover" onclick="openGallery(${urlListStr}, ${idx})">
+                                            <img src="${p.thumb}" data-fallback="${p.fallback}" onerror="handleImgError(this)" loading="lazy" class="w-full h-full object-cover" onclick="openGallery(${urlListStr}, ${idx})">
                                         </div>
                                     </div>`;
                                 }).join('')}
@@ -857,18 +1007,39 @@
             document.getElementById(`card_${id}`).classList.toggle('open');
         }
 
-        function openGallery(urls, startIndex) {
+        function openGallery(items, startIndex) {
             const overlay = document.getElementById('galleryOverlay');
             const content = document.getElementById('galleryContent');
             content.innerHTML = "";
-            urls.forEach((u, i) => { content.innerHTML += `<div class="gallery-full-img"><img src="${u}"></div>`; });
+            items.forEach((item, i) => {
+                content.innerHTML += `<div class="gallery-full-img"><img src="${item.src}" data-fallback="${item.fallback}" onerror="handleImgError(this)"></div>`;
+            });
             overlay.style.display = "flex";
-            document.getElementById('galleryCounter').innerText = `${startIndex + 1} / ${urls.length}`;
+            document.getElementById('galleryCounter').innerText = `${startIndex + 1} / ${items.length}`;
             setTimeout(() => { content.scrollLeft = content.clientWidth * startIndex; }, 50);
             content.onscroll = () => {
                 const index = Math.round(content.scrollLeft / content.clientWidth);
-                document.getElementById('galleryCounter').innerText = `${index + 1} / ${urls.length}`;
+                document.getElementById('galleryCounter').innerText = `${index + 1} / ${items.length}`;
             };
+        }
+
+        // Shared by feed thumbnails and the fullscreen gallery: if the primary Drive
+        // thumbnail fails to load (throttling, indexing delay, etc.), retry once with
+        // an alternate Drive image endpoint. If that also fails, show a clear
+        // "unavailable" placeholder instead of leaving a broken/blank image.
+        function handleImgError(imgEl) {
+            const fallback = imgEl.dataset.fallback;
+            if (fallback && imgEl.getAttribute('data-tried-fallback') !== 'true') {
+                imgEl.setAttribute('data-tried-fallback', 'true');
+                imgEl.src = fallback;
+                return;
+            }
+            imgEl.onerror = null;
+            imgEl.style.display = 'none';
+            const parent = imgEl.parentElement;
+            if (parent && !parent.querySelector('.img-error-placeholder')) {
+                parent.insertAdjacentHTML('beforeend', '<div class="img-error-placeholder h-full w-full flex flex-col items-center justify-center gap-2 bg-slate-100 text-slate-400 text-[9px] font-black uppercase"><i class="fas fa-image text-lg"></i>Photo Unavailable</div>');
+            }
         }
 
         function closeGallery() { document.getElementById('galleryOverlay').style.display = "none"; }
