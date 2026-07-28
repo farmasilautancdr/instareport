@@ -1,7 +1,7 @@
 {
-  "name": "InstaReport v3.8",
+  "name": "InstaReport v4.0",
   "short_name": "InstaReport",
-  "description": "Enterprise Submission Portal",
+  "description": "Field reports, audits, and photo evidence for outlet staff",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#F5F4F0",
