@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>InstaReport — Internal Report Manager v3.8</title>
+    <title>InstaReport — Internal Report Manager v4.0</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0B6870">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -16,7 +16,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         /* ============================================================
-           InstaReport v3.8 — Design tokens
+           InstaReport v4.0 — Design tokens
            A field-audit tool built around inspection tags, evidence
            photos and scored checklists. The palette is petrol teal
            (compliance/clinical) + mustard gold (retail shelf-tag,
@@ -210,7 +210,7 @@
     <div id="uploadSpinner"></div>
     <div id="successOverlay" class="hidden fixed inset-0 bg-white/95 z-[10000] flex flex-col items-center justify-center text-center">
         <div class="w-20 h-20 bg-success-500 rounded-full flex items-center justify-center text-white text-4xl shadow-xl animate-bounce"><i class="fas fa-check"></i></div>
-        <h2 class="text-2xl font-black mt-6 tracking-tight uppercase px-6">Upload Successful</h2>
+        <h2 class="text-2xl font-black mt-6 tracking-tight uppercase px-6">Report Submitted</h2>
     </div>
 
     <div id="galleryOverlay">
@@ -229,11 +229,11 @@
             </button>
             <p class="font-mono text-[10px] tracking-[0.2em] text-brand-100 uppercase mb-1">Field Operations</p>
             <h1 class="font-display text-4xl font-bold tracking-tight">InstaReport</h1>
-            <p class="font-mono text-[10px] tracking-widest uppercase text-brand-100 mt-2">Internal Report Manager <span class="text-accent-500">(v3.8)</span></p>
+            <p class="font-mono text-[10px] tracking-widest uppercase text-brand-100 mt-2">Internal Report Manager <span class="text-accent-500">(v4.0)</span></p>
         </header>
         <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-6">
             <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Access Role</label>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Role</label>
                 <select id="userRole" onchange="handleRoleChange()" class="w-full mt-1.5 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-slate-700">
                     <option value="Staff">Staff Member</option>
                     <option value="Area Manager">Area Manager (AM)</option>
@@ -241,12 +241,12 @@
             </div>
             <div>
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
-                <input type="text" id="staffName" class="w-full mt-1.5 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold" placeholder="Required">
+                <input type="text" id="staffName" class="w-full mt-1.5 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold" placeholder="Your full name">
             </div>
             <div id="amRegionContainer" class="hidden">
                 <label class="text-[10px] font-black text-brand-400 uppercase tracking-widest ml-1">AM Region</label>
                 <select id="amRegion" onchange="updateOutletList()" class="w-full mt-1.5 p-4 bg-brand-50 border border-brand-100 rounded-2xl outline-none font-black text-brand-700">
-                    <option value="">Select Region...</option>
+                    <option value="">Choose Region</option>
                     <option value="R1">R1 - AMIRUL</option><option value="R2">R2 - HAZWANI</option>
                     <option value="R3">R3 - HARIS</option><option value="R4">R4 - RAIHAN</option>
                     <option value="R5">R5 - ADNIN</option><option value="R6">R6 - NADHIRAH</option>
@@ -255,14 +255,14 @@
                 </select>
             </div>
             <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Select Outlet</label>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Outlet</label>
                 <select id="outletName" class="w-full mt-1.5 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold"></select>
             </div>
             <div>
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Reporting Date</label>
                 <input type="date" id="reportDate" class="w-full mt-1.5 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-brand-600">
             </div>
-            <button onclick="navTo(2)" class="w-full bg-accent-500 text-brand-900 font-display font-bold py-5 rounded-2xl shadow-xl active:scale-95 transition-all">DASHBOARD <i class="fas fa-arrow-right ml-2"></i></button>
+            <button onclick="navTo(2)" class="w-full bg-accent-500 text-brand-900 font-display font-bold py-5 rounded-2xl shadow-xl active:scale-95 transition-all">CONTINUE <i class="fas fa-arrow-right ml-2"></i></button>
         </div>
     </div>
 
@@ -333,7 +333,7 @@
         </nav>
         <div id="filtersDrawer" class="filters-drawer bg-white rounded-3xl shadow-sm border border-slate-100 mb-6">
             <div class="space-y-3 p-5">
-                <input type="text" id="dashSearch" onkeyup="filterFeed()" placeholder="Search Name/Outlet..." class="w-full p-4 bg-slate-50 rounded-2xl text-sm font-bold outline-none border border-slate-100">
+                <input type="text" id="dashSearch" onkeyup="filterFeed()" placeholder="Search by name or outlet" class="w-full p-4 bg-slate-50 rounded-2xl text-sm font-bold outline-none border border-slate-100">
                 <div class="grid grid-cols-4 gap-2">
                     <button id="btn-all" onclick="setTimeFilter('all')" class="time-btn active border p-2 rounded-lg text-[8px] font-black uppercase">ALL</button>
                     <button id="btn-week" onclick="setTimeFilter('week')" class="time-btn border p-2 rounded-lg text-[8px] font-black uppercase">Week</button>
@@ -343,7 +343,7 @@
                 <div id="subFilterContainer" class="hidden space-y-2 bg-slate-50 p-3 rounded-2xl border border-slate-100">
                     <div class="relative">
                         <i class="fas fa-search absolute left-3 top-3.5 text-slate-300 text-xs"></i>
-                        <input type="text" id="periodSearch" onkeyup="searchPeriods()" placeholder="Search period..." class="w-full pl-8 p-3 bg-white rounded-xl text-xs font-bold border border-slate-100 outline-none">
+                        <input type="text" id="periodSearch" onkeyup="searchPeriods()" placeholder="Search period" class="w-full pl-8 p-3 bg-white rounded-xl text-xs font-bold border border-slate-100 outline-none">
                     </div>
                     <select id="subFilterSelect" onchange="filterFeed()" class="w-full p-3 bg-white rounded-xl text-xs font-bold border border-slate-100 outline-none"></select>
                 </div>
@@ -363,7 +363,7 @@
         <div id="feedStatus" class="hidden text-center text-[10px] font-black uppercase tracking-widest text-slate-400 py-3"></div>
         <div id="feedList" class="space-y-4"></div>
         <button id="loadMoreBtn" onclick="loadMore()" class="hidden w-full mt-4 py-4 bg-white border border-slate-200 rounded-2xl text-[10px] font-black uppercase text-brand-600 shadow-sm">
-            Load More (currently showing last <span id="loadMoreCount">200</span> per portal)
+            Load More (showing last <span id="loadMoreCount">200</span> per portal)
         </button>
         <div id="bulkBar" class="hidden">
             <div class="flex items-center gap-3">
@@ -459,8 +459,8 @@
                 const role = document.getElementById('userRole').value;
                 const name = document.getElementById('staffName').value;
                 const region = document.getElementById('amRegion').value;
-                if(!name) return alert("Please enter your name.");
-                if(role === "Area Manager" && !region) return alert("Area Managers must select an AM Region to proceed.");
+                if(!name) return alert("Enter your name to continue.");
+                if(role === "Area Manager" && !region) return alert("Select your AM Region to continue.");
 
                 const isAM = role === "Area Manager";
                 document.getElementById('menu_outlet').classList.toggle('hidden', isAM);
@@ -477,7 +477,7 @@
 
         function openCategory(cat) {
             if(cat === 'AM' && !isAmAuthenticated) {
-                if(prompt("Security: Enter AM PIN") === AM_PASS) isAmAuthenticated = true;
+                if(prompt("Enter AM PIN") === AM_PASS) isAmAuthenticated = true;
                 else return;
             }
             currentCat = cat;
@@ -503,29 +503,29 @@
             document.getElementById('auditScoreBox').classList.add('hidden');
             navTo(4);
             if(task === 'TRAINING' || task === 'VISIT EVIDENCE' || task === 'AM TRAINING') {
-                form.innerHTML = `<input type="text" id="taskSub" class="w-full p-4 rounded-2xl border font-bold" placeholder="Topic / Title"><textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="Notes..."></textarea>`;
+                form.innerHTML = `<input type="text" id="taskSub" class="w-full p-4 rounded-2xl border font-bold" placeholder="e.g. New product briefing"><textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="Any notes for this session"></textarea>`;
                 initPhotos(4);
             } else if(task === 'PLANOGRAM' || task === 'ALL PRODUCTS') {
                 const opts = task === 'PLANOGRAM' ? planogramTasks : productsList;
                 let s = `<select id="subTask" class="w-full p-4 rounded-2xl border font-bold bg-slate-50 appearance-none">`;
                 opts.forEach(o => s += `<option value="${o}">${o}</option>`);
-                form.innerHTML = s + `</select><textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="Remarks..."></textarea>`;
+                form.innerHTML = s + `</select><textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="What did you check?"></textarea>`;
                 initPhotos(8);
             } else if(task === 'COLLABORATION' || task === 'DISPLAY (INFORMED BY MARKETING)' || task === 'CLEARANCE' || task === 'PWP') {
-                form.innerHTML = `<input type="text" id="taskSub" class="w-full p-4 rounded-2xl border font-bold" placeholder="Subject / Brand"><textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="Details..."></textarea>`;
+                form.innerHTML = `<input type="text" id="taskSub" class="w-full p-4 rounded-2xl border font-bold" placeholder="e.g. Colgate CNY Promo"><textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="Describe the activity"></textarea>`;
                 initPhotos(8);
             } else if(task === 'AUDIT FORM') {
                 document.getElementById('auditScoreBox').classList.remove('hidden');
                 buildAuditForm(form);
             } else if(task === 'KPI DISCUSSION') {
                 form.innerHTML = `<div class="space-y-4">
-                    <div class="bg-white p-5 rounded-3xl border"><label class="text-[9px] font-black text-slate-400 uppercase">PROGRESSION</label><textarea id="kpi1" class="w-full mt-2 h-24 outline-none font-bold text-sm"></textarea></div>
-                    <div class="bg-white p-5 rounded-3xl border"><label class="text-[9px] font-black text-slate-400 uppercase">LIMITATIONS</label><textarea id="kpi2" class="w-full mt-2 h-24 outline-none font-bold text-sm"></textarea></div>
-                    <div class="bg-white p-5 rounded-3xl border"><label class="text-[9px] font-black text-slate-400 uppercase">ACTION PLAN</label><textarea id="kpi3" class="w-full mt-2 h-24 outline-none font-bold text-sm"></textarea></div>
+                    <div class="bg-white p-5 rounded-3xl border"><label class="text-[9px] font-black text-slate-400 uppercase">PROGRESSION</label><textarea id="kpi1" class="w-full mt-2 h-24 outline-none font-bold text-sm" placeholder="What's improved since the last visit?"></textarea></div>
+                    <div class="bg-white p-5 rounded-3xl border"><label class="text-[9px] font-black text-slate-400 uppercase">LIMITATIONS</label><textarea id="kpi2" class="w-full mt-2 h-24 outline-none font-bold text-sm" placeholder="What's holding the outlet back?"></textarea></div>
+                    <div class="bg-white p-5 rounded-3xl border"><label class="text-[9px] font-black text-slate-400 uppercase">ACTION PLAN</label><textarea id="kpi3" class="w-full mt-2 h-24 outline-none font-bold text-sm" placeholder="What are we doing about it, and by when?"></textarea></div>
                 </div>`;
                 initPhotos(0);
             } else {
-                form.innerHTML = `<input type="text" id="taskSub" class="w-full p-4 rounded-2xl border font-bold bg-slate-50" placeholder="Topic Title"><textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="Notes..."></textarea>`;
+                form.innerHTML = `<input type="text" id="taskSub" class="w-full p-4 rounded-2xl border font-bold bg-slate-50" placeholder="e.g. New product briefing"><textarea id="remarks" class="w-full p-4 rounded-2xl border h-28 font-bold" placeholder="Any notes for this session"></textarea>`;
                 initPhotos(8);
             }
         }
@@ -559,9 +559,15 @@
                 container.innerHTML += h + `</div>`;
             });
             const discItems = ["DISCUSSION WITH PIC", "Staff Challenges", "Ground feedback", "Event Plan & Update"];
+            const discPlaceholders = [
+                "What did you discuss with the person in charge?",
+                "Any challenges the team is facing right now?",
+                "What's the on-the-ground feedback from staff or customers?",
+                "Any upcoming events, promos, or changes to flag?"
+            ];
             let dHtml = `<div class="audit-section"><h4 class="text-brand-800 font-black text-[10px] mb-4 border-b pb-2 uppercase tracking-widest">Discussion</h4>`;
             discItems.forEach((di, idx) => {
-                dHtml += `<div class="mb-4"><div class="flex justify-between items-center mb-2"><label class="text-[10px] font-black text-slate-500 uppercase">${di}</label><input type="checkbox" class="audit-check" onchange="calcAudit()"></div><textarea id="disc_${idx}" class="w-full p-4 rounded-2xl bg-slate-50 border-none font-bold text-sm h-24" placeholder="Type here..."></textarea></div>`;
+                dHtml += `<div class="mb-4"><div class="flex justify-between items-center mb-2"><label class="text-[10px] font-black text-slate-500 uppercase">${di}</label><input type="checkbox" class="audit-check" onchange="calcAudit()"></div><textarea id="disc_${idx}" class="w-full p-4 rounded-2xl bg-slate-50 border-none font-bold text-sm h-24" placeholder="${discPlaceholders[idx]}"></textarea></div>`;
             });
             container.innerHTML += dHtml + `</div>`;
         }
@@ -570,7 +576,7 @@
             const grid = document.getElementById('photoGrid');
             grid.innerHTML = "";
             for(let i=0; i<count; i++) {
-                grid.innerHTML += `<div class="photo-slot"><div class="preview-box"><i class="fas fa-camera text-slate-300"></i><img id="prev_${i}" class="hidden"></div><input type="text" id="label_${i}" class="p-3 text-xs font-black border-b border-dashed outline-none" placeholder="Description"><button onclick="document.getElementById('cam_${i}').click()" class="bg-slate-100 py-3 rounded-xl text-[9px] font-black uppercase">Open Camera</button><input type="file" id="cam_${i}" class="hidden" accept="image/*" capture="environment" onchange="handleImg(${i})"></div>`;
+                grid.innerHTML += `<div class="photo-slot"><div class="preview-box"><i class="fas fa-camera text-slate-300"></i><img id="prev_${i}" class="hidden"></div><input type="text" id="label_${i}" class="p-3 text-xs font-black border-b border-dashed outline-none" placeholder="e.g. Shelf restocked"><button onclick="document.getElementById('cam_${i}').click()" class="bg-slate-100 py-3 rounded-xl text-[9px] font-black uppercase">Take Photo</button><input type="file" id="cam_${i}" class="hidden" accept="image/*" capture="environment" onchange="handleImg(${i})"></div>`;
             }
         }
 
@@ -625,16 +631,16 @@
                     const base64Data = img.src.split(',')[1];
                     images.push(base64Data);
                     const lblInput = document.getElementById('label_'+i);
-                    const labelValue = lblInput ? (lblInput.value || 'Evidence') : 'Evidence';
+                    const labelValue = lblInput ? (lblInput.value || 'Evidence Photo') : 'Evidence Photo';
                     photoNames.push(`${currentTask}|${labelValue}`);
                 }
             });
 
             if(currentTask === 'AUDIT FORM') {
-                if(document.querySelectorAll('.audit-check:checked').length === 0) return alert("Select at least one achievement.");
-                if(images.length < 11) return alert("Audit Form requires 11 snap evidences.");
+                if(document.querySelectorAll('.audit-check:checked').length === 0) return alert("Check off at least one item before submitting.");
+                if(images.length < 11) return alert("This audit needs all 11 photos before you can submit.");
             } else if(currentTask !== 'KPI DISCUSSION' && images.length === 0) {
-                return alert("Please capture at least one photo.");
+                return alert("Add at least one photo before submitting.");
             }
 
             blocker.style.display = "block"; btn.disabled = true; btnText.style.display = "none"; btnLoader.style.display = "block";
@@ -801,12 +807,12 @@
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-            } catch (e) { alert("PDF Error"); } finally { blocker.style.display = "none"; }
+            } catch (e) { alert("Couldn't generate the PDF. Try again."); } finally { blocker.style.display = "none"; }
         }
 
         async function downloadBulk(btn) {
             const selected = Array.from(document.querySelectorAll('.report-checkbox:checked')).map(cb => cb.value);
-            if (selected.length === 0) return alert("Please select at least one report.");
+            if (selected.length === 0) return alert("Select at least one report first.");
             const blocker = document.getElementById('uploadSpinner');
             blocker.style.display = "block";
             try {
@@ -818,7 +824,7 @@
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-            } catch (e) { alert("Bulk PDF Failed."); } finally { blocker.style.display = "none"; }
+            } catch (e) { alert("Couldn't generate the combined PDF. Try again."); } finally { blocker.style.display = "none"; }
         }
 
         function toggleFiltersDrawer() {
@@ -936,8 +942,8 @@
         async function searchDateRange() {
             const start = document.getElementById('rangeStart').value;
             const end = document.getElementById('rangeEnd').value;
-            if (!start || !end) return alert("Please select both a start and end date.");
-            if (start > end) return alert("Start date must be before end date.");
+            if (!start || !end) return alert("Pick both a start and end date.");
+            if (start > end) return alert("Start date needs to be before the end date.");
 
             const statusEl = document.getElementById('feedStatus');
             const syncIcon = document.getElementById('syncIcon');
@@ -1026,8 +1032,14 @@
                     const fileId = u.split("id=")[1]?.split("&")[0] || "";
                     let label = "Evidence Photo";
                     try {
-                        const nameMatch = u.match(/\|([^._?]+)/);
-                        if (nameMatch) label = decodeURIComponent(nameMatch[1]);
+                        // FIX (v4.0): previously looked for a "|" character inside the
+                        // Drive URL itself — but a Drive file URL structurally never
+                        // contains that, so this always fell through to the generic
+                        // fallback regardless of what description was actually typed.
+                        // The backend now sends the real description as a proper
+                        // "&label=" parameter (see Code.gs buildPhotoUrls).
+                        const labelMatch = u.match(/[?&]label=([^&]*)/);
+                        if (labelMatch && labelMatch[1]) label = decodeURIComponent(labelMatch[1]);
                     } catch(e) {}
                     return {
                         thumb: `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`,
@@ -1086,7 +1098,7 @@
                             </div>
 
                             <button onclick="downloadIndividualPDF(${s.rowId}, '${targetTab}')" class="w-full mt-2 py-3 bg-white border border-slate-200 rounded-2xl text-[9px] font-black uppercase text-slate-400 shadow-sm">
-                                <i class="fas fa-file-pdf mr-1 text-red-400"></i> Generate Official Neat PDF
+                                <i class="fas fa-file-pdf mr-1 text-red-400"></i> Download PDF Report
                             </button>
                         </div>
                     </div>
