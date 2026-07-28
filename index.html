@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>InstaReport — Internal Report Manager v3.7</title>
+    <title>InstaReport — Internal Report Manager v3.8</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0B6870">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -16,7 +16,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         /* ============================================================
-           InstaReport v3.7 — Design tokens
+           InstaReport v3.8 — Design tokens
            A field-audit tool built around inspection tags, evidence
            photos and scored checklists. The palette is petrol teal
            (compliance/clinical) + mustard gold (retail shelf-tag,
@@ -103,6 +103,13 @@
             background-position: right 16px center;
             background-size: 16px;
             padding-right: 40px;
+        }
+        /* The arrow above is a static SVG data-URI, so it can't read CSS
+           variables — without this override it would stay light-mode teal
+           (#0B6870) even in dark mode, duller than every other themed
+           element. This swaps in the actual dark-mode brand-600 hex. */
+        [data-theme="dark"] select {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232C978C' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
         }
         input[type="date"] { -webkit-appearance: none; appearance: none; }
         button, .menu-card, .photo-slot button, .tab-btn, .time-btn { touch-action: manipulation; }
@@ -222,7 +229,7 @@
             </button>
             <p class="font-mono text-[10px] tracking-[0.2em] text-brand-100 uppercase mb-1">Field Operations</p>
             <h1 class="font-display text-4xl font-bold tracking-tight">InstaReport</h1>
-            <p class="font-mono text-[10px] tracking-widest uppercase text-brand-100 mt-2">Internal Report Manager <span class="text-accent-500">(v3.7)</span></p>
+            <p class="font-mono text-[10px] tracking-widest uppercase text-brand-100 mt-2">Internal Report Manager <span class="text-accent-500">(v3.8)</span></p>
         </header>
         <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-6">
             <div>
@@ -532,6 +539,7 @@
                 {title: "Operational Compliance", items: [{n: "Poison logbook", snap: true}, {n: "License valid & displayed", snap: true}, {n: "No expired products", snap: true}, {n: "Temperature logs", snap: true}, {n: "Storage FEFO", snap: true}, {n: "No personal item in area", snap: true}]}
             ];
             let photoIdx = 0;
+            let criteriaIdx = 0; // flat index across all 42 non-header criteria, in display order — must match Code.gs's allCriteria order exactly
             const photoGrid = document.getElementById('photoGrid');
             container.innerHTML = ""; photoGrid.innerHTML = "";
             auditData.forEach(sec => {
@@ -539,7 +547,8 @@
                 sec.items.forEach(item => {
                     if(item.header) h += `<div class="mt-4 mb-2"><span class="text-[10px] font-black text-slate-400 uppercase">${item.n}</span></div>`;
                     else {
-                        h += `<div class="py-3 border-b border-slate-50 last:border-0"><div class="flex justify-between items-center"><span class="text-xs font-black text-slate-600 pr-4">${item.n}</span><input type="checkbox" class="audit-check" onchange="calcAudit()"></div>`;
+                        h += `<div class="py-3 border-b border-slate-50 last:border-0"><div class="flex justify-between items-center"><span class="text-xs font-black text-slate-600 pr-4">${item.n}</span><input type="checkbox" class="audit-check" data-idx="${criteriaIdx}" onchange="calcAudit()"></div>`;
+                        criteriaIdx++;
                         if(item.snap) {
                             h += `<div class="photo-slot"><div class="preview-box"><i class="fas fa-camera text-slate-300"></i><img id="prev_${photoIdx}" class="hidden"></div><button onclick="document.getElementById('cam_${photoIdx}').click()" class="bg-brand-50 text-brand-600 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest">Snap Evidence</button><input type="file" id="cam_${photoIdx}" class="hidden" accept="image/*" capture="environment" onchange="handleImg(${photoIdx})"><input type="hidden" id="label_${photoIdx}" value="${item.n}"></div>`;
                             photoIdx++;
@@ -632,6 +641,7 @@
 
             // PACKAGING REMARKS
             let rem = "";
+            let auditChecks = null; // per-item checked state (42 booleans, in the same order as Code.gs's allCriteria) — only populated for AUDIT FORM
             if (currentTask === 'KPI DISCUSSION') {
                 const p = document.getElementById('kpi1').value;
                 const l = document.getElementById('kpi2').value;
@@ -641,6 +651,11 @@
                 const discItems = ["DISCUSSION WITH PIC", "Staff Challenges", "Ground feedback", "Event Plan & Update"];
                 let discStr = discItems.map((di, idx) => `${di}: ${document.getElementById('disc_'+idx).value}`).join(" | ");
                 rem = `SCORE: ${document.getElementById('currentScore').innerText}/46 | ${discStr}`;
+
+                auditChecks = [];
+                document.querySelectorAll('.audit-check[data-idx]').forEach(cb => {
+                    auditChecks[parseInt(cb.dataset.idx)] = cb.checked;
+                });
             } else {
                 const subName = document.getElementById('taskSub')?.value || document.getElementById('subTask')?.value || "General";
                 rem = `TASK: ${subName} | REMARKS: ${document.getElementById('remarks')?.value || 'N/A'}`;
@@ -655,7 +670,8 @@
                     remarks: rem,
                     staffTime: document.getElementById('reportDate').value,
                     images: images,
-                    photoNames: photoNames
+                    photoNames: photoNames,
+                    auditChecks: auditChecks
                 };
                 const r = await fetchWithTimeout(SCRIPT_URL, 60000, {
                     method: "POST",
@@ -834,6 +850,18 @@
         }
 
         function setTimeFilter(f) {
+            if (isDateRangeMode) {
+                // Quick filters and custom date range are mutually exclusive modes.
+                // Previously, clicking a quick filter while a date-range search was
+                // active would visually highlight the button but have zero effect on
+                // the results (filterFeed ignores timeFilter while isDateRangeMode is
+                // true) — misleading UI state. Exiting date-range mode here makes the
+                // clicked filter actually take effect, as the UI implies it should.
+                isDateRangeMode = false;
+                dateRangeSubmissions = [];
+                document.getElementById('clearRangeBtn').classList.add('hidden');
+                document.getElementById('feedStatus').classList.add('hidden');
+            }
             timeFilter = f;
             document.querySelectorAll('.time-btn').forEach(b => {
                 b.classList.toggle('active', b.id === `btn-${f}`);
@@ -929,6 +957,11 @@
                 dateRangeSubmissions = d.submissions || [];
                 isDateRangeMode = true;
                 document.getElementById('clearRangeBtn').classList.remove('hidden');
+                // Quick filters don't apply in date-range mode (see setTimeFilter) —
+                // reset their visual state to ALL so nothing stale looks selected.
+                document.querySelectorAll('.time-btn').forEach(b => b.classList.toggle('active', b.id === 'btn-all'));
+                document.getElementById('subFilterContainer').classList.add('hidden');
+                timeFilter = 'all';
 
                 if (d.truncated) {
                     statusEl.classList.remove('hidden');
@@ -956,7 +989,9 @@
             document.getElementById('rangeStart').value = "";
             document.getElementById('rangeEnd').value = "";
             document.getElementById('feedStatus').classList.add('hidden');
-            filterFeed();
+            // Reset quick filters to a known state (ALL) rather than leaving whatever
+            // was clicked while date-range mode was active — see setTimeFilter fix.
+            setTimeFilter('all');
         }
 
         // --- ENHANCED DEEP SCAN COLLAPSIBLE RENDERER ---
